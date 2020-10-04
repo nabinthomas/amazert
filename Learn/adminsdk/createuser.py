@@ -5,7 +5,7 @@ import json
 userEmail = "nabin@test.com"
 password = "amazert"
 firebaseConfig = {
-    "apiKey": "AIzaSyBoNiOEg2atuC_Js5_lvue9hhVXeD4SQ1k",
+    "apiKey": "AIzaSyANijXaYG0hKZJNtilFguMv_RwMmFAvkkE",
     "authDomain": "amazert.firebaseapp.com",
     "databaseURL": "https://amazert.firebaseio.com",
     "projectId": "amazert",
@@ -17,26 +17,27 @@ firebaseConfig = {
 
 firebase = pyrebase.initialize_app(firebaseConfig);
 
-authSuccess = False
 
+userCreated = False
 print ("Attempting...")
 try:
   auth = firebase.auth(); 
-  user = auth.sign_in_with_email_and_password(userEmail, password);
-
+  user = auth.create_user_with_email_and_password(userEmail, password);
   accountInfo = auth.get_account_info(user['idToken']);
-  print ("ID TOken is ", user['idToken'])
-  print ("Acc Info: " , accountInfo);
-  authSuccess = True
+  print ("User created Account : ", accountInfo);  authCompleted = True;
+  userCreated = True
 except requests.exceptions.HTTPError as e:
   error_json = e.args[1]
   error = json.loads(error_json)['error']
   print ("Error :" , error);
   
-print ("End of Auth Attempt")
+print ("End of User Creation")
 
 # Result
-if authSuccess == True: 
-  print ("User " + userEmail + " was authenticated successfully")
+if userCreated == True: 
+  print ("User " + userEmail + " was created successfully")
 else:
-  print ("Failed to authenticate user " + userEmail )
+  print ("Failed to create user " + userEmail )
+
+
+
