@@ -23,3 +23,4 @@ make # Builds the package
 
 make commit #commits the built package so that it can be checked in, and used by the Android App later
 
+The package amazert/amazert.pkg will be packaged with the android app for installing during the initial setup
