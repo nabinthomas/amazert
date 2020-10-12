@@ -5,7 +5,7 @@ import json
 userEmail = "nabin@test.com"
 password = "amazert"
 firebaseConfigFile = open("firebase.json")
-firebaseConfig = json.load(firebaseConfigFile);
+firebaseConfig = json.load(firebaseConfigFile);t
 firebase = pyrebase.initialize_app(firebaseConfig);
 
 authSuccess = False
