@@ -4,17 +4,8 @@ import json
 
 userEmail = "nabin@test.com"
 password = "amazert"
-firebaseConfig = {
-    "apiKey": "AIzaSyANijXaYG0hKZJNtilFguMv_RwMmFAvkkE",
-    "authDomain": "amazert.firebaseapp.com",
-    "databaseURL": "https://amazert.firebaseio.com",
-    "projectId": "amazert",
-    "storageBucket": "amazert.appspot.com",
-    "messagingSenderId": "447659316293",
-    "appId": "1:447659316293:web:80afbfe74c0d6218ab7f2c",
-    "measurementId": "G-XQXW3T2PK9"
-  };
-
+firebaseConfigFile = open("firebase.json")
+firebaseConfig = json.load(firebaseConfigFile);
 firebase = pyrebase.initialize_app(firebaseConfig);
 
 
