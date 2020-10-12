@@ -24,3 +24,4 @@ make # Builds the package
 make commit #commits the built package so that it can be checked in, and used by the Android App later
 
 The package amazert/amazert.pkg will be packaged with the android app for installing during the initial setup
+The App will copy this file to the OpenWRT router, extract, and run install.sh in it. The install.sh script can be customized to copy the other app files to required locations, do the initial setup, and start the amazeRT Management Service
