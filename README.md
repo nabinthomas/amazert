@@ -18,6 +18,8 @@ Makefile - used to build and package the services running on the router
 3. Following commands can bne used to build 
 
 cd amazert
+
 make # Builds the package
+
 make commit #commits the built package so that it can be checked in, and used by the Android App later
 
