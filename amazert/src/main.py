@@ -5,20 +5,28 @@
 
 import asyncio
 import pathlib
-#import ssl
+import ssl
+import threading
 import websockets
 import time
 
 keepRunning = True
 
-async def amazeRTHeartbeat(websocket):
-    while (keepRunning == True):
-        message = '{ "action" : "register"}'
-        print(f"> {message}")
-        await websocket.send(message)
-        #time.sleep(10)
-        asyncio.get_event_loop().call_later(10, )
-        #asyncio.sleep(10)
+def amazeRTHeartbeat(websocket):
+    #while (keepRunning == True):
+    message = '{ "action" : "register"}'
+    print(f"> {message}")
+    websocket.send(message)
+    
+
+class amazeRTHeartBeatThread(threading.Thread):
+    def __init__(self, websocket):
+        threading.Thread.__init__(self)
+        self.websocket = websocket
+    def run(self):
+        while (keepRunning == True):
+            amazeRTHeartbeat(self.websocket)    
+            time.sleep(10)
 
 async def amazeRTCommandHandler(websocket):
     print ("amazeRTCommandHandler start ")
@@ -34,10 +42,12 @@ async def amazeRTServiceMain():
     async with websockets.connect(
         uri #, ssl=ssl_context
     ) as websocket:
+        hearbeatThread = amazeRTHeartBeatThread(websocket)
+        hearbeatThread.start()
         await asyncio.gather(
-            amazeRTCommandHandler(websocket)#,
-            #amazeRTHeartbeat(websocket)
-            )
+           amazeRTCommandHandler(websocket)
+        )
+        hearbeatThread.join()
             
 
 print ("Starting amazeRT Management system\n")
