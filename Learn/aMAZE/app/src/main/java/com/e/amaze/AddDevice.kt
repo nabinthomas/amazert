@@ -30,25 +30,33 @@ class AddDevice : AppCompatActivity() {
         val deviceDetails = findViewById<EditText>(R.id.deviceDetails)
         var output:String = "None"
 
-        class SftpTask : AsyncTask<Void, Void, String>() {
-            override fun doInBackground(vararg p0: Void?): String {
-                output = executeCopyCommand(userName.text.toString(), passwd.text.toString(), deviceIP.text.toString())
-                print(output)
-                return output
-            }
-        }
-
-        SftpTask().execute()
-
         class SshTask : AsyncTask<Void, Void, String>() {
             override fun doInBackground(vararg p0: Void?): String {
                 output = executeRemoteCommand(userName.text.toString(), passwd.text.toString(), deviceIP.text.toString())
                 print(output)
                 return output
             }
+
+            override fun onPostExecute(result: String) {
+                deviceDetails.setText(output.toString())
+            }
         }
-        SshTask().execute()
-        deviceDetails.setText(output.toString())
+
+        class SftpTask : AsyncTask<Void, Void, String>() {
+            override fun doInBackground(vararg p0: Void?): String {
+                output = executeCopyCommand(userName.text.toString(), passwd.text.toString(), deviceIP.text.toString())
+                print(output)
+                return output
+            }
+
+            override fun onPostExecute(result: String) {
+                deviceDetails.setText(output.toString())
+                SshTask().execute()
+            }
+        }
+
+        SftpTask().execute()
+
     }
 
 }
