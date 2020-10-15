@@ -60,15 +60,19 @@ async def connectionHandler(websocket, path):
         async for message in websocket:
             print ("message = " + message)
             data = json.loads(message)
-            if data["action"] == "minus":
-                STATE["value"] -= 1
-                await notify_state()
-            elif data["action"] == "plus":
-                STATE["value"] += 1
-                await notify_state()
-            else:
+            try: 
+                if data["action"] == "minus":
+                    STATE["value"] -= 1
+                    await notify_state()
+                elif data["action"] == "plus":
+                    STATE["value"] += 1
+                    await notify_state()
+                else:
+                    await forward_message(message)
+                    logging.error("unsupported event: {} but forwarning to all clients (test tool)", data)
+            except KeyError: 
                 await forward_message(message)
-                logging.error("unsupported event: {} but forwarning to all clients (test tool)", data)
+                logging.error("unsupported message: {} but forwarning to all clients (test tool)", data)
     finally:
         await unregister(websocket)
 

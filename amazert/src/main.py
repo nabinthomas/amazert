@@ -9,15 +9,9 @@ import ssl
 import threading
 import websockets
 import time
+import json
 
-keepRunning = True
-
-def amazeRTHeartbeat(websocket):
-    #while (keepRunning == True):
-    message = '{ "action" : "register"}'
-    print(f"> {message}")
-    websocket.send(message)
-    
+keepRunning = True    
 
 class amazeRTHeartBeatThread(threading.Thread):
     def __init__(self, websocket):
@@ -25,15 +19,46 @@ class amazeRTHeartBeatThread(threading.Thread):
         self.websocket = websocket
     def run(self):
         while (keepRunning == True):
-            amazeRTHeartbeat(self.websocket)    
+            self.sendHeartbeat()
             time.sleep(10)
+    def sendHeartbeat(self):
+        message = '{ "action" : "register"}'
+        print(f"> {message}")
+        self.websocket.send(message)
 
-async def amazeRTCommandHandler(websocket):
-    print ("amazeRTCommandHandler start ")
+def amazeRTCommandHandler(websocket, command, options):
+    print ("Executing command : > " + json.dumps(command))
+
+def amazerRTSettingHandler(websocket, setting, options):
+    print ("Applying setting : > " + json.dumps(setting))
+
+def amazerRTControlHandler(websocket, control, options):
+    print ("Responding to control : > " + json.dumps(control))
+    if control == "exit":
+        keepRunning = False
+
+actionHandlerMappings = {
+    "command" : amazeRTCommandHandler, 
+    "setting" : amazerRTSettingHandler,
+    "control"  : amazerRTControlHandler
+ }
+
+async def amazeRTActionHandler(websocket):
+    print ("amazeRTActionHandler start ")
     async for message in websocket:
-        print ("In Loop to receive")
-        #reply = await websocket.recv()
         print(f"< {message}")
+        request = json.loads(message)
+        try:
+            action = request["action"]
+            actionParams = request[action]
+            try:
+                options = request["options"]
+            except KeyError:
+                options = {}
+            actionHandler = actionHandlerMappings[action]
+            actionHandler(websocket, actionParams, options)
+        except KeyError:
+            print ("Unsupported Action")
         if (message == "exit"):
             keepRunning = False
 
@@ -45,7 +70,7 @@ async def amazeRTServiceMain():
         hearbeatThread = amazeRTHeartBeatThread(websocket)
         hearbeatThread.start()
         await asyncio.gather(
-           amazeRTCommandHandler(websocket)
+           amazeRTActionHandler(websocket)
         )
         hearbeatThread.join()
             
