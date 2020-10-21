@@ -10,6 +10,7 @@ import threading
 import websockets
 import time
 import json
+import subprocess
 
 keepRunning = True    
 
@@ -26,13 +27,35 @@ class amazeRTHeartBeatThread(threading.Thread):
         print(f"> {message}")
         self.websocket.send(message)
 
-def amazeRTCommandHandler(websocket, command, options):
+async def amazeRTCommandHandler(websocket, command, options):
     print ("Executing command : > " + json.dumps(command))
+    # Send a response.
+    resultString = ""
+    responseCode = 0
+    try:
+        commandProcess = subprocess.Popen(command,
+            stdin = subprocess.PIPE, 
+            stdout = subprocess.PIPE,
+            stderr = subprocess.PIPE,
+            universal_newlines = True,
+            bufsize = 0)
+        commandProcess.stdin.close() # Command requiring additional input is not supported
+        for line in commandProcess.stdout:
+            resultString = resultString + line
+    except Exception as e:
+        resultString = str(e)
+        responseCode = -1
+    
+    responseJson = { "action" : "response",
+                     "response" : resultString,
+                     "code" : responseCode 
+                    }
+    await websocket.send(json.dumps(responseJson))
 
-def amazerRTSettingHandler(websocket, setting, options):
+async def amazerRTSettingHandler(websocket, setting, options):
     print ("Applying setting : > " + json.dumps(setting))
 
-def amazerRTControlHandler(websocket, control, options):
+async def amazerRTControlHandler(websocket, control, options):
     print ("Responding to control : > " + json.dumps(control))
     if control == "exit":
         keepRunning = False
@@ -56,7 +79,7 @@ async def amazeRTActionHandler(websocket):
             except KeyError:
                 options = {}
             actionHandler = actionHandlerMappings[action]
-            actionHandler(websocket, actionParams, options)
+            await actionHandler(websocket, actionParams, options)
         except KeyError:
             print ("Unsupported Action")
         if (message == "exit"):
@@ -64,6 +87,7 @@ async def amazeRTActionHandler(websocket):
 
 async def amazeRTServiceMain():
     uri = "ws://localhost:6789"
+    #uri = "ws://amaze-id1.wl.r.appspot.com/chat"
     async with websockets.connect(
         uri #, ssl=ssl_context
     ) as websocket:
