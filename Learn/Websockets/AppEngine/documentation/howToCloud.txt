@@ -10,7 +10,11 @@ Google Given sample on how to create a websocket app and deploy it through the v
 7) Open Cloud Shell by clicking the ">_"  Icon on top -right side , just on the left side of your profile ICON
    This will open a virtual terminal   
 8)git clone https://github.com/GoogleCloudPlatform/python-docs-samples
-9)cd  python-docs-samples/appengine/flexible/websockets (make any change you need here main.py)
+9)cd  python-docs-samples/appengine/flexible/websockets 
+	(copy the following files from 'websockets' in our code base amazert\Learn\Websockets\AppEngine\websockets and replace in thisfolder )
+		main.py
+		requirements.txt
+		key.json ( thake this from https://drive.google.com/file/d/1ycigZb0-5mg3g3o4DXkwQvlehiHEdSdV/view?usp=sharing)
 10)gcloud app create
 11)gcloud app deploy app.yaml --project amaze1-id
 
@@ -32,12 +36,15 @@ Creating websocket app using SDK.(steps 1-6 same )
 	select the cloud project to be used (amaze1-id)
 12)git clone https://github.com/GoogleCloudPlatform/python-docs-samples
 13)cd  python-docs-samples/appengine/flexible/websockets
-10)virtualenv --python python3 ~/envs/hello_world
-11)source ~/envs/hello_world/bin/activate
-12)gcloud app create
-13)gcloud app deploy app.yaml --project amaze1-id  
+14)	(copy the following files from 'websockets' in our code base amazert\Learn\Websockets\AppEngine\websockets and replace in thisfolder )
+		main.py
+		requirements.txt
+		key.json ( thake this from https://drive.google.com/file/d/1ycigZb0-5mg3g3o4DXkwQvlehiHEdSdV/view?usp=sharing)
+15)gcloud app create
+16)gcloud app deploy app.yaml --project amaze1-id  
 
----------------
+---------------For Testing with out cloud (need to fill out the following) -----------------
+
 10)virtualenv --python python3 ~/envs/hello_world
 11)source ~/envs/hello_world/bin/activate
 	
