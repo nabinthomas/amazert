@@ -1,0 +1,43 @@
+Google Given sample on how to create a websocket app and deploy it through the virtual terminal from webbroser itself.
+------------------------------------------------------------------------------------------------------------------------
+
+1)https://cloud.google.com
+2)Goto Console
+3)New project 
+4)projectname = amaze1 
+5)Just below ProjectID can be Edited to "amaze1-id" //This ID is important 
+6)Select AppEngine from Left hand Side pannel 
+7) Open Cloud Shell by clicking the ">_"  Icon on top -right side , just on the left side of your profile ICON
+   This will open a virtual terminal   
+8)git clone https://github.com/GoogleCloudPlatform/python-docs-samples
+9)cd  python-docs-samples/appengine/flexible/websockets (make any change you need here main.py)
+10)gcloud app create
+11)gcloud app deploy app.yaml --project amaze1-id
+
+
+Creating websocket app using SDK.(steps 1-6 same )
+---------------------------------------------------
+1)https://cloud.google.com
+2)Goto Console
+3)New project 
+4)projectname = amaze1 
+5)Just below ProjectID can be Edited to "amaze1-id"
+6)Select AppEngine from Left hand Side pannel 
+7)Click On CreateEngine 
+8)Select Language Python , Environment Flexible
+9)DownLoad the cloud SDK 
+10)Go to the console of the SDK
+11) First Time OR/Not First Time and want to chnage to another project 
+	gcloud init
+	select the cloud project to be used (amaze1-id)
+12)git clone https://github.com/GoogleCloudPlatform/python-docs-samples
+13)cd  python-docs-samples/appengine/flexible/websockets
+10)virtualenv --python python3 ~/envs/hello_world
+11)source ~/envs/hello_world/bin/activate
+12)gcloud app create
+13)gcloud app deploy app.yaml --project amaze1-id  
+
+---------------
+10)virtualenv --python python3 ~/envs/hello_world
+11)source ~/envs/hello_world/bin/activate
+	
