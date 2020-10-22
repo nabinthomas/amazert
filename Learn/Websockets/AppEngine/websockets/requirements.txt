@@ -5,6 +5,7 @@ requests==2.24.0
 
 google-api-core[grpc] >= 1.14.0, < 2.0.0dev; platform.python_implementation != 'PyPy'
 google-api-python-client >= 1.7.8
-google-auth == 1.18.0  # temporary workaround
+google-auth<2.0dev,>=1.21.1
 google-cloud-firestore >= 1.4.0; platform.python_implementation != 'PyPy'
 google-cloud-storage >= 1.18.0
+firebase_admin >=4.2.0

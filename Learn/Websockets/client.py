@@ -12,6 +12,9 @@ localhost_pem = pathlib.Path(__file__).with_name("cert.pem")
 ssl_context.load_verify_locations(localhost_pem)
 
 async def hello():
+    # un comment the below line , and send any message from
+    # http://amaze-id1.appspot.com
+    # uri = "ws://amaze-id1.wl.r.appspot.com:80/chat"
     uri = "wss://localhost:8765"
     async with websockets.connect(
         uri, ssl=ssl_context

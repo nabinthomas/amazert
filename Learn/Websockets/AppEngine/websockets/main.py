@@ -18,6 +18,35 @@ from __future__ import print_function
 from flask import Flask, render_template
 from flask_sockets import Sockets
 
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import db
+from firebase_admin import messaging
+
+import firebase_admin
+from firebase_admin import credentials
+
+cred = credentials.Certificate("./key.json")
+firebase_admin.initialize_app(cred,{
+        'databaseURL' : 'https://amaze-id1.firebaseio.com'
+    })
+ref = db.reference('/user')
+queryResults1 = ref.get()
+print (queryResults1)
+
+'''
+const firebaseConfig = {
+  apiKey: "AIzaSyDnsNBeVMqwif9fjBVb_DnxQ-D6fBuTltk",
+  authDomain: "amaze-id1.firebaseapp.com",
+  databaseURL: "https://amaze-id1.firebaseio.com",
+  projectId: "amaze-id1",
+  storageBucket: "amaze-id1.appspot.com",
+  messagingSenderId: "668969402569",
+  appId: "1:668969402569:web:796cc33e91e2934a578d18",
+  measurementId: "G-C8PD91FZQZ"
+  };
+'''
+
 
 app = Flask(__name__)
 sockets = Sockets(app)
