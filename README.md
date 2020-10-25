@@ -43,10 +43,9 @@ Android App will need to do the following
 10. App Now can send commands to the Cloud Database for the settings it needs to change
 
 # Format of amazert.json
-----
-{
-    'registrationId': '8784c5df-f087-4740-b41b-248dc9389a2f',  # Id unique to this registration. This is kind of a secret password to be used
-    'email': 'nabin@gmail.com', # Owner's email id. Used by App Engine to find the device and to validate Android App's authentication state
-    'deviceId': 'fb967061-168a-11eb-9272-88e9fe6b97d6' # Unique, secret Id for the device. All communication jsons will have this uuid as part of the json
-}
-----
+
+  {
+      'registrationId': '8784c5df-f087-4740-b41b-248dc9389a2f',  # Id unique to this registration. This is kind of a secret password to be used
+      'email': 'nabin@gmail.com', # Owner's email id. Used by App Engine to find the device and to validate Android App's authentication state
+      'deviceId': 'fb967061-168a-11eb-9272-88e9fe6b97d6' # Unique, secret Id for the device. All communication jsons will have this uuid as part of the json
+  }
