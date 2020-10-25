@@ -16,6 +16,6 @@ package: compile
 	tar -czvf $(BUILD_OUT_DIR)/amazert.pkg -C $(BUILD_OUT_DIR) amazert
 
 commit: $(BUILD_OUT_DIR)/amazert.pkg
-	cp $(BUILD_OUT_DIR)/amazert.pkg ../Learn/aMAZE/app/src/main/res/raw/amazert.pkg
+	cp $(BUILD_OUT_DIR)/amazert.pkg ../Learn/aMAZE/app/src/main/assets/amazert.pkg
 clean:
 	rm -rf $(BUILD_OUT_DIR)
