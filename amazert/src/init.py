@@ -26,12 +26,14 @@ def generateRegistrationUUID():
 """
 Generate the registration Json for this device.
 @param emailid - email Id associated with the device
+@param uid - uid associated with the email for simplification of database access
 @param deviceId - Device UUID
 @param registrationId - Registration UUID
 """
-def generateRegistrationJson(emailId, deviceId, registrationId):
+def generateRegistrationJson(emailId, uid, deviceId, registrationId):
     registration = {}
     registration['email'] = emailId
+    registration['uid'] = uid
     registration['deviceId'] = str(deviceId)
     registration['registrationId'] = str(registrationId)
     registrationJson = json.dumps(registration)
@@ -53,10 +55,13 @@ def loadCurrentRegistration():
 
 """
 Entry point. 
-Excepts one argument, which is the email id with which the device should be registered. 
+
 @note If the device is already registered, then the registration process is skipped. 
 If the device should be forced to reregister, delete the config File first
 The config is stored in the file pointed to by configFilePath
+@param argv - arguments
+    argv[0] - email id of the user associated with this device
+    argv[1] - uid of ther user. user for simplification of the data base access
 """
 def main(argv):
     try:
@@ -68,11 +73,12 @@ def main(argv):
             # Since the ids are different with each generation, overwriting 
             # this will otherwise cause the previously registered accounts to be deactivated
             emailId = argv[0]
+            uid = argv[1]
             deviceId = generateDeviceUUID()
             print (deviceId)
             registrationId = generateRegistrationUUID()
             print (registrationId)
-            currentRegistrationData = generateRegistrationJson(emailId, deviceId, registrationId)
+            currentRegistrationData = generateRegistrationJson(emailId, uid, deviceId, registrationId)
             print (currentRegistrationData)
         try:
             configFile = open(configFilePath, "w")
