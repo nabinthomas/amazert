@@ -50,3 +50,49 @@ Android App will need to do the following
       'deviceId': 'fb967061-168a-11eb-9272-88e9fe6b97d6' # Unique, secret Id for the device. All communication jsons will have this uuid as part of the json
   }
 </pre>
+
+# AmazeRT Communication to Cloud
+## General Structure
+Every Json sent across will need to have a way to identify the device being controlled. 
+The JSON sent will have "identifier" field to handle this case. 
+A Sample is given below
+<pre>
+{
+    "identifier" : {
+      'registrationId': '8784c5df-f087-4740-b41b-248dc9389a2f', 
+      'email': 'nabin@gmail.com', 
+      'deviceId': 'fb967061-168a-11eb-9272-88e9fe6b97d6'
+  }
+  ... Other data
+}
+</pre>
+## Registration packet
+Registration is done on every reboot as the first message to the server.
+This make sure that the device's settings are updated on the server once it boots up
+A Sample is given below
+<pre>
+{
+    "identifier" : {
+      'registrationId': '8784c5df-f087-4740-b41b-248dc9389a2f', 
+      'email': 'nabin@gmail.com', 
+      'deviceId': 'fb967061-168a-11eb-9272-88e9fe6b97d6'
+  },
+  "action" : "register", 
+  "settings": {
+      ... All the settings.. TBD
+  }
+}
+## Hearbeat packet
+Heartbeat keeps the devices connection with the server alive.
+Server may choose to ignore this completely. 
+
+A Sample is given below
+<pre>
+{
+    "identifier" : {
+      'registrationId': '8784c5df-f087-4740-b41b-248dc9389a2f', 
+      'email': 'nabin@gmail.com', 
+      'deviceId': 'fb967061-168a-11eb-9272-88e9fe6b97d6'
+  },
+  "action" : "heartbeat"
+}
