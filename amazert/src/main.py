@@ -18,8 +18,8 @@ keepRunning = True
 Settings that can be controlled via AmazeRT
 This is used for data driven control instead of writing specific code for each setting
 General format
-{
-    [
+[
+    {
         name : {
             value : currentValue,
             filter : {
@@ -47,10 +47,10 @@ General format
             
         },
         ...
-    ]
-}
+    }
+]
 """
-dataDrivenSettings = { [
+dataDrivenSettings = [ {
         "system.@system[0].hostname" : {
             "commandType" : "uci", 
             "read" : { 
@@ -60,8 +60,8 @@ dataDrivenSettings = { [
                 "commandType" : "uci"
             }
         }
-    ]
-}
+    }
+]
 
 
 """
