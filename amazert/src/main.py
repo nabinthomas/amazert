@@ -15,6 +15,11 @@ import subprocess
 keepRunning = True    
 
 """
+How frequent the heartbeat is sent to the server to keep the connection active.
+""" 
+heartBeatIntervalInSeconds = 30
+
+"""
 Prepares a packet to send. 
 Every packet will need to be added with some extra information about the 
 identification of the device being controlled/reported. This is a wrapper for generating
@@ -33,7 +38,7 @@ def preparePacketToSend(config, dataToSend):
 
 """
 Thread implementing Heartbeat support. This sends all the current settings to the Cloud server once on boot
-and then keeps sending a hearbeat message at heartBeatInterval
+and then keeps sending a hearbeat message at heartBeatIntervalInSeconds
 """
 class amazeRTHeartBeatThread(threading.Thread):
     def __init__(self, config, websocket):
@@ -44,7 +49,7 @@ class amazeRTHeartBeatThread(threading.Thread):
     def run(self):
         while (keepRunning == True):
             self.sendHeartbeat()
-            time.sleep(10)
+            time.sleep(heartBeatIntervalInSeconds)
 
     def sendAllConfiguration(self):
         message = { "action" : "register"}
