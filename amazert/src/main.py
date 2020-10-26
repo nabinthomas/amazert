@@ -15,9 +15,10 @@ import subprocess
 keepRunning = True    
 
 class amazeRTHeartBeatThread(threading.Thread):
-    def __init__(self, websocket):
+    def __init__(self, config, websocket):
         threading.Thread.__init__(self)
         self.websocket = websocket
+        self.config = config
     def run(self):
         while (keepRunning == True):
             self.sendHeartbeat()
@@ -27,7 +28,7 @@ class amazeRTHeartBeatThread(threading.Thread):
         print(f"> {message}")
         self.websocket.send(message)
 
-async def amazeRTCommandHandler(websocket, command, options):
+async def amazeRTCommandHandler(config, websocket, command, options):
     print ("Executing command : > " + json.dumps(command))
     # Send a response.
     resultString = ""
@@ -52,10 +53,10 @@ async def amazeRTCommandHandler(websocket, command, options):
                     }
     await websocket.send(json.dumps(responseJson))
 
-async def amazerRTSettingHandler(websocket, setting, options):
+async def amazerRTSettingHandler(config, websocket, setting, options):
     print ("Applying setting : > " + json.dumps(setting))
 
-async def amazerRTControlHandler(websocket, control, options):
+async def amazerRTControlHandler(config, websocket, control, options):
     print ("Responding to control : > " + json.dumps(control))
     if control == "exit":
         keepRunning = False
@@ -66,7 +67,7 @@ actionHandlerMappings = {
     "control"  : amazerRTControlHandler
  }
 
-async def amazeRTActionHandler(websocket):
+async def amazeRTActionHandler(config, websocket):
     print ("amazeRTActionHandler start ")
     async for message in websocket:
         print(f"< {message}")
@@ -91,10 +92,10 @@ async def amazeRTServiceMain():
     async with websockets.connect(
         uri #, ssl=ssl_context
     ) as websocket:
-        hearbeatThread = amazeRTHeartBeatThread(websocket)
+        hearbeatThread = amazeRTHeartBeatThread(config, websocket)
         hearbeatThread.start()
         await asyncio.gather(
-           amazeRTActionHandler(websocket)
+           amazeRTActionHandler(config, websocket)
         )
         hearbeatThread.join()
             
