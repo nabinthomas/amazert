@@ -53,7 +53,7 @@ Android App will need to do the following
   }
 </pre>
 
-### AmazeRT communication documentaiton. 
+### AmazeRT communication documentation
 #### AmazeRT Communication to Cloud
 ##### General Structure
 Every Json sent across will need to have a way to identify the device being controlled. 
