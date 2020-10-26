@@ -15,6 +15,56 @@ import subprocess
 keepRunning = True    
 
 """
+Settings that can be controlled via AmazeRT
+This is used for data driven control instead of writing specific code for each setting
+General format
+{
+    [
+        name : {
+            value : currentValue,
+            filter : {
+                possibleValues : [ list of possible values that are valid for this. 
+                                If this field is not present any value is accepted. 
+                                If this field is present and empty then the field is read Only
+                                ],
+                commandMappings : {
+                    value1 : [ commands to run in sequence to set this value. 
+                            This may be a shell script too. 
+                            This is valid only for settings with restricted set of possibleValues
+                        ]
+                },
+            },
+            write : {
+                prologue : [commands to be run before applying this setting. Optional. eg: turn of wifi before changing something]
+                commandType : < uci -> will run uci set <name>=<value>; uci commit>,
+                epilogue : [ commands to be run after applying this setting. Optional. eg: wifi on after applying settings/ wifi restart etc]
+            }, 
+            read : {
+                prologue : [commands to be run before reading this setting. Optional. ]
+                commandType : < uci -> will run uci set <name>=<value>; uci commit>,
+                epilogue : [ commands to be run after reading this setting. Optional. ]
+            }
+            
+        },
+        ...
+    ]
+}
+"""
+dataDrivenSettings = { [
+        "system.@system[0].hostname" : {
+            "commandType" : "uci", 
+            "read" : { 
+                "commandType" : "uci" 
+            }, 
+            "write" : {
+                "commandType" : "uci"
+            }
+        }
+    ]
+}
+
+
+"""
 How frequent the heartbeat is sent to the server to keep the connection active.
 """ 
 heartBeatIntervalInSeconds = 30
