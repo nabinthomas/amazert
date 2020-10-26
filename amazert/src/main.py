@@ -241,7 +241,7 @@ async def amazerRTSettingHandler(config, websocket, setting, options):
                         response = response + runShellcommand(rule["handler"]["prologue"])
                 except:
                     response += "no prologue\n"
-                command = ["uci", "set", settingName + "='" + setting["value"] + "'"]
+                command = ["uci", "set", settingName + "=" + setting["value"]]
                 print (command)
                 response = response + runShellcommand(command)
                 print("Response is " + response)
@@ -313,7 +313,7 @@ def loadCurrentRegistration():
     try:
         configFile = open(configFilePath)
         currentRegistration = json.load(configFile)
-        if ((currentRegistration['email']) and (currentRegistration['deviceId']) and (currentRegistration['registrationId'])):
+        if ((currentRegistration['email']) and (currentRegistration['deviceId']) and (currentRegistration['registrationId']) and (currentRegistration['uid'])):
             return currentRegistration
         return None
     except Exception:

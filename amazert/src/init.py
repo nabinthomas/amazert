@@ -46,7 +46,7 @@ def loadCurrentRegistration():
     try:
         configFile = open(configFilePath)
         currentRegistration = json.load(configFile)
-        if ((currentRegistration['email']) and (currentRegistration['deviceId']) and (currentRegistration['registrationId'])):
+        if ((currentRegistration['email']) and (currentRegistration['deviceId']) and (currentRegistration['registrationId']) and (currentRegistration['uid'])):
             return currentRegistration
         return None
     except Exception:
