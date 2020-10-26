@@ -104,7 +104,7 @@ A Sample is given below
       'email': 'nabin@gmail.com', 
       'uid': '_SDFsEfRSDjFCZXCVASEf',
       'deviceId': 'fb967061-168a-11eb-9272-88e9fe6b97d6'
-  },
-  "action" : "heartbeat"
+    },
+    "action" : "heartbeat"
 }
 </pre>
