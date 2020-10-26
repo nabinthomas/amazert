@@ -20,8 +20,8 @@ This is used for data driven control instead of writing specific code for each s
 General format
 [
     {
-        name : {
-            value : currentValue,
+        name : settingname,
+        handler:  {
             filter : {
                 possibleValues : [ list of possible values that are valid for this. 
                                 If this field is not present any value is accepted. 
@@ -50,8 +50,9 @@ General format
     }
 ]
 """
-dataDrivenSettings = [ {
-        "system.@system[0].hostname" : {
+dataDrivenSettingsRules = [ {
+        "name" : "system.@system[0].hostname",
+        "handler" : {
             "commandType" : "uci", 
             "read" : { 
                 "commandType" : "uci" 
@@ -62,7 +63,41 @@ dataDrivenSettings = [ {
         }
     }
 ]
+"""
+Helper function to run a command in shell and collect the output. 
+to be used only for reading and writing settings
+@param is an array of strings which form the command line
+"""
+def runShellcommand(command):
+    resultString = ""
+    try:
+        commandProcess = subprocess.Popen(command,
+            stdin = subprocess.PIPE, 
+            stdout = subprocess.PIPE,
+            stderr = subprocess.PIPE,
+            universal_newlines = True,
+            bufsize = 0)
+        commandProcess.stdin.close() # Command requiring additional input is not supported
+        for line in commandProcess.stdout:
+            resultString = resultString + line
+    except Exception as e:
+        resultString = str(e)
+        responseCode = -1
+    return resultString.strip()
 
+""" 
+Prepare a list of all the settings which will be sent across to the AmazeRT App Engine
+""" 
+def getAllSupportedSettings():
+    allSettings = []
+    for rule in dataDrivenSettingsRules:
+        setting = {}
+        setting['name'] = rule['name']
+        if (rule['handler']['commandType'] == "uci"):
+            setting['value'] = runShellcommand(["uci", "get", setting["name"]])
+            print ("Setting " + setting["name"] + "=" + setting['value'])
+            allSettings.append(setting)
+    return allSettings
 
 """
 How frequent the heartbeat is sent to the server to keep the connection active.
@@ -97,14 +132,18 @@ class amazeRTHeartBeatThread(threading.Thread):
         self.config = config
 
     def run(self):
+        self.sendAllConfiguration()
         while (keepRunning == True):
             self.sendHeartbeat()
             time.sleep(heartBeatIntervalInSeconds)
 
     def sendAllConfiguration(self):
         message = { "action" : "register"}
-        print(f"> {message}")
-        self.websocket.send(preparePacketToSend(self.config, message))
+        allSettings = getAllSupportedSettings()
+        message["settings"] = allSettings
+        packettoSend = preparePacketToSend(self.config, message)
+        print(f"> {packettoSend}")
+        self.websocket.send(packettoSend)
 
     def sendHeartbeat(self):
         message = { "action" : "heartbeat"}
