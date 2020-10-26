@@ -108,3 +108,21 @@ A Sample is given below
     "action" : "heartbeat"
 }
 </pre>
+
+#### AmazeRT Communication from Cloud
+Commnication to from the cloud to AmazeRT Router also follow a similar structure of the communication the other way around
+
+#### AmazeRT Applying a setting from Cloud
+Example Request to apply a setting
+<pre>
+{
+    "identifier" : {
+      'registrationId': '8784c5df-f087-4740-b41b-248dc9389a2f', 
+      'email': 'nabin@gmail.com', 
+      'uid': '_SDFsEfRSDjFCZXCVASEf',
+      'deviceId': 'fb967061-168a-11eb-9272-88e9fe6b97d6'
+    },
+    "action": "setting",
+    "setting" : { "name" : "wireless.wifinet0.ssid", "value" : "PiWRT" }
+}
+</pre>
