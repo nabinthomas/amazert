@@ -83,7 +83,8 @@ A Sample is given below
   "action" : "register", 
   "settings": {
     [
-        {'name': 'system.@system[0].hostname', 'value': 'amazeRT'}
+        {'name': 'system.@system[0].hostname', 'value': 'amazeRT'},
+        .. Other Settings like this.. TBD
     ]
   }
 }
