@@ -82,7 +82,9 @@ A Sample is given below
   },
   "action" : "register", 
   "settings": {
-      ... All the settings.. TBD
+    [
+        {'name': 'system.@system[0].hostname', 'value': 'amazeRT'}
+    ]
   }
 }
 </pre>
