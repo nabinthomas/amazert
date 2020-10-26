@@ -6,7 +6,7 @@ import sys
 
 configFilePath = "/etc/amazert.json"
 ##TODO . This is for local testing. The file should be in /etc along with other configs. 
-configFilePath = "/tmp/amazert.json"
+#configFilePath = "/tmp/amazert.json"
 
 """
 Generate And returns a UUID for this device
@@ -46,7 +46,7 @@ def loadCurrentRegistration():
         currentRegistration = json.load(configFile)
         if ((currentRegistration['email']) and (currentRegistration['deviceId']) and (currentRegistration['registrationId'])):
             return currentRegistration
-        return currentRegistration
+        return None
     except Exception:
         print("AmazeRT Config json does not exist or is invalid")
     return None

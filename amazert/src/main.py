@@ -14,6 +14,11 @@ import subprocess
 
 keepRunning = True    
 
+
+configFilePath = "/etc/amazert.json"
+##TODO . This is for local testing. The file should be in /etc along with other configs. 
+#configFilePath = "/tmp/amazert.json"
+
 """
 Settings that can be controlled via AmazeRT
 This is used for data driven control instead of writing specific code for each setting
@@ -147,8 +152,9 @@ class amazeRTHeartBeatThread(threading.Thread):
 
     def sendHeartbeat(self):
         message = { "action" : "heartbeat"}
-        print(f"> {message}")
-        self.websocket.send(preparePacketToSend(self.config, message))
+        packettoSend = preparePacketToSend(self.config, message)
+        print(f"> {packettoSend}")
+        self.websocket.send(packettoSend)
 
 """
 Handles a command sent from the cloud.
@@ -257,12 +263,30 @@ async def amazeRTActionHandler(config, websocket):
             keepRunning = False
 
 """
+Loads and retuns the current Registration Configuration if any
+"""
+def loadCurrentRegistration():
+    try:
+        configFile = open(configFilePath)
+        currentRegistration = json.load(configFile)
+        if ((currentRegistration['email']) and (currentRegistration['deviceId']) and (currentRegistration['registrationId'])):
+            return currentRegistration
+        return None
+    except Exception:
+        print("AmazeRT Config json does not exist or is invalid")
+    return None
+
+"""
 Main for the service. Connects to the Cloud App Engine, Initialize local handlers 
 and keep listening to requests
 """
 async def amazeRTServiceMain():
     uri = "ws://localhost:6789"
-    config = {}
+    config = loadCurrentRegistration()
+    if (config is None):
+        print("AmazeRT is not configured on this machine. please run initial configuration using init.py")
+        exit(-1)
+    
     #uri = "ws://amaze-id1.wl.r.appspot.com/chat"
     async with websockets.connect(
         uri #, ssl=ssl_context
