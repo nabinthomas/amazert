@@ -88,6 +88,7 @@ async def amazeRTActionHandler(config, websocket):
 
 async def amazeRTServiceMain():
     uri = "ws://localhost:6789"
+    config = {}
     #uri = "ws://amaze-id1.wl.r.appspot.com/chat"
     async with websockets.connect(
         uri #, ssl=ssl_context
