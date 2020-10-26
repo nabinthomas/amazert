@@ -55,15 +55,27 @@ General format
     }
 ]
 """
-dataDrivenSettingsRules = [ {
+dataDrivenSettingsRules = [ 
+    {
         "name" : "system.@system[0].hostname",
         "handler" : {
-            "commandType" : "uci", 
             "read" : { 
                 "commandType" : "uci" 
             }, 
             "write" : {
                 "commandType" : "uci"
+            }
+        }
+    },
+    {
+        "name" : "wireless.wifinet0.ssid",
+        "handler" : {
+            "read" : { 
+                "commandType" : "uci" 
+            }, 
+            "write" : {
+                "commandType" : "uci",
+                "epilogue" : ["wifi"]
             }
         }
     }
@@ -85,6 +97,9 @@ def runShellcommand(command):
         commandProcess.stdin.close() # Command requiring additional input is not supported
         for line in commandProcess.stdout:
             resultString = resultString + line
+        for line in commandProcess.stderr:
+            resultString = resultString + line
+
     except Exception as e:
         resultString = str(e)
         responseCode = -1
@@ -98,7 +113,7 @@ def getAllSupportedSettings():
     for rule in dataDrivenSettingsRules:
         setting = {}
         setting['name'] = rule['name']
-        if (rule['handler']['commandType'] == "uci"):
+        if (rule['handler']["read"]['commandType'] == "uci"):
             setting['value'] = runShellcommand(["uci", "get", setting["name"]])
             print ("Setting " + setting["name"] + "=" + setting['value'])
             allSettings.append(setting)
@@ -204,12 +219,41 @@ async def amazeRTCommandHandler(config, websocket, command, options):
 Handle a request to apply a particular setting
 @param config - Identification for this device. 
 @param websocket - used for communicating with the server
-@setting name and value for the setting to be applied
+@setting name and value for the setting to be applied in the format { name : <name>, value : <value>}
 @options Special options to run the command. Unused for now. Added for future enhancements
 
 """
 async def amazerRTSettingHandler(config, websocket, setting, options):
     print ("Applying setting : > " + json.dumps(setting))
+    settingName = setting["name"]
+    response = ""
+    # Find the rule for handling this setting. 
+    for rule in dataDrivenSettingsRules:
+        print(rule["name"])
+        if (rule["name"] == settingName):
+            print ("Match with " + rule["handler"]["write"]["commandType"] )
+
+            if (rule["handler"]["write"]["commandType"] == "uci"):
+                print ("uci command")
+                try: 
+                    if (rule["handler"]["write"]["prologue"] is not None):
+                        print ("prologue")
+                        response = response + runShellcommand(rule["handler"]["prologue"])
+                except:
+                    response += "no prologue\n"
+                command = ["uci", "set", settingName + "='" + setting["value"] + "'"]
+                print (command)
+                response = response + runShellcommand(command)
+                print("Response is " + response)
+                response = response + runShellcommand(["uci", "commit"])
+                print("Response is " + response)
+
+                try: 
+                    if (rule["handler"]["write"]["epilogue"] is not None):
+                        response = response + runShellcommand(rule["handler"]["write"]["epilogue"])
+                except:
+                    response += "no epilogue\n"
+                print("Response is " + response)
 
 """
 Handle a request to control the amazeRT SW
