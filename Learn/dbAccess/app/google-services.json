@@ -1,1 +1,48 @@
-WIll be copied and shared across teams
+{
+  "project_info": {
+    "project_number": "227068942112",
+    "firebase_url": "https://fireamaze-24f54.firebaseio.com",
+    "project_id": "fireamaze-24f54",
+    "storage_bucket": "fireamaze-24f54.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:227068942112:android:979f59c2384c04ff0aa945",
+        "android_client_info": {
+          "package_name": "com.example.fireamaze"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "227068942112-tcaotsvatti59bfsj97jb9u76dn98n8m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.fireamaze",
+            "certificate_hash": "72e9fbadc7df437f952b995d198ff3ceb4dacf27"
+          }
+        },
+        {
+          "client_id": "227068942112-gvphmi36h6ukn0g7n17ue5qs6n7sck60.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCntyR2IH4RJDVDxs07KbU6IXF_ps9YnAA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "227068942112-gvphmi36h6ukn0g7n17ue5qs6n7sck60.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

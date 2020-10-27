@@ -1,0 +1,20 @@
+{
+  "rules": {
+    "$uid": {  
+      ".write": "$uid === auth.uid",
+      ".read": "true",
+      "device": {
+        "$deviceuid":{
+          "Wifi":{
+            ".validate": "newData.isString() && newData.val().length < 4 && ((newData.val().toUpperCase() === 'ON') || (newData.val().toUpperCase() === 'OFF'))",
+            ".read": "true"
+          },
+          "PowerState":{
+            ".validate": "newData.isString() && newData.val().length < 4 && ((newData.val().toUpperCase() === 'ON') || (newData.val().toUpperCase() === 'OFF'))",
+            ".read": "true"
+          }
+        }
+      }
+    }
+  }
+}

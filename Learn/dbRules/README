@@ -1,0 +1,12 @@
+
+Adding sampleRule file used to validate User authorization based on unique id from auth frameowrk. 
+The rules restrict write access to a database path to the authenticated user. 
+Also added data validation rules for the Wifi and PowerState database fields. 
+
+Apply the rule as:
+	Firebase Console 
+		--> Project 
+			--> Realtime Database [from left pane]
+				--> Rules 
+					--> Edit rules 
+						--> Publish!!
