@@ -35,8 +35,9 @@ Android App will need to do the following
 1. Extract the package file (It is really a tar file) to the openWRT device
 2. Run install.sh
 3. Wait for all the dependecies to be install from the above script
-4. Run python3 init.py <emailId>
+4. Run python3 init.py <emailId> <uid>
     The emailid will need to be the authenticated user's email Id from the Android App
+    The uid is for simplifying the App Engine Code, and will need to be filled in once the App is authenticated with the above emailid
 5. Wait for the above script to generate the config file. It will generate a new config only if there is nothing present.
 6. The new config will be saved to /etc/amazert.json (Note: this is in /tmp/amazert.json for now to do some local testing but will move at some point)
 7. Copy the json back to the Androd App, and use the values in there for sending out the initial registration to the App Engine
