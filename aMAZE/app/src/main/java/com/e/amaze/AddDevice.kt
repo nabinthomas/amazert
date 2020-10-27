@@ -1,19 +1,19 @@
 package com.e.amaze
 
+import android.app.Person
 import android.content.res.AssetManager
 import android.os.AsyncTask
 import android.os.Bundle
 import android.view.View
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.jcraft.jsch.ChannelExec
 import com.jcraft.jsch.ChannelSftp
 import com.jcraft.jsch.ChannelSftp.OVERWRITE
 import com.jcraft.jsch.JSch
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileOutputStream
-import java.io.InputStream
+import java.io.*
 import java.util.*
 
 
@@ -43,7 +43,7 @@ class AddDevice : AppCompatActivity() {
 
             override fun onPostExecute(result: String) {
                 //deviceDetails.setText(output.toString())
-                deviceDetails.setText("Sftp Get Done")
+                deviceDetails.setText(result)
                 print("Sftp Get Done")
             }
         }
@@ -232,6 +232,12 @@ fun executeGetCommand(username: String,
 
     val iStream: InputStream = sftpChannel.get(remoteFile)
 
+    val response = BufferedReader(
+        InputStreamReader(iStream, "UTF-8")
+    ).use { it.readText() }
+
+    val register = Gson().fromJson(response,Register::class.java)
+
     // set local file
     //val tFile = FileOutputStream("amazert.json")
     //val tFile = FileOutputStream(File("amazert.json"))
@@ -252,5 +258,5 @@ fun executeGetCommand(username: String,
     session.disconnect()
 
     //return outputStream.toString()
-    return "Sftp Get Done"
+    return register.toString()
 }
