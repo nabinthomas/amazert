@@ -18,11 +18,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        launchSignInFlow()
     }
 
-    fun launchSignInFlow() {
+    fun launchSignInFlow(view: View) {
         // Give users the option to sign in / register with their email or Google account.
         // If users choose to register with their email,
         // they will need to create a password as well.
@@ -68,4 +66,6 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
 
     }
+
+
 }
