@@ -4,8 +4,11 @@ import android.app.Person
 import android.content.res.AssetManager
 import android.os.AsyncTask
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.EditText
+import android.widget.Toast
+import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -18,10 +21,17 @@ import java.util.*
 
 
 class AddDevice : AppCompatActivity() {
+
+    private lateinit var uName: String
+    private lateinit var uId: String
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.add_device)
     //    SshTask().execute()
+
+        uName = intent.getStringExtra("Name")
+        uId = intent.getStringExtra("Uid")
     }
 
     fun launchAddDeviceHandling(view: View) {
@@ -100,163 +110,168 @@ class AddDevice : AppCompatActivity() {
 
     }
 
-}
+    fun executeRemoteInitCommand(username: String,
+                                 password: String,
+                                 hostname: String,
+                                 port: Int = 22): String {
+        val jsch = JSch()
+        val session = jsch.getSession(username, hostname, port)
+        session.setPassword(password)
 
-fun executeRemoteInitCommand(username: String,
-                         password: String,
-                         hostname: String,
-                         port: Int = 22): String {
-    val jsch = JSch()
-    val session = jsch.getSession(username, hostname, port)
-    session.setPassword(password)
+        // Avoid asking for key confirmation.
+        val properties = Properties()
+        properties.put("StrictHostKeyChecking", "no")
+        session.setConfig(properties)
 
-    // Avoid asking for key confirmation.
-    val properties = Properties()
-    properties.put("StrictHostKeyChecking", "no")
-    session.setConfig(properties)
+        session.connect()
 
-    session.connect()
+        // Create SSH Channel.
+        val sshChannel = session.openChannel("exec") as ChannelExec
+        val outputStream = ByteArrayOutputStream()
+        sshChannel.outputStream = outputStream
 
-    // Create SSH Channel.
-    val sshChannel = session.openChannel("exec") as ChannelExec
-    val outputStream = ByteArrayOutputStream()
-    sshChannel.outputStream = outputStream
+        // Execute command.
+        sshChannel.setCommand("opkg update && opkg install openssh-sftp-server")
+        //sshChannel.setCommand("uname -a")
+        sshChannel.connect()
 
-    // Execute command.
-    sshChannel.setCommand("opkg update && opkg install openssh-sftp-server")
-    //sshChannel.setCommand("uname -a")
-    sshChannel.connect()
+        // Sleep needed in order to wait long enough to get result back.
+        Thread.sleep(1_000)
+        sshChannel.disconnect()
 
-    // Sleep needed in order to wait long enough to get result back.
-    Thread.sleep(1_000)
-    sshChannel.disconnect()
+        session.disconnect()
 
-    session.disconnect()
+        return outputStream.toString()
+    }
 
-    return outputStream.toString()
-}
+    fun executeRemoteCommand(username: String,
+                             password: String,
+                             hostname: String,
+                             port: Int = 22): String {
+        val jsch = JSch()
+        val session = jsch.getSession(username, hostname, port)
+        session.setPassword(password)
 
-fun executeRemoteCommand(username: String,
-                         password: String,
-                         hostname: String,
-                         port: Int = 22): String {
-    val jsch = JSch()
-    val session = jsch.getSession(username, hostname, port)
-    session.setPassword(password)
+        // Avoid asking for key confirmation.
+        val properties = Properties()
+        properties.put("StrictHostKeyChecking", "no")
+        session.setConfig(properties)
 
-    // Avoid asking for key confirmation.
-    val properties = Properties()
-    properties.put("StrictHostKeyChecking", "no")
-    session.setConfig(properties)
+        session.connect()
 
-    session.connect()
+        // Create SSH Channel.
+        val sshChannel = session.openChannel("exec") as ChannelExec
+        //val sshChannel = session.openChannel("shell") as ChannelShell
+        val outputStream = ByteArrayOutputStream()
+        sshChannel.outputStream = outputStream
 
-    // Create SSH Channel.
-    val sshChannel = session.openChannel("exec") as ChannelExec
-    //val sshChannel = session.openChannel("shell") as ChannelShell
-    val outputStream = ByteArrayOutputStream()
-    sshChannel.outputStream = outputStream
+        sshChannel.connect(160000)
+        // Execute command.
+        //TODO - get email id from previous context
+        val cmd =
+            "cd /tmp && tar -xvzf amazert.tar.gz && cd /tmp/amazert && chmod 744 install.sh && ./install.sh && python3 init.py $uName $uId"
+        Log.d("CMD","cmd "+ cmd)
+        sshChannel.setCommand(cmd)
+        //sshChannel.setCommand("uname -a")
+        sshChannel.connect()
 
-    sshChannel.connect(120000)
-    // Execute command.
-    //TODO - get email id from previous context
-    val cmd = "cd /tmp && tar -xvzf amazert.tar.gz && cd /tmp/amazert && chmod 744 install.sh && ./install.sh && python3 init.py " + "ginto100@gmail.com 1234"
-    sshChannel.setCommand(cmd)
-    //sshChannel.setCommand("uname -a")
-    sshChannel.connect()
+        // Sleep needed in order to wait long enough to get result back.
+        Thread.sleep(30_000)
+        sshChannel.disconnect()
 
-    // Sleep needed in order to wait long enough to get result back.
-    Thread.sleep(30_000)
-    sshChannel.disconnect()
+        session.disconnect()
 
-    session.disconnect()
+        return outputStream.toString()
+    }
 
-    return outputStream.toString()
-}
+    fun executeCopyCommand(username: String,
+                           password: String,
+                           hostname: String,
+                           port: Int = 22, inputStream: InputStream): String {
+        val jsch = JSch()
+        val session = jsch.getSession(username, hostname, port)
+        session.setPassword(password)
 
-fun executeCopyCommand(username: String,
-                         password: String,
-                         hostname: String,
-                         port: Int = 22, inputStream: InputStream): String {
-    val jsch = JSch()
-    val session = jsch.getSession(username, hostname, port)
-    session.setPassword(password)
+        // Avoid asking for key confirmation.
+        val properties = Properties()
+        properties.put("StrictHostKeyChecking", "no")
+        session.setConfig(properties)
 
-    // Avoid asking for key confirmation.
-    val properties = Properties()
-    properties.put("StrictHostKeyChecking", "no")
-    session.setConfig(properties)
+        session.connect()
 
-    session.connect()
+        // Create SSH Channel.
+        val sftpChannel = session.openChannel("sftp") as ChannelSftp
+        //val outputStream = ByteArrayOutputStream()
+        //sftpChannel.outputStream = outputStream
 
-    // Create SSH Channel.
-    val sftpChannel = session.openChannel("sftp") as ChannelSftp
-    //val outputStream = ByteArrayOutputStream()
-    //sftpChannel.outputStream = outputStream
+        sftpChannel.connect(10000)
+        //sftpChannel.put("I:/demo/myOutFile.txt", "/tmp/myOutFile.zip", 1 )
+        sftpChannel.put(inputStream, "/tmp/amazert.tar.gz", OVERWRITE)
 
-    sftpChannel.connect(10000)
-    //sftpChannel.put("I:/demo/myOutFile.txt", "/tmp/myOutFile.zip", 1 )
-    sftpChannel.put(inputStream, "/tmp/amazert.tar.gz", OVERWRITE)
+        // Sleep needed in order to wait long enough to get result back.
+        Thread.sleep(1_000)
+        sftpChannel.disconnect()
 
-    // Sleep needed in order to wait long enough to get result back.
-    Thread.sleep(1_000)
-    sftpChannel.disconnect()
+        session.disconnect()
 
-    session.disconnect()
+        //return outputStream.toString()
+        return "Sftp Done"
+    }
 
-    //return outputStream.toString()
-    return "Sftp Done"
-}
+    fun executeGetCommand(username: String,
+                          password: String,
+                          hostname: String,
+                          port: Int = 22): String {
+        val jsch = JSch()
+        val session = jsch.getSession(username, hostname, port)
+        session.setPassword(password)
 
-fun executeGetCommand(username: String,
-                       password: String,
-                       hostname: String,
-                       port: Int = 22): String {
-    val jsch = JSch()
-    val session = jsch.getSession(username, hostname, port)
-    session.setPassword(password)
+        // Avoid asking for key confirmation.
+        val properties = Properties()
+        properties.put("StrictHostKeyChecking", "no")
+        session.setConfig(properties)
 
-    // Avoid asking for key confirmation.
-    val properties = Properties()
-    properties.put("StrictHostKeyChecking", "no")
-    session.setConfig(properties)
+        session.connect()
 
-    session.connect()
+        // Create SSH Channel.
+        val sftpChannel = session.openChannel("sftp") as ChannelSftp
 
-    // Create SSH Channel.
-    val sftpChannel = session.openChannel("sftp") as ChannelSftp
+        sftpChannel.connect(10000)
 
-    sftpChannel.connect(10000)
+        val remoteFile = "/etc/amazert.json"
 
-    val remoteFile = "/etc/amazert.json"
+        val iStream: InputStream = sftpChannel.get(remoteFile)
 
-    val iStream: InputStream = sftpChannel.get(remoteFile)
+        val response = BufferedReader(
+            InputStreamReader(iStream, "UTF-8")
+        ).use { it.readText() }
 
-    val response = BufferedReader(
-        InputStreamReader(iStream, "UTF-8")
-    ).use { it.readText() }
+        val register = Gson().fromJson(response,Register::class.java)
 
-    val register = Gson().fromJson(response,Register::class.java)
+        MyApplication.Companion.register = register.toString()
 
-    // set local file
-    //val tFile = FileOutputStream("amazert.json")
-    //val tFile = FileOutputStream(File("amazert.json"))
+        // set local file
+        //val tFile = FileOutputStream("amazert.json")
+        //val tFile = FileOutputStream(File("amazert.json"))
 
-    // read local file contents
-    //var c: Int
-    //while (iStream.read().also { c = it } != -1) {
-    //    tFile.write(c)
-    //}
+        // read local file contents
+        //var c: Int
+        //while (iStream.read().also { c = it } != -1) {
+        //    tFile.write(c)
+        //}
 
-    iStream.close()
-    //tFile.close()
+        iStream.close()
+        //tFile.close()
 
-    // Sleep needed in order to wait long enough to get result back.
-    Thread.sleep(1_000)
-    sftpChannel.disconnect()
+        // Sleep needed in order to wait long enough to get result back.
+        Thread.sleep(1_000)
+        sftpChannel.disconnect()
 
-    session.disconnect()
+        session.disconnect()
 
-    //return outputStream.toString()
-    return register.toString()
+        //return outputStream.toString()
+        return register.toString()
+
+    }
+
 }

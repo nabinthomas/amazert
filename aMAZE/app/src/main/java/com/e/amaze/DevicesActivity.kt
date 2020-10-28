@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.Toast
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
@@ -20,10 +21,19 @@ class DevicesActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_devices)
+
+        val button = findViewById<Button>(R.id.button3)
+        button.setOnClickListener {
+            registerDevice("c55d78f3-18de-11eb-ae63-dca6328f819e")
+        }
     }
 
     fun launchAddDevice(view: View) {
         val intent = Intent(this, AddDevice::class.java)
+        var uid = FirebaseAuth.getInstance().currentUser?.uid
+        var user = FirebaseAuth.getInstance().currentUser?.email
+        intent.putExtra("Name", user)
+        intent.putExtra("Uid", uid)
         startActivity(intent)
     }
 
@@ -44,7 +54,6 @@ class DevicesActivity : AppCompatActivity() {
         val intent = Intent(this, DevicesActivity::class.java)
         intent.putExtra("Name", user)
         startActivity(intent)
-
     }
 
     fun logoutCurrentUser(view: View) {
@@ -52,6 +61,20 @@ class DevicesActivity : AppCompatActivity() {
         Log.i("FBase", "LOGGING OUT User: $userName")
         AuthUI.getInstance().signOut(this)
         onBackPressed()
+    }
+
+    fun launchFirebaseIo(view: View) {
+        val intent = Intent(this, dbio::class.java)
+        startActivity(intent)
+    }
+
+    private fun registerDevice(deviceId: String) {
+        var userId = FirebaseAuth.getInstance().currentUser?.uid
+        //var deviceId = "c55d78f3-18de-11eb-ae63-dca6328f819e" // Unique_DeviceUID
+
+        val refPrefix = "/users/$userId/$deviceId/identifier/email"
+        val devRef = database.getReference(refPrefix)
+        devRef.setValue(FirebaseAuth.getInstance().currentUser?.email)
     }
 }
 
