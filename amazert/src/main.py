@@ -46,8 +46,9 @@ General format
             }, 
             read : {
                 prologue : [commands to be run before reading this setting. Optional. ]
-                commandType : < uci -> will run uci set <name>=<value>; uci commit>,
+                commandType : < uci -> will run uci get <name>=<value>
                 epilogue : [ commands to be run after reading this setting. Optional. ]
+                default : <default value>
             }
             
         },
@@ -72,6 +73,19 @@ dataDrivenSettingsRules = [
         "handler" : {
             "read" : { 
                 "commandType" : "uci" 
+            }, 
+            "write" : {
+                "commandType" : "uci",
+                "epilogue" : ["wifi"]
+            }
+        }
+    },
+    {
+        "name" : "wireless.wifinet0.disabled",
+        "handler" : {
+            "read" : { 
+                "commandType" : "uci",
+                "default" : "0"
             }, 
             "write" : {
                 "commandType" : "uci",
@@ -114,7 +128,24 @@ def getAllSupportedSettings():
         setting = {}
         setting['name'] = rule['name']
         if (rule['handler']["read"]['commandType'] == "uci"):
+            try: 
+                if (rule["handler"]["read"]["prologue"] is not None):
+                    print ("prologue")
+                    runShellcommand(rule["handler"]["prologue"])
+            except:
+                print("no prologue")
+
             setting['value'] = runShellcommand(["uci", "get", setting["name"]])
+            try:
+                if (setting["value"] == "uci: Entry not found"):
+                    setting["value"] = rule["handler"]["read"]["default"]
+            except:
+                print("using default value")
+            try: 
+                if (rule["handler"]["read"]["epilogue"] is not None):
+                    runShellcommand(rule["handler"]["read"]["epilogue"])
+            except:
+                print( "no epilogue" )
             print ("Setting " + setting["name"] + "=" + setting['value'])
             allSettings.append(setting)
     return allSettings
