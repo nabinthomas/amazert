@@ -161,15 +161,15 @@ Every packet will need to be added with some extra information about the
 identification of the device being controlled/reported. This is a wrapper for generating
 and updating that data
 
-@param config - JSON Object holding the device configuration (ID data)
+@param identification - JSON Object holding the device configuration (ID data)
 @param dataToSend - JSON Object holding the data to be sent
 
-@return - JSON Object with config data added to dataToSend
+@return - JSON with identification data added to dataToSend
 
 """
-def preparePacketToSend(config, dataToSend):
+def preparePacketToSend(identification, dataToSend):
     jsonPacket = dataToSend
-    jsonPacket['identifier'] = config
+    jsonPacket['identifier'] = identification
     return  json.dumps(jsonPacket)
 
 """
