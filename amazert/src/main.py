@@ -170,7 +170,7 @@ and updating that data
 def preparePacketToSend(config, dataToSend):
     jsonPacket = dataToSend
     jsonPacket['identifier'] = config
-    return jsonPacket
+    return  json.dumps(jsonPacket)
 
 """
 Thread implementing Heartbeat support. This sends all the current settings to the Cloud server once on boot
