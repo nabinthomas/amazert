@@ -12,6 +12,7 @@
         android:layout_height="55dp"
         android:layout_marginStart="141dp"
         android:layout_marginTop="16dp"
+        android:onClick="registerAppDb"
         android:text="@string/update_device"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button2" />
@@ -28,5 +29,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.3" />
+
+    <Button
+        android:id="@+id/button4"
+        android:layout_width="126dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="143dp"
+        android:layout_marginTop="53dp"
+        android:onClick="logoutCurrentUser"
+        android:text="LogOut"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button3" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
