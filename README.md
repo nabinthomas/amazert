@@ -48,7 +48,7 @@ Android App will need to do the following
 ### Format of amazert.json
 <pre>
   {
-      'registrationId': '8784c5df-f087-4740-b41b-248dc9389a2f',  # Id unique to this registration. This is kind of a secret password to be used
+      'registrationId': '8784c5df-f087-4740-b41b-248dc9389a2f',  # Id unique to this registration. This is kind of a secret password to be used. This may be used in future to encrypt secure data so that it is not visible for the AmazeRT App Engine. This value is shared with the AmazeRT Android App during initial setup
       'email': 'nabin@gmail.com', # Owner's email id. Used by App Engine to find the device and to validate Android App's authentication state
       'uid': '_SDFsEfRSDjFCZXCVASEf', # Uid associated with this email, used for simplificaiton of database access at the server
       'deviceId': 'fb967061-168a-11eb-9272-88e9fe6b97d6' # Unique, secret Id for the device. All communication jsons will have this uuid as part of the json
@@ -79,7 +79,6 @@ A Sample is given below
 <pre>
 {
     "identifier" : {
-      'registrationId': '8784c5df-f087-4740-b41b-248dc9389a2f', 
       'email': 'nabin@gmail.com', 
       'uid': '_SDFsEfRSDjFCZXCVASEf',
       'deviceId': 'fb967061-168a-11eb-9272-88e9fe6b97d6'
@@ -101,7 +100,6 @@ A Sample is given below
 <pre>
 {
     "identifier" : {
-      'registrationId': '8784c5df-f087-4740-b41b-248dc9389a2f', 
       'email': 'nabin@gmail.com', 
       'uid': '_SDFsEfRSDjFCZXCVASEf',
       'deviceId': 'fb967061-168a-11eb-9272-88e9fe6b97d6'
@@ -118,7 +116,6 @@ Example Request to apply a setting
 <pre>
 {
     "identifier" : {
-      'registrationId': '8784c5df-f087-4740-b41b-248dc9389a2f', 
       'email': 'nabin@gmail.com', 
       'uid': '_SDFsEfRSDjFCZXCVASEf',
       'deviceId': 'fb967061-168a-11eb-9272-88e9fe6b97d6'

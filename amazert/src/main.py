@@ -314,6 +314,7 @@ def loadCurrentRegistration():
         configFile = open(configFilePath)
         currentRegistration = json.load(configFile)
         if ((currentRegistration['email']) and (currentRegistration['deviceId']) and (currentRegistration['registrationId']) and (currentRegistration['uid'])):
+            del currentRegistration['registrationId']
             return currentRegistration
         return None
     except Exception:
@@ -326,6 +327,8 @@ and keep listening to requests
 """
 async def amazeRTServiceMain():
     uri = "ws://localhost:6789"
+    #uri = "ws://amaze-id1.wl.r.appspot.com/register"
+
     config = loadCurrentRegistration()
     if (config is None):
         print("AmazeRT is not configured on this machine. please run initial configuration using init.py")
