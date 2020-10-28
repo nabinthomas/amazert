@@ -27,22 +27,20 @@ General format
     {
         name : settingname,
         handler:  {
-            filter : {
-                possibleValues : [ list of possible values that are valid for this. 
-                                If this field is not present any value is accepted. 
-                                If this field is present and empty then the field is read Only
-                                ],
-                commandMappings : {
-                    value1 : [ commands to run in sequence to set this value. 
-                            This may be a shell script too. 
-                            This is valid only for settings with restricted set of possibleValues
-                        ]
-                },
-            },
             write : {
                 prologue : [commands to be run before applying this setting. Optional. eg: turn of wifi before changing something]
                 commandType : < uci -> will run uci set <name>=<value>; uci commit>,
+            filter : {
+                value1 : {
+                    write : [ commands to run in sequence to set this value. 
+                        This may be a shell script too. 
+                        This is valid only for settings with restricted set of possibleValues
+                        ]
+                },
+                value2...
+            },
                 epilogue : [ commands to be run after applying this setting. Optional. eg: wifi on after applying settings/ wifi restart etc]
+
             }, 
             read : {
                 prologue : [commands to be run before reading this setting. Optional. ]
@@ -88,7 +86,11 @@ dataDrivenSettingsRules = [
                 "default" : "0"
             }, 
             "write" : {
-                "commandType" : "uci",
+                "commandType" : "uci.filtered",
+                "filter" : {
+                    "0" : ["uci", "delete", "wireless.wifinet0.disabled"],
+                    "1" : ["uci", "set", "wireless.wifinet0.disabled=1"]
+                },
                 "epilogue" : ["wifi"]
             }
         }
@@ -127,27 +129,27 @@ def getAllSupportedSettings():
     for rule in dataDrivenSettingsRules:
         setting = {}
         setting['name'] = rule['name']
+        
+        try: 
+            if (rule["handler"]["read"]["prologue"] is not None):
+                print ("prologue")
+                runShellcommand(rule["handler"]["prologue"])
+        except:
+            print("no prologue")
         if (rule['handler']["read"]['commandType'] == "uci"):
-            try: 
-                if (rule["handler"]["read"]["prologue"] is not None):
-                    print ("prologue")
-                    runShellcommand(rule["handler"]["prologue"])
-            except:
-                print("no prologue")
-
             setting['value'] = runShellcommand(["uci", "get", setting["name"]])
-            try:
-                if (setting["value"] == "uci: Entry not found"):
-                    setting["value"] = rule["handler"]["read"]["default"]
-            except:
-                print("using default value")
-            try: 
-                if (rule["handler"]["read"]["epilogue"] is not None):
-                    runShellcommand(rule["handler"]["read"]["epilogue"])
-            except:
-                print( "no epilogue" )
-            print ("Setting " + setting["name"] + "=" + setting['value'])
-            allSettings.append(setting)
+        try:
+            if (setting["value"] == "uci: Entry not found"):
+                setting["value"] = rule["handler"]["read"]["default"]
+        except:
+            print("using default value")
+        try: 
+            if (rule["handler"]["read"]["epilogue"] is not None):
+                runShellcommand(rule["handler"]["read"]["epilogue"])
+        except:
+            print( "no epilogue" )
+        print ("Setting " + setting["name"] + "=" + setting['value'])
+        allSettings.append(setting)
     return allSettings
 
 """
@@ -264,27 +266,28 @@ async def amazerRTSettingHandler(config, websocket, setting, options):
         if (rule["name"] == settingName):
             print ("Match with " + rule["handler"]["write"]["commandType"] )
 
+            try: 
+                if (rule["handler"]["write"]["prologue"] is not None):
+                    print ("prologue")
+                    response = response + runShellcommand(rule["handler"]["prologue"])
+            except:
+                response += "no prologue\n"
             if (rule["handler"]["write"]["commandType"] == "uci"):
-                print ("uci command")
-                try: 
-                    if (rule["handler"]["write"]["prologue"] is not None):
-                        print ("prologue")
-                        response = response + runShellcommand(rule["handler"]["prologue"])
-                except:
-                    response += "no prologue\n"
                 command = ["uci", "set", settingName + "=" + setting["value"]]
-                print (command)
-                response = response + runShellcommand(command)
-                print("Response is " + response)
-                response = response + runShellcommand(["uci", "commit"])
-                print("Response is " + response)
+            elif (rule["handler"]["write"]["commandType"] == "uci.filtered"):
+                command = rule["handler"]["write"]["filter"][str(setting["value"])]
+            print (command)
+            response = response + runShellcommand(command)
+            print("Response is " + response)
+            response = response + runShellcommand(["uci", "commit"])
+            print("Response is " + response)
 
-                try: 
-                    if (rule["handler"]["write"]["epilogue"] is not None):
-                        response = response + runShellcommand(rule["handler"]["write"]["epilogue"])
-                except:
-                    response += "no epilogue\n"
-                print("Response is " + response)
+            try: 
+                if (rule["handler"]["write"]["epilogue"] is not None):
+                    response = response + runShellcommand(rule["handler"]["write"]["epilogue"])
+            except:
+                response += "no epilogue\n"
+            print("Response is " + response)
 
 """
 Handle a request to control the amazeRT SW
