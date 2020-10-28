@@ -168,7 +168,8 @@ class AddDevice : AppCompatActivity() {
         sshChannel.connect(160000)
         // Execute command.
         //TODO - get email id from previous context
-        val cmd = "cd /tmp && tar -xvzf amazert.tar.gz && cd /tmp/amazert && chmod 744 install.sh && ./install.sh && python3 init.py " + uName + " " + uId
+        val cmd =
+            "cd /tmp && tar -xvzf amazert.tar.gz && cd /tmp/amazert && chmod 744 install.sh && ./install.sh && python3 init.py $uName $uId"
         Log.d("CMD","cmd "+ cmd)
         sshChannel.setCommand(cmd)
         //sshChannel.setCommand("uname -a")
