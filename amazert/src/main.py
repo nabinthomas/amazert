@@ -31,12 +31,10 @@ General format
                 prologue : [commands to be run before applying this setting. Optional. eg: turn of wifi before changing something]
                 commandType : < uci -> will run uci set <name>=<value>; uci commit>,
             filter : {
-                value1 : {
-                    write : [ commands to run in sequence to set this value. 
+                value1 : [ command to run in sequence to set this value. 
                         This may be a shell script too. 
                         This is valid only for settings with restricted set of possibleValues
-                        ]
-                },
+                        ],s
                 value2...
             },
                 epilogue : [ commands to be run after applying this setting. Optional. eg: wifi on after applying settings/ wifi restart etc]
