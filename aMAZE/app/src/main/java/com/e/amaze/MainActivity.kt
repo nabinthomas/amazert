@@ -1,6 +1,7 @@
 package com.e.amaze
 
 import android.app.Activity
+import android.app.Application
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -13,6 +14,17 @@ import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.iid.FirebaseInstanceId
+
+class MyApplication : Application() {
+
+    companion object {
+        var register = "NONE"
+    }
+    override fun onCreate() {
+        super.onCreate()
+    }
+
+}
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

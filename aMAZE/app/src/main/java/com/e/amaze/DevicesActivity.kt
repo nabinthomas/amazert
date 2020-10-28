@@ -24,6 +24,10 @@ class DevicesActivity : AppCompatActivity() {
 
     fun launchAddDevice(view: View) {
         val intent = Intent(this, AddDevice::class.java)
+        var uid = FirebaseAuth.getInstance().currentUser?.uid
+        var user = FirebaseAuth.getInstance().currentUser?.email
+        intent.putExtra("Name", user)
+        intent.putExtra("Uid", uid)
         startActivity(intent)
     }
 
