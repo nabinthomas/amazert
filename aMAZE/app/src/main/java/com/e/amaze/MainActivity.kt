@@ -18,7 +18,7 @@ import com.google.firebase.iid.FirebaseInstanceId
 class MyApplication : Application() {
 
     companion object {
-        lateinit var register: Register
+        var register: Register = Register("","","","")
     }
     override fun onCreate() {
         super.onCreate()

@@ -7,6 +7,9 @@ import android.util.Log
 import android.view.View
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
 import com.jcraft.jsch.ChannelExec
 import com.jcraft.jsch.ChannelSftp
@@ -20,6 +23,7 @@ class AddDevice : AppCompatActivity() {
 
     private lateinit var uName: String
     private lateinit var uId: String
+    private val database = Firebase.database.getReferenceFromUrl("https://amaze-8f94e.firebaseio.com").database
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +55,8 @@ class AddDevice : AppCompatActivity() {
                 //deviceDetails.setText(output.toString())
                 deviceDetails.setText(result)
                 print("Sftp Get Done")
+                registerDeviceToCloud()
+                deviceDetails.setText("Device registration done Successfully")
             }
         }
         class SshTask : AsyncTask<Void, Void, String>() {
@@ -104,6 +110,16 @@ class AddDevice : AppCompatActivity() {
         //SshTask().execute()
         SshInitTask().execute()
 
+    }
+
+    private fun registerDeviceToCloud() {
+        var userId = FirebaseAuth.getInstance().currentUser?.uid
+        //var deviceId = "532e8c40-18cd-11eb-a4ca-dca6328f80c0" // Unique_DeviceUID
+        var deviceId = MyApplication.Companion.register.deviceId
+
+        val refPrefix = "/users/$userId/$deviceId/identifier/email"
+        val devRef = database.getReference(refPrefix)
+        devRef.setValue(FirebaseAuth.getInstance().currentUser?.email)
     }
 
     fun executeRemoteInitCommand(username: String,
