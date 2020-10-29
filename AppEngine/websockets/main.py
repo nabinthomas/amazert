@@ -32,24 +32,9 @@ cred = credentials.Certificate("./key.json")
 firebase_admin.initialize_app(cred,{
         'databaseURL' : 'https://amaze-id1.firebaseio.com'
     })
-ref = db.reference('/users')
-queryResults1 = ref.get()
-print (queryResults1)
-
-'''
-const firebaseConfig = {
-  apiKey: "AIzaSyDnsNBeVMqwif9fjBVb_DnxQ-D6fBuTltk",
-  authDomain: "amaze-id1.firebaseapp.com",
-  databaseURL: "https://amaze-id1.firebaseio.com",
-  projectId: "amaze-id1",
-  storageBucket: "amaze-id1.appspot.com",
-  messagingSenderId: "668969402569",
-  appId: "1:668969402569:web:796cc33e91e2934a578d18",
-  measurementId: "G-C8PD91FZQZ"
-  };
-'''
-
-
+#ref = db.reference('/users')
+#queryResults1 = ref.get()
+#print (queryResults1)
 app = Flask(__name__)
 sockets = Sockets(app)
 
@@ -90,13 +75,60 @@ Notify the appropriate WRT device about a realtime data base change event
 """
 @sockets.route('/notify')
 def notify_socket(ws):
+   print("NOTIFY")
    while not ws.closed:
         message = ws.receive()
         if message is None:  # message is "None" if the client has closed.
             continue
+            
+        '''
+        {
+         "resource_string"= "projects/_/instances/amaze-id1/refs/users/_SDFsEfRSDjFCZXCVASEf/532e8c40-18cd-11eb-a4ca-dca6328f80c0"  ,
+          "data" = {'settings': {'1': {'value': 'MuttuWRT'}}}
+        }
+        '''
         print(message)
-       
+        msg = json.loads(message)
+        print("jsonload ok ")
+        resource_string = msg["resource_string"]
+        print("resource_string ok = " + str(resource_string))
+        #resource_string= "projects/_/instances/amaze-id1/refs/users/_SDFsEfRSDjFCZXCVASEf/532e8c40-18cd-11eb-a4ca-dca6328f80c0"
+                          #0       /1/2        /3        /4   /5    /6                    /7
+        path= resource_string.split("/")
+        uid = path[6]
+        print("uid", uid)
+        did= path[7]
+        print("did", did)
 
+        settings = msg["data"]
+        print("settings", settings)
+        for node in settings.keys():
+            print("node=", node)
+            
+            #refpath = "/users/" + str(uid) + "/" + str(did)+"/settings/"+node
+            #{'settings': {'1': {'value': 'MuttuWRT'}}}
+            refSetting = db.reference("/users/" + str(uid) + "/" + str(did)+ "/settings/" + str(node))
+            settingChnage = refSetting.get()
+            print("settingChnage=" + str(settingChnage))
+            name = settingChnage["name"]
+            val1= settingChnage["value"]
+            print("name=" + name + "  Value=" +val1 )
+
+            identifierRef= db.reference("/users/" + str(uid) + "/" + str(did)+ "/identifier")
+            identifier = identifierRef.get()
+            email = identifier["email"]
+            print(email)
+            reply = {
+                    "identifier" : {
+                            "email": email, 
+                            "uid": uid,
+                            "deviceId": did
+                    },
+                    "action": "setting",
+                    "setting" : { "name" : name, "value" : val1}
+            }
+            wrtWs= scockeDevMap[did]
+            wrtWs.send(json.dumps(reply))
         
 # [END gae_flex_websockets_app]
 # [END gae_flex_websockets_app]
@@ -155,12 +187,11 @@ def register_socket(ws):
                         settingsRef = db.reference(settingsPath) 
                         settingsRef.set(settings)
                         sendReply(ws, message, "PASS")
+                        scockeDevMap[deviceId]=ws
                         return
                 print("NOT Found in DB")
                 sendReply(ws, message, "FAIL")
                 #return 
-                
-
             except Exception as e:
                 print("Exceptoin here1")
                 sendReply(ws, message, "FAIL")
