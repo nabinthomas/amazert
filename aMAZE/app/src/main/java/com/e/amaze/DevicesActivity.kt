@@ -16,13 +16,13 @@ import com.google.firebase.ktx.Firebase
 
 class DevicesActivity : AppCompatActivity() {
 
-    private val database = Firebase.database
+    private val database = Firebase.database.getReferenceFromUrl("https://amaze-8f94e.firebaseio.com").database
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_devices)
 
-        val button = findViewById<Button>(R.id.button3)
+        val button = findViewById<Button>(R.id.button7)
         button.setOnClickListener {
             registerDevice("c55d78f3-18de-11eb-ae63-dca6328f819e")
         }
@@ -70,7 +70,7 @@ class DevicesActivity : AppCompatActivity() {
 
     private fun registerDevice(deviceId: String) {
         var userId = FirebaseAuth.getInstance().currentUser?.uid
-        //var deviceId = "c55d78f3-18de-11eb-ae63-dca6328f819e" // Unique_DeviceUID
+        var deviceId = "532e8c40-18cd-11eb-a4ca-dca6328f80c0" // Unique_DeviceUID
 
         val refPrefix = "/users/$userId/$deviceId/identifier/email"
         val devRef = database.getReference(refPrefix)

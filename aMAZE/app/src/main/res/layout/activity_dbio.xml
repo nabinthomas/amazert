@@ -12,41 +12,9 @@
         android:layout_width="305dp"
         android:layout_height="63dp"
         android:layout_marginStart="60dp"
-        android:layout_marginTop="52dp"
+        android:layout_marginTop="43dp"
         android:onClick="logoutCurrentUser"
         android:text="Logout"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/readDb" />
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="122dp"
-        android:layout_height="60dp"
-        android:layout_marginStart="56dp"
-        android:layout_marginTop="28dp"
-        android:text="          UID                   [ optional, for DB Rule test]"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView3" />
-
-    <Button
-        android:id="@+id/writeDb"
-        android:layout_width="307dp"
-        android:layout_height="64dp"
-        android:layout_marginStart="56dp"
-        android:layout_marginTop="32dp"
-        android:onClick="updateCompleteDB"
-        android:text="Update DB"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/uid" />
-
-    <Button
-        android:id="@+id/readDb"
-        android:layout_width="305dp"
-        android:layout_height="73dp"
-        android:layout_marginStart="60dp"
-        android:layout_marginTop="44dp"
-        android:onClick="readDb"
-        android:text="Read DB"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/writeDb" />
 
@@ -54,13 +22,34 @@
         android:id="@+id/uid"
         android:layout_width="182dp"
         android:layout_height="52dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="31dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="100dp"
         android:ems="10"
         android:inputType="textPersonName"
         android:longClickable="true"
         app:layout_constraintStart_toEndOf="@+id/textView2"
         app:layout_constraintTop_toBottomOf="@+id/power_spinner" />
+
+    <Button
+        android:id="@+id/writeDb"
+        android:layout_width="307dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="56dp"
+        android:layout_marginTop="20dp"
+        android:onClick="testDbRules"
+        android:text="Test Rule"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/uid" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="122dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="56dp"
+        android:layout_marginTop="96dp"
+        android:text="          UID                   [ optional, for DB Rule test]"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
     <TextView
         android:id="@+id/textView"
