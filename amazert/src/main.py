@@ -373,9 +373,13 @@ async def amazeRTServiceMain():
     ) as websocket:
         hearbeatThread = amazeRTHeartBeatThread(config, websocket)
         hearbeatThread.start()
-        await asyncio.gather(
-           amazeRTActionHandler(config, websocket)
-        )
+        try:
+            await asyncio.gather(
+                amazeRTActionHandler(config, websocket)
+            )
+        except websockets.exceptions.ConnectionClosedError as e:
+            logger.debug("Connection was closed by server. Will quit now and restart + ", str(e))
+            exit(-1)
         hearbeatThread.join()
             
 
