@@ -3,7 +3,9 @@
 import json
 import uuid
 import sys
+import logging
 
+amazertlogfile = "/var/log/amazert.log"
 configFilePath = "/etc/amazert.json"
 ##TODO . This is for local testing. The file should be in /etc along with other configs. 
 #configFilePath = "/tmp/amazert.json"
@@ -50,7 +52,7 @@ def loadCurrentRegistration():
             return currentRegistration
         return None
     except Exception:
-        print("AmazeRT Config json does not exist or is invalid")
+        logger.debug("AmazeRT Config json does not exist or is invalid")
     return None
 
 """
@@ -66,7 +68,7 @@ The config is stored in the file pointed to by configFilePath
 def main(argv):
     try:
         currentRegistrationData = loadCurrentRegistration()
-        print(currentRegistrationData)
+        logger.debug(currentRegistrationData)
         if (currentRegistrationData is None):
             # create a new configuration only if it does not exist
             # This prevents accidentally overwriting config data.
@@ -75,20 +77,29 @@ def main(argv):
             emailId = argv[0]
             uid = argv[1]
             deviceId = generateDeviceUUID()
-            print (deviceId)
+            logger.debug (deviceId)
             registrationId = generateRegistrationUUID()
-            print (registrationId)
+            logger.debug (registrationId)
             currentRegistrationData = generateRegistrationJson(emailId, uid, deviceId, registrationId)
-            print (currentRegistrationData)
+            logger.debug (currentRegistrationData)
         try:
             configFile = open(configFilePath, "w")
             json.dump(currentRegistrationData, configFile, indent=4)
             configFile.close()
         except Exception as e:
-            print("Unable to create/write configfile")
+            logger.debug("Unable to create/write configfile")
             raise e
     except Exception as e:
-        print ("AmazeRT Failed to Register device. Details: " + str(e) + "\n")
+        logger.debug ("AmazeRT Failed to Register device. Details: " + str(e) + "\n")
+
+
+## Setup debug logging
+logger = logging.getLogger("AmazeRT::Init")
+logger.setLevel(logging.DEBUG)
+loghandler = logging.FileHandler(amazertlogfile)
+logformatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+loghandler.setFormatter(logformatter)
+logger.addHandler(loghandler)
 
 if __name__ == "__main__":
     main(sys.argv[1:])

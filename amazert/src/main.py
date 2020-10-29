@@ -11,10 +11,12 @@ import websockets
 import time
 import json
 import subprocess
+import logging 
 
 keepRunning = True    
 
 
+amazertlogfile = "/var/log/amazert.log"
 configFilePath = "/etc/amazert.json"
 ##TODO . This is for local testing. The file should be in /etc along with other configs. 
 #configFilePath = "/tmp/amazert.json"
@@ -130,23 +132,23 @@ def getAllSupportedSettings():
         
         try: 
             if (rule["handler"]["read"]["prologue"] is not None):
-                print ("prologue")
+                logger.debug ("prologue")
                 runShellcommand(rule["handler"]["prologue"])
         except:
-            print("no prologue")
+            logger.debug("no prologue")
         if (rule['handler']["read"]['commandType'] == "uci"):
             setting['value'] = runShellcommand(["uci", "get", setting["name"]])
         try:
             if (setting["value"] == "uci: Entry not found"):
                 setting["value"] = rule["handler"]["read"]["default"]
         except:
-            print("using default value")
+            logger.debug("using default value")
         try: 
             if (rule["handler"]["read"]["epilogue"] is not None):
                 runShellcommand(rule["handler"]["read"]["epilogue"])
         except:
-            print( "no epilogue" )
-        print ("Setting " + setting["name"] + "=" + setting['value'])
+            logger.debug( "no epilogue" )
+        logger.debug ("Setting " + setting["name"] + "=" + setting['value'])
         allSettings.append(setting)
     return allSettings
 
@@ -193,13 +195,13 @@ class amazeRTHeartBeatThread(threading.Thread):
         allSettings = getAllSupportedSettings()
         message["settings"] = allSettings
         packettoSend = preparePacketToSend(self.config, message)
-        print(f"> {packettoSend}")
+        logger.debug(f"> {packettoSend}")
         self.websocket.send(packettoSend)
 
     def sendHeartbeat(self):
         message = { "action" : "heartbeat"}
         packettoSend = preparePacketToSend(self.config, message)
-        print(f"> {packettoSend}")
+        logger.debug(f"> {packettoSend}")
         self.websocket.send(packettoSend)
 
 """
@@ -219,7 +221,7 @@ in the format like
 @options Special options to run the command. Unused for now. Added for future enhancements
 """
 async def amazeRTCommandHandler(config, websocket, command, options):
-    print ("Executing command : > " + json.dumps(command))
+    logger.debug ("Executing command : > " + json.dumps(command))
     # Send a response.
     resultString = ""
     responseCode = 0
@@ -255,18 +257,18 @@ Handle a request to apply a particular setting
 
 """
 async def amazerRTSettingHandler(config, websocket, setting, options):
-    print ("Applying setting : > " + json.dumps(setting))
+    logger.debug ("Applying setting : > " + json.dumps(setting))
     settingName = setting["name"]
     response = ""
     # Find the rule for handling this setting. 
     for rule in dataDrivenSettingsRules:
-        print(rule["name"])
+        logger.debug(rule["name"])
         if (rule["name"] == settingName):
-            print ("Match with " + rule["handler"]["write"]["commandType"] )
+            logger.debug ("Match with " + rule["handler"]["write"]["commandType"] )
 
             try: 
                 if (rule["handler"]["write"]["prologue"] is not None):
-                    print ("prologue")
+                    logger.debug ("prologue")
                     response = response + runShellcommand(rule["handler"]["prologue"])
             except:
                 response += "no prologue\n"
@@ -274,18 +276,18 @@ async def amazerRTSettingHandler(config, websocket, setting, options):
                 command = ["uci", "set", settingName + "=" + setting["value"]]
             elif (rule["handler"]["write"]["commandType"] == "uci.filtered"):
                 command = rule["handler"]["write"]["filter"][str(setting["value"])]
-            print (command)
+            logger.debug (command)
             response = response + runShellcommand(command)
-            print("Response is " + response)
+            logger.debug("Response is " + response)
             response = response + runShellcommand(["uci", "commit"])
-            print("Response is " + response)
+            logger.debug("Response is " + response)
 
             try: 
                 if (rule["handler"]["write"]["epilogue"] is not None):
                     response = response + runShellcommand(rule["handler"]["write"]["epilogue"])
             except:
                 response += "no epilogue\n"
-            print("Response is " + response)
+            logger.debug("Response is " + response)
 
 """
 Handle a request to control the amazeRT SW
@@ -296,7 +298,7 @@ Handle a request to control the amazeRT SW
 
 """
 async def amazerRTControlHandler(config, websocket, control, options):
-    print ("Responding to control : > " + json.dumps(control))
+    logger.debug ("Responding to control : > " + json.dumps(control))
     if control == "exit":
         keepRunning = False
 
@@ -320,9 +322,9 @@ matches the local configuration in config
 
 """
 async def amazeRTActionHandler(config, websocket):
-    print ("amazeRTActionHandler start ")
+    logger.debug ("amazeRTActionHandler start ")
     async for message in websocket:
-        print(f"< {message}")
+        logger.debug(f"< {message}")
         request = json.loads(message)
         try:
             action = request["action"]
@@ -334,7 +336,7 @@ async def amazeRTActionHandler(config, websocket):
             actionHandler = actionHandlerMappings[action]
             await actionHandler(config, websocket, actionParams, options)
         except KeyError:
-            print ("Unsupported Action > " )
+            logger.debug ("Unsupported Action > " )
         if (message == "exit"):
             keepRunning = False
 
@@ -350,7 +352,7 @@ def loadCurrentRegistration():
             return currentRegistration
         return None
     except Exception:
-        print("AmazeRT Config json does not exist or is invalid")
+        logger.debug("AmazeRT Config json does not exist or is invalid")
     return None
 
 """
@@ -358,15 +360,14 @@ Main for the service. Connects to the Cloud App Engine, Initialize local handler
 and keep listening to requests
 """
 async def amazeRTServiceMain():
-    uri = "ws://localhost:6789"
-    #uri = "ws://amaze-id1.wl.r.appspot.com/register"
+    #uri = "ws://localhost:6789"
+    uri = "ws://amaze-id1.wl.r.appspot.com/register"
 
     config = loadCurrentRegistration()
     if (config is None):
-        print("AmazeRT is not configured on this machine. please run initial configuration using init.py")
+        logger.debug("AmazeRT is not configured on this machine. please run initial configuration using init.py")
         exit(-1)
     
-    #uri = "ws://amaze-id1.wl.r.appspot.com/chat"
     async with websockets.connect(
         uri #, ssl=ssl_context
     ) as websocket:
@@ -378,7 +379,16 @@ async def amazeRTServiceMain():
         hearbeatThread.join()
             
 
-print ("Starting amazeRT Management system\n")
+## Setup debug logging
+logger = logging.getLogger("AmazeRT::Main")
+logger.setLevel(logging.DEBUG)
+loghandler = logging.FileHandler(amazertlogfile)
+logformatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+loghandler.setFormatter(logformatter)
+logger.addHandler(loghandler)
+
+
+logger.debug ("Starting amazeRT Management system\n")
 
 asyncio.get_event_loop().run_until_complete(amazeRTServiceMain())
 
