@@ -1,7 +1,6 @@
 package com.e.amaze
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -9,8 +8,8 @@ import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.firebase.ui.auth.AuthUI
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -66,8 +65,25 @@ class dbio : AppCompatActivity() {
         return true
     }
 
-    fun updateCompleteDB(view: View) {
+    fun testDbRules(view: View) {
+        var userId = FirebaseAuth.getInstance().currentUser?.uid
+        val deviceId = "532e8c40-18cd-11eb-a4ca-dca6328f80c0"
 
+        val editTextUid = findViewById<EditText>(R.id.uid)
+        val uidVal = editTextUid.text.toString()
+        if (uidVal.isNotBlank() ) userId = uidVal.toString() else userId = "NoUser"
+
+        val wifiSpinner = findViewById<View>(R.id.wifi_spinner) as Spinner
+        val wifiVal = wifiSpinner.selectedItem.toString()
+
+        val settingsPath = "users/$userId/$deviceId/settings/0/name"
+        val valPath = "users/$userId/$deviceId/settings/0/value"
+
+        val myRef = database.getReference(settingsPath.toString())
+        myRef.setValue("WifiState")
+        val myRef1 = database.getReference(valPath.toString())
+        myRef1.setValue(wifiVal)
+        /*
         var userId = FirebaseAuth.getInstance().currentUser?.uid
         var deviceId = "Unique_DeviceUID"
 
@@ -93,6 +109,7 @@ class dbio : AppCompatActivity() {
             "UID" to "$userId"
         )
         devRef.setValue(map)
+         */
     }
 
     private fun readCurrentDB(){
@@ -192,23 +209,33 @@ class dbio : AppCompatActivity() {
 
     fun updateWifiState(view: View) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
-        val refPrefix = userId.plus("/device/device-$userId")
+        val deviceId = "532e8c40-18cd-11eb-a4ca-dca6328f80c0"
+        //val refPrefix = userId.plus("/device/device-$userId")
+        val settingsPath = "users/$userId/$deviceId/settings/0/name"
+        val valPath = "users/$userId/$deviceId/settings/0/value"
 
         val wifiSpinner = findViewById<View>(R.id.wifi_spinner) as Spinner
         val wifiVal = wifiSpinner.selectedItem.toString()
 
-        val updWifiState:Map<String, String> = mapOf(Pair("$refPrefix/WifiState", "$wifiVal"))
-        Firebase.database.reference.updateChildren(updWifiState)
+        val myRef = database.getReference(settingsPath.toString())
+        myRef.setValue("WifiState")
+        val myRef1 = database.getReference(valPath.toString())
+        myRef1.setValue(wifiVal)
     }
 
     fun updatePowerState(view: View) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
-        val refPrefix = userId.plus("/device/device-$userId")
+        val deviceId = "532e8c40-18cd-11eb-a4ca-dca6328f80c0"
+        //val refPrefix = userId.plus("/device/device-$userId")
+        val settingsPath = "users/$userId/$deviceId/settings/1/name"
+        val valPath = "users/$userId/$deviceId/settings/1/value"
 
         val powerSpinner = findViewById<View>(R.id.power_spinner) as Spinner
         val powerVal = powerSpinner.selectedItem.toString()
 
-        val updPowerState:Map<String, String> = mapOf(Pair("$refPrefix/PowerState", "$powerVal"))
-        Firebase.database.reference.updateChildren(updPowerState)
+        val myRef = database.getReference(settingsPath.toString())
+        myRef.setValue("PowerState")
+        val myRef1 = database.getReference(valPath.toString())
+        myRef1.setValue(powerVal)
     }
 }
