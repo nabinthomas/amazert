@@ -380,7 +380,7 @@ async def amazeRTServiceMain():
             
 
 ## Setup debug logging
-logger = logging.getLogger("AmazeRT")
+logger = logging.getLogger("AmazeRT::Main")
 logger.setLevel(logging.DEBUG)
 loghandler = logging.FileHandler(amazertlogfile)
 logformatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
