@@ -37,6 +37,6 @@ def hello_rtdb(event, context):
         "resource_string": resource_string,
         "data": delta
     }
-    msgS=json.sumps(msg)
+    msgS=json.dumps(msg)
     notify_cloud  (msgS)
     print("MsgSend"+msgS)
