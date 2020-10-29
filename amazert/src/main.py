@@ -389,7 +389,6 @@ loghandler.setFormatter(logformatter)
 logger.addHandler(loghandler)
 
 
-
 logger.debug ("Starting amazeRT Management system\n")
 
 asyncio.get_event_loop().run_until_complete(amazeRTServiceMain())
