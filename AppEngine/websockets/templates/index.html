@@ -25,7 +25,12 @@
     <p>Chat demo</p>
     <form id="chat-form">
       <textarea id="chat-text" placeholder="Enter some text..."></textarea>
-      <button type="submit">Send</button>
+      <button type="submit">Notify</button>
+    </form>
+
+    <form id="reg-form">
+      <textarea id="reg-text" placeholder="Enter some text..."></textarea>
+      <button type="submit">Register</button>
     </form>
 
     <div>
@@ -46,14 +51,16 @@
       /* If the main page is served via https, the WebSocket must be served via
          "wss" (WebSocket Secure) */
       var scheme = window.location.protocol == "https:" ? 'wss://' : 'ws://';
-      var webSocketUri =  scheme
+      var webSocketRegUri =  scheme
                           + window.location.hostname
                           + (location.port ? ':'+location.port: '')
-                          + '/chat';
+                          + '/register';
 
       /* Get elements from the page */
       var form = $('#chat-form');
+      var Regform = $('#reg-form');
       var textarea = $('#chat-text');
+      var Regtextarea = $('#reg-text');
       var output = $('#chat-response');
       var status = $('#chat-status');
 
@@ -63,32 +70,73 @@
       }
 
       /* Establish the WebSocket connection and register event handlers. */
-      var websocket = new WebSocket(webSocketUri);
+      var websocket = new WebSocket(webSocketRegUri);
 
       websocket.onopen = function() {
-        log('Connected');
+        log('Reg Connected');
       };
 
       websocket.onclose = function() {
-        log('Closed');
+        log('Reg Closed');
       };
 
       websocket.onmessage = function(e) {
-        log('Message received');
-        output.append($('<li>').text(e.data));
+        log('Reg Message received');
+        output.append($('<li>').text('Notification Rvd: '+ e.data));
       };
 
       websocket.onerror = function(e) {
-        log('Error (see console)');
+        log('Reg Error (see console)');
         console.log(e);
       };
+
+   /*Second websocket to listen the notification */
+      var webSocketNtfyUri =  scheme
+                          + window.location.hostname
+                          + (location.port ? ':'+location.port: '')
+                          + '/notify';
+
+      /* Establish the WebSocket connection and register event handlers. */
+      var websocket1 = new WebSocket(webSocketNtfyUri);
+
+      websocket1.onopen = function() {
+        log('Notify Connected');
+      };
+
+      websocket1.onclose = function() {
+        log('NotifyClosed');
+      };
+
+      websocket1.onmessage = function(e) {
+        log('NotifyMessage received');
+        output.append($('<li>').text(e.data));
+      };
+
+      websocket1.onerror = function(e) {
+        log('Notify Error (see console)');
+        console.log(e);
+      };
+
+
+   /*********************************************/
+
+
 
       /* Handle form submission and send a message to the websocket. */
       form.submit(function(e) {
         e.preventDefault();
         var data = textarea.val();
+        websocket1.send(data);
+      });
+
+
+     /* Registration form submission and send a message to the websocket. */
+      Regform.submit(function(e) {
+        e.preventDefault();
+        var data = Regtextarea.val();
         websocket.send(data);
       });
+
     });
     // [END gae_flex_websockets_js]
     </script>
