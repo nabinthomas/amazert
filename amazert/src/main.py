@@ -358,8 +358,8 @@ Main for the service. Connects to the Cloud App Engine, Initialize local handler
 and keep listening to requests
 """
 async def amazeRTServiceMain():
-    uri = "ws://localhost:6789"
-    #uri = "ws://amaze-id1.wl.r.appspot.com/register"
+    #uri = "ws://localhost:6789"
+    uri = "ws://amaze-id1.wl.r.appspot.com/register"
 
     config = loadCurrentRegistration()
     if (config is None):

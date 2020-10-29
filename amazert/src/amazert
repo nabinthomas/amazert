@@ -1,0 +1,10 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2020 Nabin Thomas
+
+START=101
+
+start() {        
+        starttime=`date`
+        echo "$starttime : Starting AmazeRT Service" >> /var/log/amazert.log
+        /usr/bin/amazert/runner.sh &
+}      
