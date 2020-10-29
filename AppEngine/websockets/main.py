@@ -26,11 +26,13 @@ from firebase_admin import messaging
 import firebase_admin
 from firebase_admin import credentials
 
+import json
+
 cred = credentials.Certificate("./key.json")
 firebase_admin.initialize_app(cred,{
         'databaseURL' : 'https://amaze-id1.firebaseio.com'
     })
-ref = db.reference('/user')
+ref = db.reference('/users')
 queryResults1 = ref.get()
 print (queryResults1)
 
@@ -51,6 +53,24 @@ const firebaseConfig = {
 app = Flask(__name__)
 sockets = Sockets(app)
 
+scockeDevMap= {}
+
+def sendReply(ws,message, result):
+    response = {
+        "action" : "response", 
+        "response" : {
+            "code" : result ,
+            "message":message
+        }
+    }
+    ws.send(json.dumps(response))
+
+def sendToAll(ws,message):
+    clients = ws.handler.server.clients.values()
+    for client in clients:
+        client.ws.send(message)
+
+
 
 @sockets.route('/chat')
 def chat_socket(ws):
@@ -61,9 +81,92 @@ def chat_socket(ws):
         # Send the message to all clients connected to this webserver
         # process. (To support multiple processes or instances, an
         # extra-instance storage or messaging system would be required.)
-        clients = ws.handler.server.clients.values()
-        for client in clients:
-            client.ws.send(message)
+        sendToAll(ws,message)
+
+
+"""
+Notify the appropriate WRT device about a realtime data base change event
+@param message - JSON Object holding the change in data base 
+"""
+@sockets.route('/notify')
+def notify_socket(ws):
+   while not ws.closed:
+        message = ws.receive()
+        if message is None:  # message is "None" if the client has closed.
+            continue
+        print(message)
+       
+
+        
+# [END gae_flex_websockets_app]
+# [END gae_flex_websockets_app]
+
+
+"""
+WRT devices send message to this url for registration and heartbeat
+@param message - JSON Object holding the message from WRT device
+"""
+@sockets.route('/register')
+def register_socket(ws):
+    print("Register ")
+    while not ws.closed:
+        message = ws.receive()
+        if message is None:  # message is "None" if the client has closed.
+            continue
+         #TODO: json parsing error
+        try :
+            print("Before Parsing")
+            reg = json.loads(message)
+            print("after Parsing")
+        except Exception as e:
+            print("Message jason parse error" + str(e))
+            return
+            
+
+        if (reg["action"] == "register" ):
+            settings = reg["settings"]
+            print("settings" + str(settings))
+            
+            identifier= reg["identifier"]
+            print("identifier" + str(identifier))
+            uid = identifier["uid"]
+            print("uid" + str(uid))
+            deviceId =identifier["deviceId"]
+            print("deviceId" + str(deviceId))
+            # Now check whether the user device id in the db is same as the device id send by wrt. 
+            devIdpath = "/users/" + uid  + "/" + deviceId
+            UIdpath = "/users/" + uid 
+            try :
+                ref = db.reference(devIdpath )
+                
+                print("DB key = " + str(ref) + "Device got from message=" + str(deviceId))
+                queryResults1 = ref.get()
+                print("DB result" + str(queryResults1))
+
+                
+                uref = db.reference(UIdpath )
+                snapshot = uref.order_by_key().get()
+                print("DB ressnapshotult= " + str(snapshot))
+                
+                for key, val in snapshot.items():
+                    if key == deviceId:
+                        print("Found in DB")
+                        settingsPath = "/users/" + uid  + "/" + deviceId + "/settings"
+                        settingsRef = db.reference(settingsPath) 
+                        settingsRef.set(settings)
+                        sendReply(ws, message, "PASS")
+                        return
+                print("NOT Found in DB")
+                sendReply(ws, message, "FAIL")
+                #return 
+                
+
+            except Exception as e:
+                print("Exceptoin here1")
+                sendReply(ws, message, "FAIL")
+                return
+        
+# [END gae_flex_websockets_app]
 # [END gae_flex_websockets_app]
 
 

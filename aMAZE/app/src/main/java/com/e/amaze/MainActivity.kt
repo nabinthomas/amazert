@@ -18,7 +18,7 @@ import com.google.firebase.iid.FirebaseInstanceId
 class MyApplication : Application() {
 
     companion object {
-        var register = "NONE"
+        lateinit var register: Register
     }
     override fun onCreate() {
         super.onCreate()

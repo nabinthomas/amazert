@@ -1,17 +1,13 @@
 package com.e.amaze
 
-import android.app.Person
 import android.content.res.AssetManager
 import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.EditText
-import android.widget.Toast
-import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.jcraft.jsch.ChannelExec
 import com.jcraft.jsch.ChannelSftp
 import com.jcraft.jsch.ChannelSftp.OVERWRITE
@@ -246,9 +242,12 @@ class AddDevice : AppCompatActivity() {
             InputStreamReader(iStream, "UTF-8")
         ).use { it.readText() }
 
-        val register = Gson().fromJson(response,Register::class.java)
+        val registerDev = Gson().fromJson(response,Register::class.java)
 
-        MyApplication.Companion.register = register.toString()
+        MyApplication.Companion.register.deviceId = registerDev.deviceId
+        MyApplication.Companion.register.email = registerDev.email
+        MyApplication.Companion.register.registrationId = registerDev.registrationId
+        MyApplication.Companion.register.uid = registerDev.uid
 
         // set local file
         //val tFile = FileOutputStream("amazert.json")
@@ -270,7 +269,7 @@ class AddDevice : AppCompatActivity() {
         session.disconnect()
 
         //return outputStream.toString()
-        return register.toString()
+        return registerDev.toString()
 
     }
 
