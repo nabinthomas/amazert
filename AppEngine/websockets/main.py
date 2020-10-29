@@ -100,7 +100,7 @@ def notify_socket(ws):
         did= path[7]
         print("did", did)
 
-        settings = msg["data"]
+        settings = msg["data"]["settings"]
         print("settings", settings)
         for node in settings.keys():
             print("node=", node)
@@ -179,7 +179,7 @@ def register_socket(ws):
                 uref = db.reference(UIdpath )
                 snapshot = uref.order_by_key().get()
                 print("DB ressnapshotult= " + str(snapshot))
-                
+                devIdFound = False
                 for key, val in snapshot.items():
                     if key == deviceId:
                         print("Found in DB")
@@ -188,9 +188,13 @@ def register_socket(ws):
                         settingsRef.set(settings)
                         sendReply(ws, message, "PASS")
                         scockeDevMap[deviceId]=ws
-                        return
-                print("NOT Found in DB")
-                sendReply(ws, message, "FAIL")
+
+                        devIdFound = True
+                if devIdFound == False:
+                    print("NOT Found in DB")
+                    sendReply(ws, message, "FAIL")
+                else:
+                    print("Every Thing looks good")
                 #return 
             except Exception as e:
                 print("Exceptoin here1")
