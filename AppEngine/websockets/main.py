@@ -152,7 +152,7 @@ def register_socket(ws):
             print("after Parsing")
         except Exception as e:
             print("Message jason parse error" + str(e))
-            return
+            continue
             
 
         if (reg["action"] == "register" ):
@@ -195,7 +195,7 @@ def register_socket(ws):
             except Exception as e:
                 print("Exceptoin here1 = " + str(e))
                 sendReply(ws, message, "FAIL")
-                return
+                continue
         
 # [END gae_flex_websockets_app]
 # [END gae_flex_websockets_app]
