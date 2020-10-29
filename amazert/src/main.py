@@ -368,7 +368,6 @@ async def amazeRTServiceMain():
         logger.debug("AmazeRT is not configured on this machine. please run initial configuration using init.py")
         exit(-1)
     
-    #uri = "ws://amaze-id1.wl.r.appspot.com/chat"
     async with websockets.connect(
         uri #, ssl=ssl_context
     ) as websocket:
