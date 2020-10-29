@@ -13,13 +13,30 @@ def hello_rtdb(event, context):
     Args:
          event (dict): Event payload.
          context (google.cloud.functions.Context): Metadata for the event.
+   
+    Notify message format:
+    {
+    "resource_string":"projects/_/instances/amaze-id1/refs/users/_SDFsEfRSDjFCZXCVASEf/532e8c40-18cd-11eb-a4ca-dca6328f80c0",
+        "data":{
+            "settings":{
+                "1":{
+                    "value":"MuttuWRTdddd"
+                }
+            }
+        }
+    }   
+
     """
+    
     resource_string = context.resource
-    # print out the resource string that triggered the function
     print(f"Function triggered by change to: {resource_string}.")
     
     delta  = event["delta"]
-    print(delta)
-    msg = json.dumps(delta)
-    notify_cloud  (msg)
-    print("binu "+msg)
+    print("Delta" + str(delta))
+    msg = {
+        "resource_string": resource_string,
+        "data": delta
+    }
+    msgS=json.sumps(msg)
+    notify_cloud  (msgS)
+    print("MsgSend"+msgS)
