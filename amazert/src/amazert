@@ -1,7 +1,8 @@
 #!/bin/sh /etc/rc.common
 # Copyright (C) 2020 Nabin Thomas
 
-START=101
+# Based on documentation here: https://openwrt.org/docs/techref/initscripts
+START=99
 
 start() {        
         starttime=`date`

@@ -22,7 +22,7 @@ class dbio : AppCompatActivity() {
     companion object {
         private const val TAG = "FireBase_IO"
     }
-    private val database = Firebase.database
+    private val database = Firebase.database.getReferenceFromUrl("https://amaze-8f94e.firebaseio.com/").database
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,6 +83,7 @@ class dbio : AppCompatActivity() {
         myRef.setValue("WifiState")
         val myRef1 = database.getReference(valPath.toString())
         myRef1.setValue(wifiVal)
+
         /*
         var userId = FirebaseAuth.getInstance().currentUser?.uid
         var deviceId = "Unique_DeviceUID"
@@ -112,42 +113,25 @@ class dbio : AppCompatActivity() {
          */
     }
 
-    private fun readCurrentDB(){
-        val userId = FirebaseAuth.getInstance().currentUser?.uid
-        val deviceId = "device-$userId"
-        val refPrefix = userId.plus("/device/$deviceId")
-        val myRef = database.getReference(refPrefix)
-        val childRef = myRef.child(userId.toString())
+     fun readCurrentDB(view: View){
+         val userId = FirebaseAuth.getInstance().currentUser?.uid
+         val deviceId = "532e8c40-18cd-11eb-a4ca-dca6328f80c0"
+         val settingsPath = "users/$userId/$deviceId/settings/0"
+         val rootRef = database.getReference(settingsPath.toString())
 
-        childRef.addListenerForSingleValueEvent(object : ValueEventListener {
+        val valueEventListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                Log.d(TAG, "IN onDataChange DB cb......")
-
-                // This method is called once with the initial value and again
-                // whenever data at this location is updated.
-                var vPower: String = ""
-                var vWifi: String = ""
-
-                var hashMap : HashMap<String, String> = HashMap<String, String> ()
-
-
-                for (postSnapshot in dataSnapshot.children) {
-                    Log.d(TAG, "IN read DB, Key: ${postSnapshot.key.toString()}")
-                    Log.d(TAG, "IN read DB, Value: ${postSnapshot.value.toString()}")
-
-
-                    postSnapshot.key?.toString()?.let { hashMap.put(it,
-                        postSnapshot.value as String
-                    ) }
-                    Log.i("SANS", postSnapshot.key.toString().plus(postSnapshot.value.toString()) )
+                for (ds in dataSnapshot.children) {
+                    val username = ds.child("0").getValue(String::class.java)
+                    Log.d("Ammacheeeee.........", "name :: $$ds" )
                 }
             }
 
-            override fun onCancelled(error: DatabaseError) {
-                // Failed to read value
-                Log.w(TAG, "Failed to read value.", error.toException())
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.d(TAG, databaseError.getMessage()) //Don't ignore errors!
             }
-        })
+        }
+        rootRef.addListenerForSingleValueEvent(valueEventListener)
     }
 
     fun readDb(view: View) {
@@ -172,12 +156,9 @@ class dbio : AppCompatActivity() {
                 var hashMap : HashMap<String, String> = HashMap<String, String> ()
 
                 for (postSnapshot in dataSnapshot.children) {
-                    //Log.d("SANS", "-----------read DB, Key: ${postSnapshot.key.toString()}")
-
                     postSnapshot.key?.toString()?.let { hashMap.put(it,
                         postSnapshot.value as String
                     ) }
-                    //Log.i("SANS", postSnapshot.key.toString().plus(postSnapshot.value.toString()) )
                 }
                 var uName:String = ""
                 if (hashMap.isNotEmpty()) {
@@ -207,12 +188,31 @@ class dbio : AppCompatActivity() {
         startActivity(intent)
     }
 
+    fun updateWifiSsid(view: View) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        val deviceId = "532e8c40-18cd-11eb-a4ca-dca6328f80c0"
+        val settingsPath = "users/$userId/$deviceId/settings/0/name"
+        val valPath = "users/$userId/$deviceId/settings/0/value"
+
+        val wifiSsidTextEdit = findViewById<View>(R.id.editTextSSID) as EditText
+        val wifiSSIDVal = wifiSsidTextEdit.text
+
+        val nameRef = database.getReference(settingsPath.toString())
+        nameRef.setValue("wireless.wifinet0.ssid")
+
+        Log.d("SANS", "Edit text  $wifiSSIDVal")
+
+        val valRef = database.getReference(valPath.toString())
+        valRef.setValue(wifiSSIDVal.toString())
+
+    }
+
     fun updateWifiState(view: View) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         val deviceId = "532e8c40-18cd-11eb-a4ca-dca6328f80c0"
         //val refPrefix = userId.plus("/device/device-$userId")
-        val settingsPath = "users/$userId/$deviceId/settings/0/name"
-        val valPath = "users/$userId/$deviceId/settings/0/value"
+        val settingsPath = "users/$userId/$deviceId/settings/1/name"
+        val valPath = "users/$userId/$deviceId/settings/1/value"
 
         val wifiSpinner = findViewById<View>(R.id.wifi_spinner) as Spinner
         val wifiVal = wifiSpinner.selectedItem.toString()
@@ -227,8 +227,8 @@ class dbio : AppCompatActivity() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         val deviceId = "532e8c40-18cd-11eb-a4ca-dca6328f80c0"
         //val refPrefix = userId.plus("/device/device-$userId")
-        val settingsPath = "users/$userId/$deviceId/settings/1/name"
-        val valPath = "users/$userId/$deviceId/settings/1/value"
+        val settingsPath = "users/$userId/$deviceId/settings/2/name"
+        val valPath = "users/$userId/$deviceId/settings/2/value"
 
         val powerSpinner = findViewById<View>(R.id.power_spinner) as Spinner
         val powerVal = powerSpinner.selectedItem.toString()
@@ -238,4 +238,8 @@ class dbio : AppCompatActivity() {
         val myRef1 = database.getReference(valPath.toString())
         myRef1.setValue(powerVal)
     }
+
+
+
+
 }
