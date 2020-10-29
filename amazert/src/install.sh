@@ -17,5 +17,3 @@ chmod a+x /usr/bin/amazert/runner.sh
 cp amazert /etc/init.d/
 chmod a+x /etc/init.d/amazert
 /etc/init.d/amazert enable
-
-
