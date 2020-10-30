@@ -8,6 +8,7 @@ import pathlib
 import ssl
 import threading
 import websocket
+import websockets
 import time
 import json
 import subprocess
@@ -33,15 +34,17 @@ General format
         handler:  {
             write : {
                 prologue : [commands to be run before applying this setting. Optional. eg: turn of wifi before changing something]
-                commandType : < uci -> will run uci set <name>=<value>; uci commit>,
-                              < uci.filtered is similar to uci, except that the values are restricted. Unsupported values will be ignored
-            filter : {
+                commandType : < uci -> will run uci set <name>=<value>>, if a filter exist, then values not in filter will not be applied. 
+                              < uci.custom is similar to uci.filtered, except that each value has a custom set of commands to be done . Unsupported values will be ignored
+            filter : { # for uci.custom
                 value1 : [ command to run in sequence to set this value. 
                         This may be a shell script too. 
                         This is valid only for settings with restricted set of possibleValues
                         ],
                 value2...
             },
+             OR
+            filter : [val1, val2 ...] if using "uci"
 
             epilogue : [ commands to be run after applying this setting. Optional. eg: wifi on after applying settings/ wifi restart etc]
 
@@ -80,6 +83,18 @@ dataDrivenSettingsRules = [ {
         }
     }
 }, {
+    "name" : "wireless.radio0.country",
+    "handler" : {
+        "read" : { 
+            "commandType" : "uci" 
+        }, 
+        "write" : {
+            "commandType" : "uci",
+            "filter" : ["AF","AX","AL","DZ","AS","AD","AO","AI","AQ","AG","AR","AM","AW","AU","AT","AZ","BS","BH","BD","BB","BY","BE","BZ","BJ","BM","BT","BO","BQ","BA","BW","BV","BR","IO","VG","BN","BG","BF","BI","KH","CM","CA","CV","KY","CF","TD","CL","CN","CX","CC","CO","KM","CK","CR","HR","CU","CW","CY","CZ","CD","DK","DJ","DM","DO","TL","EC","EG","SV","GQ","ER","EE","ET","FK","FO","FJ","FI","FR","GF","PF","TF","GA","GM","GE","DE","GH","GI","GR","GL","GD","GP","GU","GT","GG","GN","GW","GY","HT","HM","HN","HK","HU","IS","IN","ID","IR","IQ","IE","IM","IL","IT","CI","JM","JP","JE","JO","KZ","KE","KI","XK","KW","KG","LA","LV","LB","LS","LR","LY","LI","LT","LU","MO","MK","MG","MW","MY","MV","ML","MT","MH","MQ","MR","MU","YT","MX","FM","MD","MC","MN","ME","MS","MA","MZ","MM","NA","NR","NP","NL","AN","NC","NZ","NI","NE","NG","NU","NF","KP","MP","NO","OM","PK","PW","PS","PA","PG","PY","PE","PH","PN","PL","PT","PR","QA","CG","RE","RO","RU","RW","BL","SH","KN","LC","MF","PM","VC","WS","SM","ST","SA","SN","RS","CS","SC","SL","SG","SX","SK","SI","SB","SO","ZA","GS","KR","SS","ES","LK","SD","SR","SJ","SZ","SE","CH","SY","TW","TJ","TZ","TH","TG","TK","TO","TT","TN","TR","TM","TC","TV","VI","UG","UA","AE","GB","US","UM","UY","UZ","VU","VA","VE","VN","WF","EH","YE","ZM","ZW"],
+            "epilogue" : ["wifi"]
+        }
+    }
+}, {
     "name" : "wireless.wifinet0.disabled",
     "handler" : {
         "read" : { 
@@ -87,7 +102,7 @@ dataDrivenSettingsRules = [ {
             "default" : "0"
         }, 
         "write" : {
-            "commandType" : "uci.filtered",
+            "commandType" : "uci.custom",
             "filter" : {
                 "0" : ["uci", "delete", "wireless.wifinet0.disabled"],
                 "1" : ["uci", "set", "wireless.wifinet0.disabled=1"]
@@ -260,7 +275,8 @@ Handle a request to apply a particular setting
 def amazerRTSettingHandler(config, ws, settings, options):
     logger.debug ("Applying settings : > " + json.dumps(settings))
     for setting in settings:
-        settingName = setting["name"]
+        settingName = str(setting["name"])
+        settingValue = str(setting["value"])
         response = ""
         # Find the rule for handling this setting. 
         for rule in dataDrivenSettingsRules:
@@ -275,9 +291,17 @@ def amazerRTSettingHandler(config, ws, settings, options):
                 except:
                     response += "no prologue\n"
                 if (rule["handler"]["write"]["commandType"] == "uci"):
-                    command = ["uci", "set", settingName + "=" + setting["value"]]
-                elif (rule["handler"]["write"]["commandType"] == "uci.filtered"):
-                    command = rule["handler"]["write"]["filter"][str(setting["value"])]
+                    command = [""]
+                    try: 
+                        supportedList = rule["handler"]["write"]["filter"]
+                    except KeyError as e:
+                        supportedList = None
+                    if ((supportedList is None) or (settingValue in supportedList)):
+                        command = ["uci", "set", settingName + "=" + settingValue]
+                    else:
+                        logger.debug ("Unsupported Value " + settingValue + " For setting " + settingName)        
+                elif (rule["handler"]["write"]["commandType"] == "uci.custom"):
+                    command = rule["handler"]["write"]["filter"][settingValue]
                 logger.debug (command)
                 response = response + runShellcommand(command)
                 logger.debug("Response is " + response)
@@ -338,7 +362,7 @@ def amazeRTActionHandler(config, ws):
         actionHandler = actionHandlerMappings[action]
         actionHandler(config, ws, actionParams, options)
     except KeyError:
-        logger.debug ("Unsupported Action > "  + action)
+        logger.debug ("Unsupported Action for request "  + json.dumps(request))
     if (message == "exit"):
         keepRunning = False
 
@@ -362,8 +386,8 @@ Main for the service. Connects to the Cloud App Engine, Initialize local handler
 and keep listening to requests
 """
 async def amazeRTServiceMain():
-    #uri = "ws://localhost:6789"
-    uri = "ws://amaze-id1.wl.r.appspot.com/register"
+    uri = "ws://localhost:6789"
+    #uri = "ws://amaze-id1.wl.r.appspot.com/register"
 
     config = loadCurrentRegistration()
     if (config is None):
@@ -378,7 +402,7 @@ async def amazeRTServiceMain():
     try:
         while (keepRunning):
             amazeRTActionHandler(config, ws)
-    except ws.exceptions.ConnectionClosedError as e:
+    except websockets.exceptions.ConnectionClosedError as e:
         logger.debug("Connection was closed by server. Will quit now and restart + ", str(e))
         exit(-1)
     hearbeatThread.join()
