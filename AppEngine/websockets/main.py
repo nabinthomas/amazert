@@ -75,61 +75,69 @@ Notify the appropriate WRT device about a realtime data base change event
 """
 @sockets.route('/notify')
 def notify_socket(ws):
-   print("NOTIFY")
-   while not ws.closed:
-        message = ws.receive()
-        if message is None:  # message is "None" if the client has closed.
-            continue
-            
-        '''
-        {
-         "resource_string"= "projects/_/instances/amaze-id1/refs/users/_SDFsEfRSDjFCZXCVASEf/532e8c40-18cd-11eb-a4ca-dca6328f80c0"  ,
-          "data" = {'settings': {'1': {'value': 'MuttuWRT'}}}
-        }
-        '''
-        print(message)
-        msg = json.loads(message)
-        print("jsonload ok ")
-        resource_string = msg["resource_string"]
-        print("resource_string ok = " + str(resource_string))
-        #resource_string= "projects/_/instances/amaze-id1/refs/users/_SDFsEfRSDjFCZXCVASEf/532e8c40-18cd-11eb-a4ca-dca6328f80c0"
-                          #0       /1/2        /3        /4   /5    /6                    /7
-        path= resource_string.split("/")
-        uid = path[6]
-        print("uid", uid)
-        did= path[7]
-        print("did", did)
-
-        settings = msg["data"]["settings"]
-        print("settings", settings)
-        for node in settings.keys():
-            print("node=", node)
-            
-            #refpath = "/users/" + str(uid) + "/" + str(did)+"/settings/"+node
-            #{'settings': {'1': {'value': 'MuttuWRT'}}}
-            refSetting = db.reference("/users/" + str(uid) + "/" + str(did)+ "/settings/" + str(node))
-            settingChnage = refSetting.get()
-            print("settingChnage=" + str(settingChnage))
-            name = settingChnage["name"]
-            val1= settingChnage["value"]
-            print("name=" + name + "  Value=" +val1 )
-
-            identifierRef= db.reference("/users/" + str(uid) + "/" + str(did)+ "/identifier")
-            identifier = identifierRef.get()
-            email = identifier["email"]
-            print(email)
-            reply = {
-                    "identifier" : {
-                            "email": email, 
-                            "uid": uid,
-                            "deviceId": did
-                    },
-                    "action": "setting",
-                    "setting" : { "name" : name, "value" : val1}
+    print("NOTIFY")
+    try:
+        while not ws.closed:
+            message = ws.receive()
+            if message is None:  # message is "None" if the client has closed.
+                continue
+                
+            '''
+            {
+            "resource_string"= "projects/_/instances/amaze-id1/refs/users/_SDFsEfRSDjFCZXCVASEf/532e8c40-18cd-11eb-a4ca-dca6328f80c0"  ,
+            "data" = {'settings': {'1': {'value': 'MuttuWRT'}}}
             }
-            wrtWs= scockeDevMap[did]
-            wrtWs.send(json.dumps(reply))
-        
+            '''
+            print(message)
+            msg = json.loads(message)
+            print("jsonload ok ")
+            resource_string = msg["resource_string"]
+            print("resource_string ok = " + str(resource_string))
+            #resource_string= "projects/_/instances/amaze-id1/refs/users/_SDFsEfRSDjFCZXCVASEf/532e8c40-18cd-11eb-a4ca-dca6328f80c0"
+                            #0       /1/2        /3        /4   /5    /6                    /7
+            path= resource_string.split("/")
+            uid = path[6]
+            print("uid", uid)
+            did= path[7]
+            print("did", did)
+
+            settings = msg["data"]["settings"]
+            print("settings", settings)
+            for node in settings.keys():
+                print("node=", node)
+                
+                #refpath = "/users/" + str(uid) + "/" + str(did)+"/settings/"+node
+                #{'settings': {'1': {'value': 'MuttuWRT'}}}
+                refSetting = db.reference("/users/" + str(uid) + "/" + str(did)+ "/settings/" + str(node))
+                settingChnage = refSetting.get()
+                print("settingChnage=" + str(settingChnage))
+                name = settingChnage["name"]
+                val1= settingChnage["value"]
+                print("name=" + name + "  Value=" +val1 )
+
+                identifierRef= db.reference("/users/" + str(uid) + "/" + str(did)+ "/identifier")
+                identifier = identifierRef.get()
+                email = identifier["email"]
+                print("Email :" + email)
+                settingData = [ { "name" : str(name), "value" : str(val1)}]
+                reply = {
+                        "identifier" : {
+                                "email": str(email), 
+                                "uid": str(uid),
+                                "deviceId": str(did)
+                        },
+                        "action": "setting",
+                        "setting" : settingData
+                }
+                
+                wrtWs= scockeDevMap[str(did)]
+                
+             
+                print(reply)
+                wrtWs.send(json.dumps(reply))
+    except Exception as e:
+            print("Message jason parse Error" + str(e))
+                    
 # [END gae_flex_websockets_app]
 # [END gae_flex_websockets_app]
 
@@ -140,63 +148,67 @@ WRT devices send message to this url for registration and heartbeat
 """
 @sockets.route('/register')
 def register_socket(ws):
-    print("Register ")
-    while not ws.closed:
-        message = ws.receive()
-        if message is None:  # message is "None" if the client has closed.
-            continue
-         #TODO: json parsing error
-        try :
-            print("Before Parsing")
-            reg = json.loads(message)
-            print("after Parsing")
-        except Exception as e:
-            print("Message jason parse error" + str(e))
-            continue
-            
-
-        if (reg["action"] == "register" ):
-            identifier= reg["identifier"]
-            print("identifier" + str(identifier))
-            uid = identifier["uid"]
-            print("uid" + str(uid))
-            deviceId =identifier["deviceId"]
-            print("deviceId" + str(deviceId))
-            # Now check whether the user device id in the db is same as the device id send by wrt. 
-            devIdpath = "/users/" + uid  + "/" + deviceId
-            UIdpath = "/users/" + uid 
-            try :
-                ref = db.reference(devIdpath )
-                queryResults1 = ref.get()
-                print("DB Device Path query result: " + str(queryResults1))
-                if queryResults1 == None :
-                    #there is no user or device registered
-                    print("Given user or device NOT Found in DB")
-                    sendReply(ws, message, "FAIL")
-                else:
-                    #find the devices in the message and update the settigns under them 
-                    uref = db.reference(UIdpath )
-                    snapshot = uref.order_by_key().get()
-                    print("DB ressnapshotult= " + str(snapshot))
-                    #do we really need this loop ?
-                    for key,val in snapshot.items():
-                        print(" Binu 1 key = " +str(key))
-                        if key == deviceId:
-                            print(" Binu 2")
-                            settings = reg["settings"]
-                            print("settings" + str(settings))
-                            print("Found in DB")
-                            settingsPath = "/users/" + uid  + "/" + deviceId + "/settings"
-                            settingsRef = db.reference(settingsPath) 
-                            settingsRef.set(settings)
-                            sendReply(ws, message, "PASS")
-                            scockeDevMap[deviceId]=ws
-                            print("Every Thing looks good")
-            except Exception as e:
-                print("Exceptoin here1 = " + str(e))
-                sendReply(ws, message, "FAIL")
+    try:
+        print("Register ")
+        while not ws.closed:
+            message = ws.receive()
+            if message is None:  # message is "None" if the client has closed.
                 continue
-        
+            #TODO: json parsing error
+            try :
+                print("Before Parsing")
+                reg = json.loads(message)
+                print("after Parsing")
+            except Exception as e:
+                print("Message jason parse error" + str(e))
+                continue
+                
+
+            if (reg["action"] == "register" ):
+                identifier= reg["identifier"]
+                print("identifier" + str(identifier))
+                uid = identifier["uid"]
+                print("uid" + str(uid))
+                deviceId =identifier["deviceId"]
+                print("deviceId" + str(deviceId))
+                # Now check whether the user device id in the db is same as the device id send by wrt. 
+                devIdpath = "/users/" + uid  + "/" + deviceId
+                UIdpath = "/users/" + uid 
+                try :
+                    ref = db.reference(devIdpath )
+                    queryResults1 = ref.get()
+                    print("DB Device Path query result: " + str(queryResults1))
+                    if queryResults1 == None :
+                        #there is no user or device registered
+                        print("Given user or device NOT Found in DB")
+                        sendReply(ws, message, "FAIL")
+                    else:
+                        #find the devices in the message and update the settigns under them 
+                        uref = db.reference(UIdpath )
+                        snapshot = uref.order_by_key().get()
+                        print("DB ressnapshotult= " + str(snapshot))
+                        #do we really need this loop ?
+                        for key,val in snapshot.items():
+                            print(" Binu 1 key = " +str(key))
+                            if key == deviceId:
+                                print(" Binu 2")
+                                settings = reg["settings"]
+                                print("settings" + str(settings))
+                                print("Found in DB")
+                                settingsPath = "/users/" + uid  + "/" + deviceId + "/settings"
+                                settingsRef = db.reference(settingsPath) 
+                                settingsRef.set(settings)
+                                sendReply(ws, message, "PASS")
+                                scockeDevMap[deviceId]=ws
+                                print("Every Thing looks good")
+                except Exception as e:
+                    print("Exceptoin here1 = " + str(e))
+                    sendReply(ws, message, "FAIL")
+                    continue
+    except Exception as e:
+        print("Exceptoin at top level " + str(e))
+        # closing the ws and returning 
+        return      
 # [END gae_flex_websockets_app]
 # [END gae_flex_websockets_app]
 
