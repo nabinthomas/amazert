@@ -103,6 +103,8 @@ def notify_socket(ws):
 
             settings = msg["data"]["settings"]
             print("settings", settings)
+
+            settingData=[]
             for node in settings.keys():
                 print("node=", node)
                 
@@ -119,22 +121,19 @@ def notify_socket(ws):
                 identifier = identifierRef.get()
                 email = identifier["email"]
                 print("Email :" + email)
-                settingData = [ { "name" : str(name), "value" : str(val1)}]
-                reply = {
-                        "identifier" : {
-                                "email": str(email), 
-                                "uid": str(uid),
-                                "deviceId": str(did)
-                        },
-                        "action": "setting",
-                        "setting" : settingData
-                }
-                
-                wrtWs= scockeDevMap[str(did)]
-                
-             
-                print(reply)
-                wrtWs.send(json.dumps(reply))
+                settingData.append({ "name" : str(name), "value" : str(val1)})
+            reply = {
+                "identifier" : {
+                        "email": str(email), 
+                        "uid": str(uid),
+                        "deviceId": str(did)
+                },
+                "action": "setting",
+                "setting" : settingData
+            }
+            print(reply)
+            wrtWs= scockeDevMap[str(did)]
+            wrtWs.send(json.dumps(reply))
     except Exception as e:
             print("Message jason parse Error" + str(e))
                     
