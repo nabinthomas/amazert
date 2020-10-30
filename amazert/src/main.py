@@ -156,7 +156,7 @@ def getAllSupportedSettings():
 """
 How frequent the heartbeat is sent to the server to keep the connection active.
 """ 
-heartBeatIntervalInSeconds = 30
+heartBeatIntervalInSeconds = 300
 
 """
 Prepares a packet to send. 
@@ -337,7 +337,7 @@ def amazeRTActionHandler(config, ws):
         actionHandler = actionHandlerMappings[action]
         actionHandler(config, ws, actionParams, options)
     except KeyError:
-        logger.debug ("Unsupported Action > " )
+        logger.debug ("Unsupported Action > "  + action)
     if (message == "exit"):
         keepRunning = False
 
@@ -375,7 +375,8 @@ async def amazeRTServiceMain():
     hearbeatThread = amazeRTHeartBeatThread(config, ws)
     hearbeatThread.start()
     try:
-        amazeRTActionHandler(config, ws)
+        while (keepRunning):
+            amazeRTActionHandler(config, ws)
     except ws.exceptions.ConnectionClosedError as e:
         logger.debug("Connection was closed by server. Will quit now and restart + ", str(e))
         exit(-1)
