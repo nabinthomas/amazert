@@ -47,4 +47,6 @@ dependencies {
     // Dependencies for Firebase Authentication
     implementation 'com.google.firebase:firebase-auth-ktx'
     implementation 'com.google.firebase:firebase-database-ktx'
+
+
 }

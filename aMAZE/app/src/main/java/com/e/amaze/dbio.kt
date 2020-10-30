@@ -1,5 +1,6 @@
 package com.e.amaze
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -16,6 +17,14 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
+import com.google.gson.reflect.TypeToken
+import org.xml.sax.Parser
+import java.io.*
+
 
 class dbio : AppCompatActivity() {
 
@@ -23,6 +32,13 @@ class dbio : AppCompatActivity() {
         private const val TAG = "FireBase_IO"
     }
     private val database = Firebase.database.getReferenceFromUrl("https://amaze-8f94e.firebaseio.com/").database
+
+    enum class SETTINGS (val description:String) {
+        WIFISSID("wireless.wifinet0.ssid"),
+        WIFISTATE("Wifi.state"),
+        POWERSTATE("Power State"),
+        MAXSETTINGS("END-OF-SEtTINGS")
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -132,7 +148,24 @@ class dbio : AppCompatActivity() {
             }
         }
         rootRef.addListenerForSingleValueEvent(valueEventListener)
-    }
+
+         for (ss in SETTINGS.values()){
+             val values = ss.ordinal
+             Log.d("ENUMS.......", "Value : $ss  -- $values  -- $ss.description "  )
+         }
+
+         val mContext: Context = applicationContext
+         val iStream: InputStream = mContext.getAssets().open("features.json")
+         val response = BufferedReader(
+             InputStreamReader(iStream, "UTF-8")
+         ).use { it.readText() }
+         Log.d("JSON read response... [ ", "$response"+"  ]'")
+
+         val itemType = object : TypeToken<List<item>>() {}.type
+         var out: List<item> = Gson().fromJson(response, itemType)
+
+         out.forEachIndexed { idx, ite -> Log.i("data", "> Item $idx:\n${ite.Name} ${ite.Description} ${ite.Input}") }
+     }
 
     fun readDb(view: View) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
@@ -190,7 +223,10 @@ class dbio : AppCompatActivity() {
 
     fun updateWifiSsid(view: View) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
-        val deviceId = "532e8c40-18cd-11eb-a4ca-dca6328f80c0"
+        var deviceId: String = MyApplication.Companion.register.deviceId
+        if (MyApplication.Companion.register.deviceId === "") {
+            deviceId = "532e8c40-18cd-11eb-a4ca-dca6328f80c0" }
+
         val settingsPath = "users/$userId/$deviceId/settings/0/name"
         val valPath = "users/$userId/$deviceId/settings/0/value"
 
@@ -209,7 +245,9 @@ class dbio : AppCompatActivity() {
 
     fun updateWifiState(view: View) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
-        val deviceId = "532e8c40-18cd-11eb-a4ca-dca6328f80c0"
+        var deviceId: String = MyApplication.Companion.register.deviceId
+        if (MyApplication.Companion.register.deviceId === "") {
+            deviceId = "532e8c40-18cd-11eb-a4ca-dca6328f80c0" }
         //val refPrefix = userId.plus("/device/device-$userId")
         val settingsPath = "users/$userId/$deviceId/settings/1/name"
         val valPath = "users/$userId/$deviceId/settings/1/value"
@@ -225,8 +263,9 @@ class dbio : AppCompatActivity() {
 
     fun updatePowerState(view: View) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
-        val deviceId = "532e8c40-18cd-11eb-a4ca-dca6328f80c0"
-        //val refPrefix = userId.plus("/device/device-$userId")
+        var deviceId: String = MyApplication.Companion.register.deviceId
+        if (MyApplication.Companion.register.deviceId === "") {
+            deviceId = "532e8c40-18cd-11eb-a4ca-dca6328f80c0" }
         val settingsPath = "users/$userId/$deviceId/settings/2/name"
         val valPath = "users/$userId/$deviceId/settings/2/value"
 
@@ -238,8 +277,7 @@ class dbio : AppCompatActivity() {
         val myRef1 = database.getReference(valPath.toString())
         myRef1.setValue(powerVal)
     }
-
-
-
-
 }
+
+//class sett(val setting: List<item>)
+class item(val Name: String ,val Description: String, val Input: String)

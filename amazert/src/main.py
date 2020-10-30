@@ -7,11 +7,13 @@ import asyncio
 import pathlib
 import ssl
 import threading
-import websockets
+import websocket
 import time
 import json
 import subprocess
 import logging 
+
+from websocket import create_connection
 
 keepRunning = True    
 
@@ -32,6 +34,7 @@ General format
             write : {
                 prologue : [commands to be run before applying this setting. Optional. eg: turn of wifi before changing something]
                 commandType : < uci -> will run uci set <name>=<value>; uci commit>,
+                              < uci.filtered is similar to uci, except that the values are restricted. Unsupported values will be ignored
             filter : {
                 value1 : [ command to run in sequence to set this value. 
                         This may be a shell script too. 
@@ -39,7 +42,8 @@ General format
                         ],
                 value2...
             },
-                epilogue : [ commands to be run after applying this setting. Optional. eg: wifi on after applying settings/ wifi restart etc]
+
+            epilogue : [ commands to be run after applying this setting. Optional. eg: wifi on after applying settings/ wifi restart etc]
 
             }, 
             read : {
@@ -54,48 +58,45 @@ General format
     }
 ]
 """
-dataDrivenSettingsRules = [ 
-    {
-        "name" : "system.@system[0].hostname",
-        "handler" : {
-            "read" : { 
-                "commandType" : "uci" 
-            }, 
-            "write" : {
-                "commandType" : "uci"
-            }
-        }
-    },
-    {
-        "name" : "wireless.wifinet0.ssid",
-        "handler" : {
-            "read" : { 
-                "commandType" : "uci" 
-            }, 
-            "write" : {
-                "commandType" : "uci",
-                "epilogue" : ["wifi"]
-            }
-        }
-    },
-    {
-        "name" : "wireless.wifinet0.disabled",
-        "handler" : {
-            "read" : { 
-                "commandType" : "uci",
-                "default" : "0"
-            }, 
-            "write" : {
-                "commandType" : "uci.filtered",
-                "filter" : {
-                    "0" : ["uci", "delete", "wireless.wifinet0.disabled"],
-                    "1" : ["uci", "set", "wireless.wifinet0.disabled=1"]
-                },
-                "epilogue" : ["wifi"]
-            }
+dataDrivenSettingsRules = [ {
+    "name" : "system.@system[0].hostname",
+    "handler" : {
+        "read" : { 
+            "commandType" : "uci" 
+        }, 
+        "write" : {
+            "commandType" : "uci"
         }
     }
-]
+}, {
+    "name" : "wireless.wifinet0.ssid",
+    "handler" : {
+        "read" : { 
+            "commandType" : "uci" 
+        }, 
+        "write" : {
+            "commandType" : "uci",
+            "epilogue" : ["wifi"]
+        }
+    }
+}, {
+    "name" : "wireless.wifinet0.disabled",
+    "handler" : {
+        "read" : { 
+            "commandType" : "uci",
+            "default" : "0"
+        }, 
+        "write" : {
+            "commandType" : "uci.filtered",
+            "filter" : {
+                "0" : ["uci", "delete", "wireless.wifinet0.disabled"],
+                "1" : ["uci", "set", "wireless.wifinet0.disabled=1"]
+            },
+            "epilogue" : ["wifi"]
+        }
+    }
+}]
+
 """
 Helper function to run a command in shell and collect the output. 
 to be used only for reading and writing settings
@@ -155,7 +156,7 @@ def getAllSupportedSettings():
 """
 How frequent the heartbeat is sent to the server to keep the connection active.
 """ 
-heartBeatIntervalInSeconds = 30
+heartBeatIntervalInSeconds = 300
 
 """
 Prepares a packet to send. 
@@ -179,9 +180,9 @@ Thread implementing Heartbeat support. This sends all the current settings to th
 and then keeps sending a hearbeat message at heartBeatIntervalInSeconds
 """
 class amazeRTHeartBeatThread(threading.Thread):
-    def __init__(self, config, websocket):
+    def __init__(self, config, ws):
         threading.Thread.__init__(self)
-        self.websocket = websocket
+        self.ws = ws
         self.config = config
 
     def run(self):
@@ -196,13 +197,13 @@ class amazeRTHeartBeatThread(threading.Thread):
         message["settings"] = allSettings
         packettoSend = preparePacketToSend(self.config, message)
         logger.debug(f"> {packettoSend}")
-        self.websocket.send(packettoSend)
+        self.ws.send(packettoSend)
 
     def sendHeartbeat(self):
         message = { "action" : "heartbeat"}
         packettoSend = preparePacketToSend(self.config, message)
         logger.debug(f"> {packettoSend}")
-        self.websocket.send(packettoSend)
+        self.ws.send(packettoSend)
 
 """
 Handles a command sent from the cloud.
@@ -216,11 +217,11 @@ in the format like
 @note identifier is always added to the reply to server
 
 @param config - Identification for this device. 
-@param websocket - used for communicating with the server
+@param ws - used for communicating with the server
 @command array of command + command line params
 @options Special options to run the command. Unused for now. Added for future enhancements
 """
-async def amazeRTCommandHandler(config, websocket, command, options):
+def amazeRTCommandHandler(config, ws, command, options):
     logger.debug ("Executing command : > " + json.dumps(command))
     # Send a response.
     resultString = ""
@@ -246,17 +247,17 @@ async def amazeRTCommandHandler(config, websocket, command, options):
                     }
 
     responseJson = preparePacketToSend(config, responseJson)
-    await websocket.send(json.dumps(responseJson))
+    ws.send(json.dumps(responseJson))
 
 """
 Handle a request to apply a particular setting
 @param config - Identification for this device. 
-@param websocket - used for communicating with the server
+@param ws - used for communicating with the server
 @setting name and value for the setting to be applied in the format { name : <name>, value : <value>}
 @options Special options to run the command. Unused for now. Added for future enhancements
 
 """
-async def amazerRTSettingHandler(config, websocket, setting, options):
+def amazerRTSettingHandler(config, ws, setting, options):
     logger.debug ("Applying setting : > " + json.dumps(setting))
     settingName = setting["name"]
     response = ""
@@ -292,12 +293,12 @@ async def amazerRTSettingHandler(config, websocket, setting, options):
 """
 Handle a request to control the amazeRT SW
 @param config - Identification for this device. 
-@param websocket - used for communicating with the server
+@param ws - used for communicating with the server
 @control control information
 @options Special options to run the command. Unused for now. Added for future enhancements
 
 """
-async def amazerRTControlHandler(config, websocket, control, options):
+def amazerRTControlHandler(config, ws, control, options):
     logger.debug ("Responding to control : > " + json.dumps(control))
     if control == "exit":
         keepRunning = False
@@ -314,31 +315,31 @@ actionHandlerMappings = {
 """
 Entry point for any request that comes to the amazeRT management service
 
-@note - Requests will be handled only if the identifier in the request messsage from the websocket
+@note - Requests will be handled only if the identifier in the request messsage from the ws
 matches the local configuration in config
 
 @param config - Identification for this device. 
-@param websocket - used for communicating with the server
+@param ws - used for communicating with the server
 
 """
-async def amazeRTActionHandler(config, websocket):
+def amazeRTActionHandler(config, ws):
     logger.debug ("amazeRTActionHandler start ")
-    async for message in websocket:
-        logger.debug(f"< {message}")
-        request = json.loads(message)
+    message = ws.recv()
+    logger.debug(f"< {message}")
+    request = json.loads(message)
+    try:
+        action = request["action"]
+        actionParams = request[action]
         try:
-            action = request["action"]
-            actionParams = request[action]
-            try:
-                options = request["options"]
-            except KeyError:
-                options = {}
-            actionHandler = actionHandlerMappings[action]
-            await actionHandler(config, websocket, actionParams, options)
+            options = request["options"]
         except KeyError:
-            logger.debug ("Unsupported Action > " )
-        if (message == "exit"):
-            keepRunning = False
+            options = {}
+        actionHandler = actionHandlerMappings[action]
+        actionHandler(config, ws, actionParams, options)
+    except KeyError:
+        logger.debug ("Unsupported Action > "  + action)
+    if (message == "exit"):
+        keepRunning = False
 
 """
 Loads and retuns the current Registration Configuration if any
@@ -368,19 +369,18 @@ async def amazeRTServiceMain():
         logger.debug("AmazeRT is not configured on this machine. please run initial configuration using init.py")
         exit(-1)
     
-    async with websockets.connect(
-        uri #, ssl=ssl_context
-    ) as websocket:
-        hearbeatThread = amazeRTHeartBeatThread(config, websocket)
-        hearbeatThread.start()
-        try:
-            await asyncio.gather(
-                amazeRTActionHandler(config, websocket)
-            )
-        except websockets.exceptions.ConnectionClosedError as e:
-            logger.debug("Connection was closed by server. Will quit now and restart + ", str(e))
-            exit(-1)
-        hearbeatThread.join()
+    ws = create_connection(uri #, ssl=ssl_context
+    )
+
+    hearbeatThread = amazeRTHeartBeatThread(config, ws)
+    hearbeatThread.start()
+    try:
+        while (keepRunning):
+            amazeRTActionHandler(config, ws)
+    except ws.exceptions.ConnectionClosedError as e:
+        logger.debug("Connection was closed by server. Will quit now and restart + ", str(e))
+        exit(-1)
+    hearbeatThread.join()
             
 
 ## Setup debug logging

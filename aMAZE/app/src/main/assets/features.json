@@ -1,0 +1,23 @@
+[
+   {
+      "Name":"WifiState",
+      "Description":"Wifi state of device",
+      "Input":"ON/OFF"
+   },
+   {
+      "Name":"PowerState",
+      "Description":"Power state of device",
+      "Input":"ON/OFF"
+   },
+   {
+      "Name":"wireless.wifinet0.ssid",
+      "Description":"Wifi SSID",
+      "Input":"String - New SSID name"
+   },
+   {
+      "Name":"system.@system[0].hostname",
+      "Description":"Hostname",
+      "Input":"String - New hostname"
+   }
+]
+
