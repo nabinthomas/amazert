@@ -23,7 +23,7 @@ class AddDevice : AppCompatActivity() {
 
     private lateinit var uName: String
     private lateinit var uId: String
-    private val database = Firebase.database.getReferenceFromUrl("https://amaze-8f94e.firebaseio.com").database
+    private val database = Firebase.database.getReferenceFromUrl("https://amaze-id1.firebaseio.com/").database
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

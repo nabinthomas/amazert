@@ -31,7 +31,7 @@ class dbio : AppCompatActivity() {
     companion object {
         private const val TAG = "FireBase_IO"
     }
-    private val database = Firebase.database.getReferenceFromUrl("https://amaze-8f94e.firebaseio.com/").database
+    private val database = Firebase.database.getReferenceFromUrl("https://amaze-id1.firebaseio.com/").database
 
     enum class SETTINGS (val description:String) {
         WIFISSID("wireless.wifinet0.ssid"),
