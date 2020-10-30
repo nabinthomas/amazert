@@ -1,0 +1,20 @@
+{
+   "settings":[
+      {
+         "Name":"WifiState",
+         "Description":"Wifi state of device",
+         "Input":"ON/OFF"
+      },
+      {
+         "Name":"PowerState",
+         "Description":"Power state of device",
+         "Input":"ON/OFF"
+      },
+      {
+         "Name":"WifiSSID",
+         "Description":"Wifi SSID",
+         "Input":"String - New SSID name"
+      }
+   ]
+}
+
