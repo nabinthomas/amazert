@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/editTextDbio"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".dbio">
@@ -12,133 +13,30 @@
         android:layout_width="182dp"
         android:layout_height="52dp"
         android:layout_marginStart="36dp"
-        android:layout_marginTop="92dp"
+        android:layout_marginTop="44dp"
         android:ems="10"
         android:inputType="textPersonName"
         android:longClickable="true"
         app:layout_constraintStart_toEndOf="@+id/textView2"
         app:layout_constraintTop_toBottomOf="@+id/power_spinner" />
 
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="67dp"
-        android:layout_height="41dp"
-        android:layout_marginStart="40dp"
-        android:layout_marginTop="28dp"
-        android:text="Power State"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
-
-    <Spinner
-        android:id="@+id/wifi_spinner"
-        android:layout_width="105dp"
-        android:layout_height="51dp"
-        android:layout_marginStart="52dp"
-        android:layout_marginTop="20dp"
-        app:layout_constraintStart_toEndOf="@+id/textView"
-        app:layout_constraintTop_toBottomOf="@+id/editTextSSID" />
-
-    <EditText
-        android:id="@+id/editTextSSID"
-        android:layout_width="137dp"
-        android:layout_height="44dp"
-        android:layout_marginStart="40dp"
-        android:layout_marginTop="52dp"
-        android:ems="10"
-        android:inputType="textPersonName"
-        app:layout_constraintStart_toEndOf="@+id/textView4"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Spinner
-        android:id="@+id/power_spinner"
-        android:layout_width="103dp"
-        android:layout_height="47dp"
-        android:layout_marginStart="44dp"
-        android:layout_marginTop="28dp"
-        app:layout_constraintStart_toEndOf="@+id/textView3"
-        app:layout_constraintTop_toBottomOf="@+id/wifi_spinner" />
-
-    <Button
-        android:id="@+id/button3"
-        android:layout_width="99dp"
-        android:layout_height="46dp"
-        android:layout_marginStart="40dp"
-        android:layout_marginTop="16dp"
-        android:onClick="updateWifiState"
-        android:text="Update"
-        app:layout_constraintStart_toEndOf="@+id/wifi_spinner"
-        app:layout_constraintTop_toBottomOf="@+id/button9" />
-
-    <Button
-        android:id="@+id/button9"
-        android:layout_width="97dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="56dp"
-        android:onClick="updateWifiSsid"
-        android:text="Update"
-        app:layout_constraintStart_toEndOf="@+id/editTextSSID"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/writeDb"
-        android:layout_width="307dp"
-        android:layout_height="64dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="12dp"
-        android:onClick="testDbRules"
-        android:text="Test Rule"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/uid" />
-
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="64dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="36dp"
-        android:layout_marginTop="56dp"
-        android:text="Wifi SSID"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="66dp"
-        android:layout_height="44dp"
-        android:layout_marginStart="36dp"
-        android:layout_marginTop="24dp"
-        android:text="Wifi State"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView4" />
-
     <Button
         android:id="@+id/read00"
         android:layout_width="119dp"
         android:layout_height="64dp"
         android:layout_marginStart="52dp"
-        android:layout_marginTop="56dp"
+        android:layout_marginTop="32dp"
         android:onClick="readCurrentDB"
         android:text="rEAD"
         app:layout_constraintStart_toEndOf="@+id/button4"
         app:layout_constraintTop_toBottomOf="@+id/writeDb" />
 
     <Button
-        android:id="@+id/button5"
-        android:layout_width="97dp"
-        android:layout_height="54dp"
-        android:layout_marginStart="36dp"
-        android:layout_marginTop="28dp"
-        android:onClick="updatePowerState"
-        android:text="Update"
-        app:layout_constraintStart_toEndOf="@+id/power_spinner"
-        app:layout_constraintTop_toBottomOf="@+id/button3" />
-
-    <Button
         android:id="@+id/button4"
         android:layout_width="155dp"
         android:layout_height="72dp"
         android:layout_marginStart="28dp"
-        android:layout_marginTop="56dp"
+        android:layout_marginTop="32dp"
         android:onClick="logoutCurrentUser"
         android:text="Logout"
         app:layout_constraintStart_toStartOf="parent"
@@ -149,9 +47,144 @@
         android:layout_width="122dp"
         android:layout_height="60dp"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="84dp"
+        android:layout_marginTop="36dp"
         android:text="          UID                   [ optional, for DB Rule test]"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
+    <Button
+        android:id="@+id/writeDb"
+        android:layout_width="307dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="8dp"
+        android:onClick="testDbRules"
+        android:text="Test Rule"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/uid" />
+
+    <Button
+        android:id="@+id/button9"
+        android:layout_width="97dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="33dp"
+        android:onClick="updateWifiSsid"
+        android:text="Update"
+        app:layout_constraintStart_toEndOf="@+id/editTextSSID"
+        app:layout_constraintTop_toBottomOf="@+id/button8" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="66dp"
+        android:layout_height="44dp"
+        android:layout_marginStart="44dp"
+        android:layout_marginTop="12dp"
+        android:text="Wifi State"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView4" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="67dp"
+        android:layout_height="41dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="44dp"
+        android:text="Power State"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="99dp"
+        android:layout_height="46dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="4dp"
+        android:onClick="updateWifiState"
+        android:text="Update"
+        app:layout_constraintStart_toEndOf="@+id/wifi_spinner"
+        app:layout_constraintTop_toBottomOf="@+id/button9" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="64dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="44dp"
+        android:layout_marginTop="36dp"
+        android:text="Wifi SSID"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView6" />
+
+    <Button
+        android:id="@+id/button5"
+        android:layout_width="97dp"
+        android:layout_height="54dp"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="40dp"
+        android:onClick="updatePowerState"
+        android:text="Update"
+        app:layout_constraintStart_toEndOf="@+id/power_spinner"
+        app:layout_constraintTop_toBottomOf="@+id/button3" />
+
+    <Spinner
+        android:id="@+id/power_spinner"
+        android:layout_width="103dp"
+        android:layout_height="47dp"
+        android:layout_marginStart="52dp"
+        android:layout_marginTop="40dp"
+        app:layout_constraintStart_toEndOf="@+id/textView3"
+        app:layout_constraintTop_toBottomOf="@+id/wifi_spinner" />
+
+    <Spinner
+        android:id="@+id/wifi_spinner"
+        android:layout_width="105dp"
+        android:layout_height="51dp"
+        android:layout_marginStart="60dp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintStart_toEndOf="@+id/textView"
+        app:layout_constraintTop_toBottomOf="@+id/editTextSSID" />
+
+    <EditText
+        android:id="@+id/editTextSSID"
+        android:layout_width="137dp"
+        android:layout_height="44dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="29dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        app:layout_constraintStart_toEndOf="@+id/textView4"
+        app:layout_constraintTop_toBottomOf="@+id/editTextHostname" />
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="71dp"
+        android:layout_height="42dp"
+        android:layout_marginStart="46dp"
+        android:layout_marginTop="35dp"
+        android:text="Hostname"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/editTextHostname"
+        android:layout_width="148dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="29dp"
+        android:layout_marginTop="30dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        app:layout_constraintStart_toEndOf="@+id/textView6"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/button8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="21dp"
+        android:layout_marginTop="27dp"
+        android:onClick="updateHostname"
+        android:text="Update"
+        app:layout_constraintStart_toEndOf="@+id/editTextHostname"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
