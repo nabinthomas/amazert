@@ -10,6 +10,7 @@ dirs:
 compile: dirs
 	cp src/*.py $(BUILD_OUT_DIR)/amazert
 	cp src/*.sh $(BUILD_OUT_DIR)/amazert
+	cp src/amazert $(BUILD_OUT_DIR)/amazert
 
 
 package: compile
