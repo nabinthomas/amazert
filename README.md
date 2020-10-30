@@ -78,18 +78,26 @@ This make sure that the device's settings are updated on the server once it boot
 A Sample is given below
 <pre>
 {
-    "identifier" : {
-      'email': 'nabin@gmail.com', 
-      'uid': '_SDFsEfRSDjFCZXCVASEf',
-      'deviceId': 'fb967061-168a-11eb-9272-88e9fe6b97d6'
-  },
-  "action" : "register", 
-  "settings": {
-    [
-        {'name': 'system.@system[0].hostname', 'value': 'amazeRT'},
-        .. Other Settings like this.. TBD
-    ]
-  }
+    "action": "register",
+    "settings": [{
+        "name": "system.@system[0].hostname",
+        "value": "amazert"
+    }, {
+        "name": "wireless.wifinet0.ssid",
+        "value": "AWrt"
+    }, {
+        "name": "wireless.wifinet0.disabled",
+        "value": "0"
+    }, 
+            .. Other Settings like this.. TBD 
+            See dataDrivenSettingsRules in main.py to see the list of settings 
+            that is currently supported
+    ],
+    "identifier": {
+        "email": "ginto100@gmail.com",
+        "uid": "oKiu1knj4IaeMvdrwCy212cIu753",
+        "deviceId": "c55d78f3-18de-11eb-ae63-dca6328f819e"
+    }
 }
 </pre>
 ##### Hearbeat packet
@@ -124,3 +132,6 @@ Example Request to apply a setting
     "setting" : { "name" : "wireless.wifinet0.ssid", "value" : "PiWRT" }
 }
 </pre>
+
+See dataDrivenSettingsRules in main.py to see the list of settings 
+that is currently supported

@@ -152,13 +152,10 @@ def register_socket(ws):
             print("after Parsing")
         except Exception as e:
             print("Message jason parse error" + str(e))
-            return
+            continue
             
 
         if (reg["action"] == "register" ):
-            settings = reg["settings"]
-            print("settings" + str(settings))
-            
             identifier= reg["identifier"]
             print("identifier" + str(identifier))
             uid = identifier["uid"]
@@ -170,36 +167,35 @@ def register_socket(ws):
             UIdpath = "/users/" + uid 
             try :
                 ref = db.reference(devIdpath )
-                
-                print("DB key = " + str(ref) + "Device got from message=" + str(deviceId))
                 queryResults1 = ref.get()
-                print("DB result" + str(queryResults1))
-
-                
-                uref = db.reference(UIdpath )
-                snapshot = uref.order_by_key().get()
-                print("DB ressnapshotult= " + str(snapshot))
-                devIdFound = False
-                for key, val in snapshot.items():
-                    if key == deviceId:
-                        print("Found in DB")
-                        settingsPath = "/users/" + uid  + "/" + deviceId + "/settings"
-                        settingsRef = db.reference(settingsPath) 
-                        settingsRef.set(settings)
-                        sendReply(ws, message, "PASS")
-                        scockeDevMap[deviceId]=ws
-
-                        devIdFound = True
-                if devIdFound == False:
-                    print("NOT Found in DB")
+                print("DB Device Path query result: " + str(queryResults1))
+                if queryResults1 == None :
+                    #there is no user or device registered
+                    print("Given user or device NOT Found in DB")
                     sendReply(ws, message, "FAIL")
                 else:
-                    print("Every Thing looks good")
-                #return 
+                    #find the devices in the message and update the settigns under them 
+                    uref = db.reference(UIdpath )
+                    snapshot = uref.order_by_key().get()
+                    print("DB ressnapshotult= " + str(snapshot))
+                    #do we really need this loop ?
+                    for key,val in snapshot.items():
+                        print(" Binu 1 key = " +str(key))
+                        if key == deviceId:
+                            print(" Binu 2")
+                            settings = reg["settings"]
+                            print("settings" + str(settings))
+                            print("Found in DB")
+                            settingsPath = "/users/" + uid  + "/" + deviceId + "/settings"
+                            settingsRef = db.reference(settingsPath) 
+                            settingsRef.set(settings)
+                            sendReply(ws, message, "PASS")
+                            scockeDevMap[deviceId]=ws
+                            print("Every Thing looks good")
             except Exception as e:
-                print("Exceptoin here1")
+                print("Exceptoin here1 = " + str(e))
                 sendReply(ws, message, "FAIL")
-                return
+                continue
         
 # [END gae_flex_websockets_app]
 # [END gae_flex_websockets_app]
