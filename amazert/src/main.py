@@ -95,6 +95,31 @@ dataDrivenSettingsRules = [ {
         }
     }
 }, {
+    "name" : "wireless.wifinet0.macfilter",
+    "handler" : {
+        "read" : { 
+            "commandType" : "uci", 
+            "default" : "disable"
+        }, 
+        "write" : {
+            "commandType" : "uci",
+            "filter" : ["allow", "deny", "disable"],
+            "epilogue" : ["wifi"]
+        }
+    }
+}, {
+    "name" : "wireless.wifinet0.maclist",
+    "handler" : {
+        "read" : { 
+            "commandType" : "uci",
+            "default" : ""
+        }, 
+        "write" : {
+            "commandType" : "uci",
+            "epilogue" : ["wifi"]
+        }
+    }
+}, {
     "name" : "wireless.wifinet0.disabled",
     "handler" : {
         "read" : { 
