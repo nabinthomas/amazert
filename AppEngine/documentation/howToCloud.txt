@@ -47,4 +47,65 @@ Creating websocket app using SDK.(steps 1-6 same )
 
 10)virtualenv --python python3 ~/envs/hello_world
 11)source ~/envs/hello_world/bin/activate
+
+virtualenv --python python3   ~/envs/hello_world
+source   ~/envs/hello_world/bin/activate
+
+gunicorn -b 127.0.0.1:8080 -k flask_sockets.worker main:app
+gcloud app deploy app.yaml     --project amaze-id1
+
+gcloud config set project amaze-id1
+gcloud app logs tail
+
+
+#global web interface to  test the cloud
+http://amaze-id1.wl.r.appspot.com/
+
+# Test messages to test the cloud 
+
+----------------------------------
+Device to Cloud Register
+----------------------------------
+{
+   "action":"register",
+   "identifier":{
+      "registrationId":"8784c5df-f087-4740-b41b-248dc9389a2f",
+      "email":"nabin@gmail.com",
+      "uid":"_SDFsEfRSDjFCZXCVASEf",
+      "deviceId":"532e8c40-18cd-11eb-a4ca-dca6328f80c0"
+   },
+   "settings":[
+      {
+         "name":"system.@system[0].hostname",
+         "value":"valA"
+      },
+      {
+         "name":"wireless.wifinet0.ssid",
+         "value":"valB"
+      }
+   ]
+}
+
+
+cloud Function to WebSocket 
+----------------------
+{
+   "resource_string":"projects/_/instances/amaze-id1/refs/users/_SDFsEfRSDjFCZXCVASEf/532e8c40-18cd-11eb-a4ca-dca6328f80c0",
+   "data":{"settings": {"0": {"value": "valA"}, "1": {"value": "valB"}}}
+}
+
+Notify to Device
+-------------------
+{
+    "identifier" : {
+      "email": "nabin@gmail.com", 
+      "uid": "_SDFsEfRSDjFCZXCVASEf",
+      "deviceId": "fb967061-168a-11eb-9272-88e9fe6b97d6"
+    },
+    "action": "setting",
+    "setting" : { "name" : "wireless.wifinet0.ssid", "value" : "PiWRT" }
+}
+
+
+
 	
