@@ -43,6 +43,20 @@ class AddDevice : AppCompatActivity() {
         val deviceDetails = findViewById<EditText>(R.id.deviceDetails)
         var output:String = "None"
 
+        class SshPostTask : AsyncTask<Void, Void, String>() {
+            override fun doInBackground(vararg p0: Void?): String {
+                output = executeRemotePostCommand(userName.text.toString(), passwd.text.toString(), deviceIP.text.toString())
+                print(output)
+                return output
+            }
+
+            override fun onPostExecute(result: String) {
+                deviceDetails.setText("Post Cloud registration.. start device service")
+                print("Post Cloud registration.. start device service")
+
+            }
+        }
+
         class SftpGetTask : AsyncTask<Void, Void, String>() {
             override fun doInBackground(vararg p0: Void?): String {
 
@@ -57,6 +71,7 @@ class AddDevice : AppCompatActivity() {
                 print("Sftp Get Done")
                 registerDeviceToCloud()
                 deviceDetails.setText("Device registration done Successfully")
+                SshPostTask().execute()
             }
         }
         class SshTask : AsyncTask<Void, Void, String>() {
@@ -145,6 +160,39 @@ class AddDevice : AppCompatActivity() {
         // Execute command.
         sshChannel.setCommand("opkg update && opkg install openssh-sftp-server")
         //sshChannel.setCommand("uname -a")
+        sshChannel.connect()
+
+        // Sleep needed in order to wait long enough to get result back.
+        Thread.sleep(1_000)
+        sshChannel.disconnect()
+
+        session.disconnect()
+
+        return outputStream.toString()
+    }
+
+    fun executeRemotePostCommand(username: String,
+                                 password: String,
+                                 hostname: String,
+                                 port: Int = 22): String {
+        val jsch = JSch()
+        val session = jsch.getSession(username, hostname, port)
+        session.setPassword(password)
+
+        // Avoid asking for key confirmation.
+        val properties = Properties()
+        properties.put("StrictHostKeyChecking", "no")
+        session.setConfig(properties)
+
+        session.connect()
+
+        // Create SSH Channel.
+        val sshChannel = session.openChannel("exec") as ChannelExec
+        val outputStream = ByteArrayOutputStream()
+        sshChannel.outputStream = outputStream
+
+        // Execute command.
+        sshChannel.setCommand("/etc/init.d/amazert start")
         sshChannel.connect()
 
         // Sleep needed in order to wait long enough to get result back.
