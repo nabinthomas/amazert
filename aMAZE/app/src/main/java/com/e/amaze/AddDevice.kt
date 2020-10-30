@@ -225,7 +225,7 @@ class AddDevice : AppCompatActivity() {
         val outputStream = ByteArrayOutputStream()
         sshChannel.outputStream = outputStream
 
-        sshChannel.connect(160000)
+        sshChannel.connect(200000)
         // Execute command.
         //TODO - get email id from previous context
         val cmd =
