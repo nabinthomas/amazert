@@ -253,42 +253,43 @@ def amazeRTCommandHandler(config, ws, command, options):
 Handle a request to apply a particular setting
 @param config - Identification for this device. 
 @param ws - used for communicating with the server
-@setting name and value for the setting to be applied in the format { name : <name>, value : <value>}
+@settings array of name and value for the setting to be applied in the format [{ name : <name>, value : <value>},...]
 @options Special options to run the command. Unused for now. Added for future enhancements
 
 """
-def amazerRTSettingHandler(config, ws, setting, options):
-    logger.debug ("Applying setting : > " + json.dumps(setting))
-    settingName = setting["name"]
-    response = ""
-    # Find the rule for handling this setting. 
-    for rule in dataDrivenSettingsRules:
-        logger.debug(rule["name"])
-        if (rule["name"] == settingName):
-            logger.debug ("Match with " + rule["handler"]["write"]["commandType"] )
+def amazerRTSettingHandler(config, ws, settings, options):
+    logger.debug ("Applying settings : > " + json.dumps(settings))
+    for setting in settings:
+        settingName = setting["name"]
+        response = ""
+        # Find the rule for handling this setting. 
+        for rule in dataDrivenSettingsRules:
+            logger.debug(rule["name"])
+            if (rule["name"] == settingName):
+                logger.debug ("Match with " + rule["handler"]["write"]["commandType"] )
 
-            try: 
-                if (rule["handler"]["write"]["prologue"] is not None):
-                    logger.debug ("prologue")
-                    response = response + runShellcommand(rule["handler"]["prologue"])
-            except:
-                response += "no prologue\n"
-            if (rule["handler"]["write"]["commandType"] == "uci"):
-                command = ["uci", "set", settingName + "=" + setting["value"]]
-            elif (rule["handler"]["write"]["commandType"] == "uci.filtered"):
-                command = rule["handler"]["write"]["filter"][str(setting["value"])]
-            logger.debug (command)
-            response = response + runShellcommand(command)
-            logger.debug("Response is " + response)
-            response = response + runShellcommand(["uci", "commit"])
-            logger.debug("Response is " + response)
+                try: 
+                    if (rule["handler"]["write"]["prologue"] is not None):
+                        logger.debug ("prologue")
+                        response = response + runShellcommand(rule["handler"]["prologue"])
+                except:
+                    response += "no prologue\n"
+                if (rule["handler"]["write"]["commandType"] == "uci"):
+                    command = ["uci", "set", settingName + "=" + setting["value"]]
+                elif (rule["handler"]["write"]["commandType"] == "uci.filtered"):
+                    command = rule["handler"]["write"]["filter"][str(setting["value"])]
+                logger.debug (command)
+                response = response + runShellcommand(command)
+                logger.debug("Response is " + response)
+                response = response + runShellcommand(["uci", "commit"])
+                logger.debug("Response is " + response)
 
-            try: 
-                if (rule["handler"]["write"]["epilogue"] is not None):
-                    response = response + runShellcommand(rule["handler"]["write"]["epilogue"])
-            except:
-                response += "no epilogue\n"
-            logger.debug("Response is " + response)
+                try: 
+                    if (rule["handler"]["write"]["epilogue"] is not None):
+                        response = response + runShellcommand(rule["handler"]["write"]["epilogue"])
+                except:
+                    response += "no epilogue\n"
+                logger.debug("Response is " + response)
 
 """
 Handle a request to control the amazeRT SW
