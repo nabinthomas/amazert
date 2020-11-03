@@ -1,6 +1,7 @@
 package com.e.amaze
 
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -20,7 +21,6 @@ class SettingsAdapter(
     private var pkgName: String = context.packageName
 
     inner class SettingsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        //val settingIndexView: TextView = itemView.findViewById(R.id.textViewIndex)
         val settingNameView: TextView = itemView.findViewById(R.id.textViewName)
         val settingValueView: TextView = itemView.findViewById(R.id.textViewValue)
     }
@@ -36,20 +36,22 @@ class SettingsAdapter(
         //holder.settingIndexView.text = position.toString()
         holder.settingNameView.text = current.name.toString()
         holder.settingValueView.text = current.value.toString()
-/*
-        holder.settingNameView.setOnClickListener{
-            val itemPrice = current.price
-            val itemCategory = current.category
-            val itemStock = current.stock
-            val intent = Intent(context, ProductDetailActivity::class.java)
-            intent.putExtra("Name", itemName)
-            intent.putExtra("Category", itemCategory)
-            intent.putExtra("Price", itemPrice.toString())
-            intent.putExtra("Stock", itemStock.toString())
-            context.startActivity(intent)
 
-             */
-       // }
+        holder.settingNameView.setOnClickListener{
+            val intent = Intent(context, UpdateSettings::class.java)
+            intent.putExtra("Name", current.name.toString())
+            intent.putExtra("Value", current.value.toString())
+            intent.putExtra("dbIndex", position.toString())
+            context.startActivity(intent)
+        }
+
+        holder.settingValueView.setOnClickListener{
+            val intent = Intent(context, UpdateSettings::class.java)
+            intent.putExtra("Name", current.name.toString())
+            intent.putExtra("Value", current.value.toString())
+            intent.putExtra("dbIndex", position.toString())
+            context.startActivity(intent)
+        }
     }
 
     internal fun setItems(snapshot: DataSnapshot) {
