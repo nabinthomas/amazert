@@ -10,6 +10,7 @@ import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LiveData
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -171,19 +172,25 @@ class dbio : AppCompatActivity() {
          val deviceId = "532e8c40-18cd-11eb-a4ca-dca6328f80c0"
          val settingsPath = "users/$userId/$deviceId/settings"
          val rootRef = database.getReference(settingsPath.toString())
+         val itemList:MutableList<SettingItem> = ArrayList()
 
-        val valueEventListener = object : ValueEventListener {
+         val valueEventListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 for (ds in dataSnapshot.children) {
                     val dbValue = ds.getValue<Comment>()
-                    Log.d("OUT...", ds.value.toString())
                     if (dbValue != null) {
-                        Log.d("OUT...Val: ", dbValue.value)
+                        Log.d("OUT...Val: ", dbValue.name.toString() + "  " +   dbValue.value)
                         if (!dbValue.value.isNullOrBlank()) {
                             updateUI(ds.key.toString(), dbValue.value.toString())
                         }
                     }
+
+                    val dbValue1 = ds.getValue<SettingItem>()
+                    if (dbValue1 != null) {
+                        itemList.add(dbValue1)
+                    }
                 }
+                return
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
@@ -343,7 +350,6 @@ class dbio : AppCompatActivity() {
 
 //class sett(val setting: List<item>)
 class item(val Name: String ,val Description: String, val Input: String)
-class settingItem (val name:String, val value: String)
 
 @IgnoreExtraProperties
 data class Comment(

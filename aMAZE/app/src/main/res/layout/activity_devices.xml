@@ -48,8 +48,20 @@
         android:layout_height="61dp"
         android:layout_marginStart="140dp"
         android:layout_marginTop="43dp"
-        android:text="Register Device"
+        android:onClick="launchDeviceScreen"
+        android:text="Settings"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button2" />
+
+    <Button
+        android:id="@+id/button10"
+        android:layout_width="222dp"
+        android:layout_height="113dp"
+        android:layout_marginStart="147dp"
+        android:layout_marginTop="51dp"
+        android:onClick="toastItUp"
+        android:text="Button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button4" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

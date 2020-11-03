@@ -76,5 +76,15 @@ class DevicesActivity : AppCompatActivity() {
         val devRef = database.getReference(refPrefix)
         devRef.setValue(FirebaseAuth.getInstance().currentUser?.email)
     }
+
+    fun launchDeviceScreen(view: View) {
+        Toast.makeText(baseContext, "Connected to launchHandle ", Toast.LENGTH_LONG).show()
+    }
+
+    fun toastItUp(view: View) {
+        Toast.makeText(baseContext, "Connected to toastItUp ", Toast.LENGTH_LONG).show()
+        val intent = Intent(this, DeviceSettingActivity::class.java)
+        startActivity(intent)
+    }
 }
 
