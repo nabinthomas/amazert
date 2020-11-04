@@ -84,7 +84,6 @@ class DevicesActivity : AppCompatActivity() {
     }
 
     fun toastItUp(view: View) {
-        Toast.makeText(baseContext, "Connected to toastItUp ", Toast.LENGTH_LONG).show()
         val intent = Intent(this, DeviceSettingActivity::class.java)
         startActivity(intent)
     }
