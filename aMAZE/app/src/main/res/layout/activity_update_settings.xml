@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:visibility="visible"
     tools:context=".UpdateSettings">
 
     <TextView
@@ -20,7 +21,7 @@
         android:layout_width="122dp"
         android:layout_height="57dp"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="113dp"
+        android:layout_marginTop="100dp"
         android:ems="10"
         android:inputType="textPersonName"
         app:layout_constraintStart_toEndOf="@+id/textViewUpdateName"
@@ -36,4 +37,14 @@
         android:text="UPDATE"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewUpdateName" />
+
+    <Switch
+        android:id="@+id/switch1"
+        android:layout_width="124dp"
+        android:layout_height="58dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="98dp"
+        android:visibility="invisible"
+        app:layout_constraintStart_toEndOf="@+id/textViewUpdateName"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
