@@ -60,6 +60,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        Log.d("MAIN", "Dev name " + MyApplication.Companion.dev_name)
+
         if (deviceName != null) {
             Log.d("MAIN","Device name $deviceName")
             data = FileCrypt().decryptFile(this, "$deviceName")
@@ -75,7 +77,7 @@ class MainActivity : AppCompatActivity() {
 
                 Log.d(
                     "MAIN",
-                    "Dev id: $MyApplication.Companion.register.deviceId, email: $MyApplication.Companion.register.email, uid $MyApplication.Companion.register.uid"
+                    "Dev id: " + MyApplication.Companion.register.deviceId + " email: " + MyApplication.Companion.register.email + " uid: " +  MyApplication.Companion.register.uid
                 )
             } catch (e: JsonSyntaxException){
                 Log.d("MAIN", "Error in parsing Json")

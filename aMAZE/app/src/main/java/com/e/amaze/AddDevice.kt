@@ -30,6 +30,7 @@ class AddDevice : AppCompatActivity() {
     private lateinit var uId: String
     private val database = Firebase.database.getReferenceFromUrl("https://amaze-id1.firebaseio.com/").database
     private lateinit var mContext: Context
+    private lateinit var deviceName:EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +40,7 @@ class AddDevice : AppCompatActivity() {
         uName = intent.getStringExtra("Name")
         uId = intent.getStringExtra("Uid")
         mContext = this.applicationContext
+        deviceName = findViewById<EditText>(R.id.editTextDeviceName)
     }
 
     fun launchAddDeviceHandling(view: View) {
@@ -52,8 +54,9 @@ class AddDevice : AppCompatActivity() {
 
         var devFile = deviceName.text.toString() + ".dev"
         Log.d("ADD", "Existing file name "+ MyApplication.Companion.dev_name + " new file name $devFile")
-        if (devFile === MyApplication.Companion.dev_name) {
-            Toast.makeText(this,"Device with same name $deviceName.text.toString() already exist, please try a different device name", Toast.LENGTH_LONG).show()
+        if (devFile.trim().toString() == MyApplication.Companion.dev_name.trim().toString()) {
+            Log.d("ADD", "Same name used")
+            Toast.makeText(this,"Device with same name '" + deviceName.text.toString() + "' already exist, please try a different device name", Toast.LENGTH_LONG).show()
             return
         }
 
@@ -88,15 +91,15 @@ class AddDevice : AppCompatActivity() {
                 deviceDetails.setText("Device registration done Successfully")
 
                 //mContext = MyApplication.Companion.context
-                var fPath = mContext.applicationInfo.dataDir
-                Log.d("ADD", "PATH $fPath")
+//                var fPath = mContext.applicationInfo.dataDir
+//                Log.d("ADD", "PATH $fPath")
 
-                var device = deviceName.text.toString()
-                var fName = "$fPath/$device.dev"
-                mContext?.let { FileCrypt().encryptFile(it, fName, result) }
+//                var device = deviceName.text.toString()
+//                var fName = "$fPath/$device.dev"
+//                mContext?.let { FileCrypt().encryptFile(it, fName, result) }
 
-                MyApplication.Companion.dev_name = "$device.dev"
-                Log.d("ADD", "Dev reg file created "+ MyApplication.Companion.dev_name)
+//                MyApplication.Companion.dev_name = "$device.dev"
+//                Log.d("ADD", "Dev reg file created "+ MyApplication.Companion.dev_name)
 
                 SshPostTask().execute()
             }
@@ -332,6 +335,16 @@ class AddDevice : AppCompatActivity() {
         val response = BufferedReader(
             InputStreamReader(iStream, "UTF-8")
         ).use { it.readText() }
+
+        var fPath = mContext.applicationInfo.dataDir
+        Log.d("ADD", "PATH $fPath")
+
+        var device = deviceName.text.toString()
+        var fName = "$fPath/$device.dev"
+        mContext?.let { FileCrypt().encryptFile(it, fName, response) }
+
+        MyApplication.Companion.dev_name = "$device.dev"
+        Log.d("ADD", "Dev reg file created "+ MyApplication.Companion.dev_name)
 
         val registerDev = Gson().fromJson(response,Register::class.java)
 
