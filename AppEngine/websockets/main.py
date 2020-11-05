@@ -254,4 +254,10 @@ support web sockets. Instead, use gunicorn:
 
 gunicorn -b 127.0.0.1:8080 -k flask_sockets.worker main:app
 
+Other useful commands are 
+gunicorn -b 127.0.0.1:8080 -k flask_sockets.worker main:app
+gcloud app deploy app.yaml     --project amaze-id1
+gcloud config set project amaze-id1
+gcloud app logs tail
+
 """)
