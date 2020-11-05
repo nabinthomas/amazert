@@ -366,7 +366,7 @@ def amazerRTSettingHandler(config, ws, settings, options):
                 logger.debug("Response is " + response)
 
 """
-Handle a request to control the amazeRT SW
+Handle a request to control the amazeRT SW, or some special commands
 @param config - Identification for this device. 
 @param ws - used for communicating with the server
 @control control information
