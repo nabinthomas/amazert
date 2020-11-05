@@ -197,9 +197,37 @@ def getAllSupportedSettings():
     return allSettings
 
 """
+Each entry in this specifies how a status is read from the system. All these  can be then sent
+to the Cloud backend, for later use from the Mobile App
+The format is  { <name> :[command to run to read the json status], ...}
+"""
+statusRules = [{
+    "name": "wifi.clients" ,
+    "command" : ["ubus", "call", "hostapd.wlan0", "get_clients"],
+}]
+
+""" 
+Prepare a list of all the status which will be sent across to the AmazeRT App Engine
+""" 
+def getAllSupportedStatus():
+    allStatus = []
+    
+    for rule in statusRules:
+        try:
+            status= {}
+            command = rule["command"]
+            status["name"] = rule["name"]
+            statusOutput = str(runShellcommand(command))
+            status["value"] = json.loads(statusOutput)
+            allStatus.append(status)
+        except Exception as e:
+            logger.debug("failed status rule " + str(rule) + str(e))
+    return allStatus
+
+"""
 How frequent the heartbeat is sent to the server to keep the connection active.
 """ 
-heartBeatIntervalInSeconds = 300
+heartBeatIntervalInSeconds = 30
 
 """
 Prepares a packet to send. 
@@ -229,21 +257,15 @@ class amazeRTHeartBeatThread(threading.Thread):
         self.config = config
 
     def run(self):
-        self.sendAllConfiguration()
         while (keepRunning == True):
-            self.sendHeartbeat()
+            self.sendAllConfiguration()
             time.sleep(heartBeatIntervalInSeconds)
 
     def sendAllConfiguration(self):
         message = { "action" : "register"}
         allSettings = getAllSupportedSettings()
         message["settings"] = allSettings
-        packettoSend = preparePacketToSend(self.config, message)
-        logger.debug(f"> {packettoSend}")
-        self.ws.send(packettoSend)
-
-    def sendHeartbeat(self):
-        message = { "action" : "heartbeat"}
+        message["status"] = getAllSupportedStatus()
         packettoSend = preparePacketToSend(self.config, message)
         logger.debug(f"> {packettoSend}")
         self.ws.send(packettoSend)
