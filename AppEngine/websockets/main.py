@@ -218,9 +218,8 @@ def register_socket(ws):
                         print("DB ressnapshotult= " + str(snapshot))
                         #do we really need this loop ?
                         for key,val in snapshot.items():
-                            print(" Binu 1 key = " +str(key))
+                            print("key = " +str(key))
                             if key == deviceId:
-                                print(" Binu 2")
                                 settings = reg["settings"]
                                 print("settings" + str(settings))
                                 print("Found in DB")
@@ -259,5 +258,7 @@ gunicorn -b 127.0.0.1:8080 -k flask_sockets.worker main:app
 gcloud app deploy app.yaml     --project amaze-id1
 gcloud config set project amaze-id1
 gcloud app logs tail
+
+http://amaze-id1.wl.r.appspot.com
 
 """)
