@@ -81,15 +81,5 @@ class DevicesActivity : AppCompatActivity() {
         val intent = Intent(this, DeviceSettingActivity::class.java)
         startActivity(intent)
     }
-
-    /*
-    fun updateFeatureMappingCall(view: View) {
-        Log.i("SETTINGS--------__", MyApplication.Companion.globalSettingsList.toString())
-        val tmp:List<SettingDetails> = MyApplication.Companion.globalSettingsList
-        val filterList = tmp.filter { (key, value) -> key.equals("system.@system[0].hostname") }
-        Log.i("SETTINGS--------__", filterList[0].displayName.toString() + "   " + filterList[0].settingName.toString() )
-    }
-     */
-
 }
 

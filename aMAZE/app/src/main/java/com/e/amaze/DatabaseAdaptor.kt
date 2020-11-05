@@ -32,8 +32,12 @@ class SettingsAdapter(
 
     override fun onBindViewHolder(holder: SettingsViewHolder, position: Int) {
         val current = items[position]
-
-        holder.settingNameView.text = current.name.toString()
+        val filterList = MyApplication.Companion.globalSettingsList.filter { (key, value) -> key.equals(current.name.toString()) }
+        if (filterList.isNotEmpty()) {
+            holder.settingNameView.text = filterList[0].displayName.toString()
+        } else {
+            holder.settingNameView.text = current.name.toString()
+        }
         holder.settingValueView.text = current.value.toString()
 
         holder.settingNameView.setOnClickListener{
