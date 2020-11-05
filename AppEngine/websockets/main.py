@@ -27,19 +27,41 @@ import firebase_admin
 from firebase_admin import credentials
 
 import json
+import uuid
 
+app = Flask(__name__)
+sockets = Sockets(app)
+scockeDevMap= {}
+
+
+#DB connection 
 cred = credentials.Certificate("./key.json")
 firebase_admin.initialize_app(cred,{
         'databaseURL' : 'https://amaze-id1.firebaseio.com'
     })
-#ref = db.reference('/users')
-#queryResults1 = ref.get()
-#print (queryResults1)
-app = Flask(__name__)
-sockets = Sockets(app)
 
-scockeDevMap= {}
+'''
+There will be only one AppEngine running .
+When AppEngine First instanciate a unique key will be generated and stored in the data base.
+Each time the Cloud function is triggered , the cloud function should read the key from database 
+and send to App Engine , when it calls the /notify websocket interface. 
+AppEngine Will check the unique key for authentication .
+'''
 
+def generateUUID():
+    uniqueKey = uuid.uuid1() 
+    return uniqueKey
+
+uniqueKey = generateUUID();
+
+uidJson = {"id" : str(uniqueKey)}
+uidSetting = db.reference( "/uniqueId") 
+uidSetting.set(uidJson)
+
+print("Unique Id updated in DB " + str(uniqueKey))
+
+
+#Websocket related functions 
 def sendReply(ws,message, result):
     response = {
         "action" : "response", 
@@ -84,6 +106,7 @@ def notify_socket(ws):
                 
             '''
             {
+            "key" : "xxuniquekeyxx",
             "resource_string"= "projects/_/instances/amaze-id1/refs/users/_SDFsEfRSDjFCZXCVASEf/532e8c40-18cd-11eb-a4ca-dca6328f80c0"  ,
             "data" = {'settings': {'1': {'value': 'MuttuWRT'}}}
             }
@@ -91,15 +114,22 @@ def notify_socket(ws):
             print(message)
             msg = json.loads(message)
             print("jsonload ok ")
+            #validate the unique key and make sure that this is infact genuine cloud function call
+            inputkey= msg["key"]
+            if str(inputkey) != str(uniqueKey) :
+                print("unique key mismatch! Ignore this")
+                continue
+            else:
+                print("unique key matched Process the call")
             resource_string = msg["resource_string"]
-            print("resource_string ok = " + str(resource_string))
+            print("resource_string =" + str(resource_string))
             #resource_string= "projects/_/instances/amaze-id1/refs/users/_SDFsEfRSDjFCZXCVASEf/532e8c40-18cd-11eb-a4ca-dca6328f80c0"
                             #0       /1/2        /3        /4   /5    /6                    /7
             path= resource_string.split("/")
             uid = path[6]
-            print("uid", uid)
+            print("uid=", uid)
             did= path[7]
-            print("did", did)
+            print("did=", did)
 
             settings = msg["data"]["settings"]
             print("settings", settings)
