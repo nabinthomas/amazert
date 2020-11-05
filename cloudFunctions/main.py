@@ -1,5 +1,18 @@
 import websocket
 import json
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import db
+
+
+#DB connection 
+cred = credentials.Certificate("./key.json")
+firebase_admin.initialize_app(cred,{
+        'databaseURL' : 'https://amaze-id1.firebaseio.com'
+    })
+
+
+#App Engine websocket uri
 uri = "ws://amaze-id1.wl.r.appspot.com/notify"
 
 from websocket import create_connection
@@ -30,15 +43,21 @@ def hello_rtdb(event, context):
 
     """
     
+    uidSetting = db.reference( "/uniqueId") 
+    uidJson= uidSetting.get()
+    print("unique json in db  =" + str(uidJson))    
+    
+   
     resource_string = context.resource
     print(f"Function triggered by change to: {resource_string}.")
     
     delta  = event["delta"]
-    print("Delta" + str(delta))
+    print("Delta :" + str(delta))
     msg = {
+        "key":  str(uidJson["id"]),
         "resource_string": resource_string,
         "data": delta
     }
     msgS=json.dumps(msg)
     notify_cloud  (msgS)
-    print("MsgSend"+msgS)
+    print("MsgSend = "+ str(msgS))
