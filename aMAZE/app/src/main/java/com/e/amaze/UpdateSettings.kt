@@ -92,4 +92,5 @@ class UpdateSettings : AppCompatActivity() {
         // Navigate back to Settings page
         onBackPressed()
     }
+
 }

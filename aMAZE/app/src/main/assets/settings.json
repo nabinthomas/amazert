@@ -1,0 +1,39 @@
+[
+    {
+      "settingName" : "system.@system[0].hostname",
+      "displayName" : "Hostname",
+      "inputOptions" : "Name",
+      "isSwitch" : "false"
+    },
+    {
+      "settingName" : "wireless.wifinet0.ssid",
+      "displayName" : "Wifi SSID",
+      "inputOptions" : "Name",
+      "isSwitch" : "false"
+    },
+    {
+      "settingName" : "wireless.radio0.country",
+      "displayName" : "Country",
+      "inputOptions" : "Name",
+      "isSwitch" : "false"
+    },
+    {
+      "settingName" : "wireless.wifinet0.macfilter",
+      "displayName" : "MAC Filter",
+      "inputOptions" : " ",
+      "isSwitch" : "false"
+    },
+    {
+      "settingName" : "wireless.wifinet0.maclist",
+      "displayName" : "MAC List",
+      "inputOptions" : " ",
+      "isSwitch" : "false"
+    },
+    {
+      "settingName" : "wireless.wifinet0.disabled",
+      "displayName" : "MAC List",
+      "inputOptions" : " ",
+      "isSwitch" : "true"
+    }
+]
+

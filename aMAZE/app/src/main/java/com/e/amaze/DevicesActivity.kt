@@ -21,12 +21,6 @@ class DevicesActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_devices)
-/*
-        val button = findViewById<Button>(R.id.button7)
-        button.setOnClickListener {
-            registerDevice("c55d78f3-18de-11eb-ae63-dca6328f819e")
-        }
- */
     }
 
     fun launchAddDevice(view: View) {
@@ -87,5 +81,15 @@ class DevicesActivity : AppCompatActivity() {
         val intent = Intent(this, DeviceSettingActivity::class.java)
         startActivity(intent)
     }
+
+    /*
+    fun updateFeatureMappingCall(view: View) {
+        Log.i("SETTINGS--------__", MyApplication.Companion.globalSettingsList.toString())
+        val tmp:List<SettingDetails> = MyApplication.Companion.globalSettingsList
+        val filterList = tmp.filter { (key, value) -> key.equals("system.@system[0].hostname") }
+        Log.i("SETTINGS--------__", filterList[0].displayName.toString() + "   " + filterList[0].settingName.toString() )
+    }
+     */
+
 }
 
