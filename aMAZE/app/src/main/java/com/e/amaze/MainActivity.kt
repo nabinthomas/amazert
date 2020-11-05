@@ -13,6 +13,7 @@ import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
+import com.google.gson.reflect.TypeToken
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStream
@@ -24,14 +25,32 @@ class MyApplication : Application() {
         var context: Context? = null
         var register: Register = Register("","","","")
         var dev_name: String = ""
+        lateinit var globalSettingsList:List<SettingDetails>
+
+        fun  updateFeatureMapping(applicationContext: Context ) {
+            val mContext: Context = applicationContext
+            val iStream: InputStream = mContext.getAssets().open("settings.json")
+            val response = BufferedReader(
+                InputStreamReader(iStream, "UTF-8")
+                ).use { it.readText() }
+            //Log.d("JSON read response... [ ", "$response"+"  ]'")
+
+            val itemType = object : TypeToken<List<SettingDetails>>() {}.type
+            var out: List<SettingDetails> = Gson().fromJson(response, itemType)
+            //out.forEachIndexed { idx, ite -> Log.i("OUT=================", "> Item $idx:\n${ite.displayName} ${ite.inputOptions} ${ite.isSwitch}") }
+
+            globalSettingsList = out
+        }
     }
     override fun onCreate() {
         super.onCreate()
 
         Companion.context = applicationContext;
     }
-
 }
+
+
+
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,6 +59,8 @@ class MainActivity : AppCompatActivity() {
 
         var fPath = this.applicationInfo.dataDir
         Log.d("MAIN", "PATH $fPath")
+
+        MyApplication.Companion.updateFeatureMapping(applicationContext)
 
         var deviceName: String? = null
         var data:String = ""
@@ -129,6 +150,7 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
 
     }
+
 
 
 }

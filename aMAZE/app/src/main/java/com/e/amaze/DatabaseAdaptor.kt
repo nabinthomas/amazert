@@ -32,8 +32,7 @@ class SettingsAdapter(
 
     override fun onBindViewHolder(holder: SettingsViewHolder, position: Int) {
         val current = items[position]
-        //val current = SettingList[position]
-        //holder.settingIndexView.text = position.toString()
+
         holder.settingNameView.text = current.name.toString()
         holder.settingValueView.text = current.value.toString()
 
