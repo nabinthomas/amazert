@@ -10,20 +10,21 @@ import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LiveData
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.IgnoreExtraProperties
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
+import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonArray
-import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
-import org.xml.sax.Parser
-import java.io.*
+import java.io.BufferedReader
+import java.io.InputStream
+import java.io.InputStreamReader
 
 
 class dbio : AppCompatActivity() {
@@ -43,6 +44,8 @@ class dbio : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dbio)
+        //Register listener
+        readCurrentDB()
 
         val power_spinner: Spinner = findViewById(R.id.power_spinner)
         // Create an ArrayAdapter using the string array and a default spinner layout
@@ -129,43 +132,89 @@ class dbio : AppCompatActivity() {
          */
     }
 
-     fun readCurrentDB(view: View){
+    fun updateUI(key:String,  value: String){
+        when(key){
+            "0" -> {
+                Log.d("SWITCH", "IN with 0 - ${value.toString()} ")
+                val hostnameTextEdit = findViewById<View>(R.id.editTextHostname) as EditText
+                hostnameTextEdit.setText(value.toString())
+            }
+            "1" -> {//val ssa = value as settingItem
+                Log.d("SWITCH", "IN with 1 - ${value.toString()}   ")
+                val wifiSsidTextEdit = findViewById<View>(R.id.editTextSSID) as EditText
+                wifiSsidTextEdit.setText(value.toString())
+            }
+            "2" -> {
+                Log.d("SWITCH", "IN with 2 - ${value.toString()}   -${value.toInt()}")
+                val wifiSpinner = findViewById<View>(R.id.wifi_spinner) as Spinner
+                var pos: Int = 1
+                if (value.toString() == "0") {
+                    pos = 0
+                }
+                wifiSpinner.setSelection(pos)
+            }
+            "3" -> {
+                Log.d("SWITCH", "IN with 3 - ${value.toString()}")
+                val powerSpinner = findViewById<View>(R.id.power_spinner) as Spinner
+                var pos: Int = 1
+                if (value.toString() == "0") {
+                    pos = 0
+                }
+                powerSpinner.setSelection(pos)
+            }
+
+            else -> Log.d("ERROR", "Invalid Key")
+        }
+    }
+
+     fun readCurrentDB(){
          val userId = FirebaseAuth.getInstance().currentUser?.uid
          val deviceId = "532e8c40-18cd-11eb-a4ca-dca6328f80c0"
-         val settingsPath = "users/$userId/$deviceId/settings/0"
+         val settingsPath = "users/$userId/$deviceId/settings"
          val rootRef = database.getReference(settingsPath.toString())
+         val itemList:MutableList<SettingItem> = ArrayList()
 
-        val valueEventListener = object : ValueEventListener {
+         val valueEventListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 for (ds in dataSnapshot.children) {
-                    val username = ds.child("0").getValue(String::class.java)
-                    Log.d("Ammacheeeee.........", "name :: $$ds" )
+                    val dbValue = ds.getValue<Comment>()
+                    if (dbValue != null) {
+                        Log.d("OUT...Val: ", dbValue.name.toString() + "  " +   dbValue.value)
+                        if (!dbValue.value.isNullOrBlank()) {
+                            updateUI(ds.key.toString(), dbValue.value.toString())
+                        }
+                    }
+
+                    val dbValue1 = ds.getValue<SettingItem>()
+                    if (dbValue1 != null) {
+                        itemList.add(dbValue1)
+                    }
                 }
+                return
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
                 Log.d(TAG, databaseError.getMessage()) //Don't ignore errors!
             }
         }
-        rootRef.addListenerForSingleValueEvent(valueEventListener)
+        //rootRef.addListenerForSingleValueEvent(valueEventListener)
+         rootRef.addValueEventListener(valueEventListener)
 
-         for (ss in SETTINGS.values()){
-             val values = ss.ordinal
-             Log.d("ENUMS.......", "Value : $ss  -- $values  -- $ss.description "  )
-         }
-
-         val mContext: Context = applicationContext
-         val iStream: InputStream = mContext.getAssets().open("features.json")
-         val response = BufferedReader(
-             InputStreamReader(iStream, "UTF-8")
-         ).use { it.readText() }
-         Log.d("JSON read response... [ ", "$response"+"  ]'")
-
-         val itemType = object : TypeToken<List<item>>() {}.type
-         var out: List<item> = Gson().fromJson(response, itemType)
-
-         out.forEachIndexed { idx, ite -> Log.i("data", "> Item $idx:\n${ite.Name} ${ite.Description} ${ite.Input}") }
      }
+
+    fun readFeatureList() {
+        val mContext: Context = applicationContext
+        val iStream: InputStream = mContext.getAssets().open("features.json")
+        val response = BufferedReader(
+            InputStreamReader(iStream, "UTF-8")
+        ).use { it.readText() }
+        Log.d("JSON read response... [ ", "$response"+"  ]'")
+
+        val itemType = object : TypeToken<List<item>>() {}.type
+        var out: List<item> = Gson().fromJson(response, itemType)
+
+        out.forEachIndexed { idx, ite -> Log.i("data", "> Item $idx:\n${ite.Name} ${ite.Description} ${ite.Input}") }
+    }
 
     fun readDb(view: View) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
@@ -221,7 +270,7 @@ class dbio : AppCompatActivity() {
         startActivity(intent)
     }
 
-    fun updateWifiSsid(view: View) {
+    fun updateHostname(view: View) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         var deviceId: String = MyApplication.Companion.register.deviceId
         if (MyApplication.Companion.register.deviceId === "") {
@@ -230,13 +279,31 @@ class dbio : AppCompatActivity() {
         val settingsPath = "users/$userId/$deviceId/settings/0/name"
         val valPath = "users/$userId/$deviceId/settings/0/value"
 
+        val hostnameTextEdit = findViewById<View>(R.id.editTextHostname) as EditText
+        val hostnameVal = hostnameTextEdit.text
+
+        val nameRef = database.getReference(settingsPath.toString())
+        nameRef.setValue("system.@system[0].hostname")
+
+        val valRef = database.getReference(valPath.toString())
+        valRef.setValue(hostnameVal.toString())
+
+    }
+
+    fun updateWifiSsid(view: View) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        var deviceId: String = MyApplication.Companion.register.deviceId
+        if (MyApplication.Companion.register.deviceId === "") {
+            deviceId = "532e8c40-18cd-11eb-a4ca-dca6328f80c0" }
+
+        val settingsPath = "users/$userId/$deviceId/settings/1/name"
+        val valPath = "users/$userId/$deviceId/settings/1/value"
+
         val wifiSsidTextEdit = findViewById<View>(R.id.editTextSSID) as EditText
         val wifiSSIDVal = wifiSsidTextEdit.text
 
         val nameRef = database.getReference(settingsPath.toString())
         nameRef.setValue("wireless.wifinet0.ssid")
-
-        Log.d("SANS", "Edit text  $wifiSSIDVal")
 
         val valRef = database.getReference(valPath.toString())
         valRef.setValue(wifiSSIDVal.toString())
@@ -249,14 +316,16 @@ class dbio : AppCompatActivity() {
         if (MyApplication.Companion.register.deviceId === "") {
             deviceId = "532e8c40-18cd-11eb-a4ca-dca6328f80c0" }
         //val refPrefix = userId.plus("/device/device-$userId")
-        val settingsPath = "users/$userId/$deviceId/settings/1/name"
-        val valPath = "users/$userId/$deviceId/settings/1/value"
+        val settingsPath = "users/$userId/$deviceId/settings/2/name"
+        val valPath = "users/$userId/$deviceId/settings/2/value"
 
         val wifiSpinner = findViewById<View>(R.id.wifi_spinner) as Spinner
-        val wifiVal = wifiSpinner.selectedItem.toString()
-
+        var wifiVal:String = "1"
+        if (wifiSpinner.selectedItem.toString() == "ON") {
+            wifiVal = "0"
+        }
         val myRef = database.getReference(settingsPath.toString())
-        myRef.setValue("WifiState")
+        myRef.setValue("wireless.wifinet0.disabled")
         val myRef1 = database.getReference(valPath.toString())
         myRef1.setValue(wifiVal)
     }
@@ -266,8 +335,8 @@ class dbio : AppCompatActivity() {
         var deviceId: String = MyApplication.Companion.register.deviceId
         if (MyApplication.Companion.register.deviceId === "") {
             deviceId = "532e8c40-18cd-11eb-a4ca-dca6328f80c0" }
-        val settingsPath = "users/$userId/$deviceId/settings/2/name"
-        val valPath = "users/$userId/$deviceId/settings/2/value"
+        val settingsPath = "users/$userId/$deviceId/settings/3/name"
+        val valPath = "users/$userId/$deviceId/settings/3/value"
 
         val powerSpinner = findViewById<View>(R.id.power_spinner) as Spinner
         val powerVal = powerSpinner.selectedItem.toString()
@@ -281,3 +350,9 @@ class dbio : AppCompatActivity() {
 
 //class sett(val setting: List<item>)
 class item(val Name: String ,val Description: String, val Input: String)
+
+@IgnoreExtraProperties
+data class Comment(
+    var name: String? = "",
+    var value: String? = ""
+)

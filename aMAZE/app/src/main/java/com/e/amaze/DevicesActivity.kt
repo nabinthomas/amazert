@@ -21,11 +21,12 @@ class DevicesActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_devices)
-
+/*
         val button = findViewById<Button>(R.id.button7)
         button.setOnClickListener {
             registerDevice("c55d78f3-18de-11eb-ae63-dca6328f819e")
         }
+ */
     }
 
     fun launchAddDevice(view: View) {
@@ -75,6 +76,16 @@ class DevicesActivity : AppCompatActivity() {
         val refPrefix = "/users/$userId/$deviceId/identifier/email"
         val devRef = database.getReference(refPrefix)
         devRef.setValue(FirebaseAuth.getInstance().currentUser?.email)
+    }
+
+    fun launchDeviceScreen(view: View) {
+        val intent = Intent(this, DeviceSettingActivity::class.java)
+        startActivity(intent)
+    }
+
+    fun toastItUp(view: View) {
+        val intent = Intent(this, DeviceSettingActivity::class.java)
+        startActivity(intent)
     }
 }
 

@@ -10,17 +10,18 @@
         android:id="@+id/button3"
         android:layout_width="130dp"
         android:layout_height="55dp"
-        android:layout_marginStart="140dp"
-        android:layout_marginTop="44dp"
+        android:layout_marginStart="137dp"
+        android:layout_marginTop="88dp"
         android:onClick="launchFirebaseIo"
         android:text="@string/update_device"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button7" />
+        app:layout_constraintTop_toBottomOf="@+id/button4" />
 
     <Button
         android:id="@+id/button2"
-        android:layout_width="128dp"
-        android:layout_height="59dp"
+        android:layout_width="135dp"
+        android:layout_height="58dp"
         android:layout_marginTop="28dp"
         android:onClick="launchAddDevice"
         android:text="@string/add_device"
@@ -33,22 +34,23 @@
 
     <Button
         android:id="@+id/button4"
-        android:layout_width="126dp"
-        android:layout_height="48dp"
+        android:layout_width="135dp"
+        android:layout_height="54dp"
         android:layout_marginStart="140dp"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="50dp"
         android:onClick="logoutCurrentUser"
         android:text="LogOut"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button3" />
+        app:layout_constraintTop_toBottomOf="@+id/button10" />
 
     <Button
-        android:id="@+id/button7"
-        android:layout_width="127dp"
-        android:layout_height="61dp"
+        android:id="@+id/button10"
+        android:layout_width="135dp"
+        android:layout_height="59dp"
         android:layout_marginStart="140dp"
-        android:layout_marginTop="43dp"
-        android:text="Register Device"
+        android:layout_marginTop="56dp"
+        android:onClick="toastItUp"
+        android:text="SETTINGS"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button2" />
 

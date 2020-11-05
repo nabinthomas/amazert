@@ -9,7 +9,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".dbio"></activity>
+        <activity android:name=".UpdateSettings"></activity>
+        <activity android:name=".DeviceSettingActivity" />
+        <activity android:name=".dbio" />
         <activity android:name=".DevicesActivity" />
         <activity
             android:name=".AddDevice"

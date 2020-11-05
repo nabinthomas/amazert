@@ -21,8 +21,11 @@ keepRunning = True
 
 amazertlogfile = "/var/log/amazert.log"
 configFilePath = "/etc/amazert.json"
+appEngineUri = "ws://amaze-id1.wl.r.appspot.com/register"
+
 ##TODO . This is for local testing. The file should be in /etc along with other configs. 
 #configFilePath = "/tmp/amazert.json"
+#appEngineUri = "ws://localhost:6789"
 
 """
 Settings that can be controlled via AmazeRT
@@ -411,15 +414,13 @@ Main for the service. Connects to the Cloud App Engine, Initialize local handler
 and keep listening to requests
 """
 async def amazeRTServiceMain():
-    uri = "ws://localhost:6789"
-    #uri = "ws://amaze-id1.wl.r.appspot.com/register"
 
     config = loadCurrentRegistration()
     if (config is None):
         logger.debug("AmazeRT is not configured on this machine. please run initial configuration using init.py")
         exit(-1)
     
-    ws = create_connection(uri #, ssl=ssl_context
+    ws = create_connection(appEngineUri #, ssl=ssl_context
     )
 
     hearbeatThread = amazeRTHeartBeatThread(config, ws)
