@@ -101,6 +101,7 @@
         android:layout_marginTop="96dp"
         android:autofillHints=""
         android:hint="Enter device name"
+        android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
         android:inputType="text"
         android:textSize="12dp"
         android:visibility="visible"

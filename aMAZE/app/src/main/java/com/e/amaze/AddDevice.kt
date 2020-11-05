@@ -1,11 +1,13 @@
 package com.e.amaze
 
+import android.content.Context
 import android.content.res.AssetManager
 import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
@@ -15,7 +17,10 @@ import com.jcraft.jsch.ChannelExec
 import com.jcraft.jsch.ChannelSftp
 import com.jcraft.jsch.ChannelSftp.OVERWRITE
 import com.jcraft.jsch.JSch
-import java.io.*
+import java.io.BufferedReader
+import java.io.ByteArrayOutputStream
+import java.io.InputStream
+import java.io.InputStreamReader
 import java.util.*
 
 
@@ -24,6 +29,7 @@ class AddDevice : AppCompatActivity() {
     private lateinit var uName: String
     private lateinit var uId: String
     private val database = Firebase.database.getReferenceFromUrl("https://amaze-id1.firebaseio.com/").database
+    private lateinit var mContext: Context
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +38,7 @@ class AddDevice : AppCompatActivity() {
 
         uName = intent.getStringExtra("Name")
         uId = intent.getStringExtra("Uid")
+        mContext = this.applicationContext
     }
 
     fun launchAddDeviceHandling(view: View) {
@@ -42,6 +49,13 @@ class AddDevice : AppCompatActivity() {
         val passwd = findViewById<EditText>(R.id.editTextPassword)
         val deviceDetails = findViewById<EditText>(R.id.deviceDetails)
         var output:String = "None"
+
+        var devFile = deviceName.text.toString() + ".dev"
+        Log.d("ADD", "Existing file name "+ MyApplication.Companion.dev_name + " new file name $devFile")
+        if (devFile === MyApplication.Companion.dev_name) {
+            Toast.makeText(this,"Device with same name $deviceName.text.toString() already exist, please try a different device name", Toast.LENGTH_LONG).show()
+            return
+        }
 
         class SshPostTask : AsyncTask<Void, Void, String>() {
             override fun doInBackground(vararg p0: Void?): String {
@@ -58,6 +72,7 @@ class AddDevice : AppCompatActivity() {
         }
 
         class SftpGetTask : AsyncTask<Void, Void, String>() {
+
             override fun doInBackground(vararg p0: Void?): String {
 
                 output = executeGetCommand(userName.text.toString(), passwd.text.toString(), deviceIP.text.toString(), 22)
@@ -68,9 +83,21 @@ class AddDevice : AppCompatActivity() {
             override fun onPostExecute(result: String) {
                 //deviceDetails.setText(output.toString())
                 deviceDetails.setText(result)
-                print("Sftp Get Done")
+                Log.d("ADD","Sftp Get Done")
                 registerDeviceToCloud()
                 deviceDetails.setText("Device registration done Successfully")
+
+                //mContext = MyApplication.Companion.context
+                var fPath = mContext.applicationInfo.dataDir
+                Log.d("ADD", "PATH $fPath")
+
+                var device = deviceName.text.toString()
+                var fName = "$fPath/$device.dev"
+                mContext?.let { FileCrypt().encryptFile(it, fName, result) }
+
+                MyApplication.Companion.dev_name = "$device.dev"
+                Log.d("ADD", "Dev reg file created "+ MyApplication.Companion.dev_name)
+
                 SshPostTask().execute()
             }
         }

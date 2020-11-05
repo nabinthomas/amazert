@@ -1,11 +1,13 @@
 package com.e.amaze
 
 import android.content.Context
+import android.util.Log
 import androidx.security.crypto.EncryptedFile
 import androidx.security.crypto.MasterKeys
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.nio.charset.StandardCharsets
+import java.nio.charset.Charset
+
 
 class FileCrypt {
 
@@ -14,6 +16,8 @@ class FileCrypt {
 
         val file = File(fName)
 
+        Log.d("ENC", "file $fName")
+
         val encryptedFile = EncryptedFile.Builder(
             file,
             context,
@@ -21,10 +25,17 @@ class FileCrypt {
             EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
         ).build()
 
-//        encryptedFile.openFileOutput().use { outputStream ->
-            //write data to your encrypted file
-//        }
+        Log.d("ENC", "content $string")
 
+        encryptedFile.openFileOutput().use { outputStream ->
+            // Write data to your encrypted file
+            //outputStream.write(string.toByteArray())
+            //outputStream.write(string.getBytes(Charset.forName("UTF-8")));
+            outputStream.write(string.toByteArray(Charset.forName("UTF-8")))
+            outputStream.flush()
+            outputStream.close()
+        }
+ /*
         val fileContent = string
             .toByteArray(StandardCharsets.UTF_8)
         encryptedFile.openFileOutput().apply {
@@ -32,12 +43,16 @@ class FileCrypt {
             flush()
             close()
         }
+
+  */
     }
 
     fun decryptFile(context: Context, fName: String): String {
         val mainKey = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
 
         val file = File(fName)
+
+        Log.d("DEC", "file $fName")
 
         val encryptedFile = EncryptedFile.Builder(
             file,
@@ -46,6 +61,27 @@ class FileCrypt {
             EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
         ).build()
 
+//        var string: String = String()
+//        encryptedFile.openFileInput().bufferedReader().useLines { lines ->
+//            string += lines
+//        }
+
+//        var string: String = String()
+        encryptedFile.openFileInput().use { inputStream ->
+            // Read data from your encrypted file
+
+            val result = ByteArrayOutputStream()
+            val buffer = ByteArray(1024)
+            var length: Int
+            while (inputStream.read(buffer).also { length = it } != -1) {
+                result.write(buffer, 0, length)
+            }
+
+            Log.d("DEC","dec text: $result")
+            return result.toString("UTF-8")
+        }
+
+        /*
         val inputStream = encryptedFile.openFileInput()
         val byteArrayOutputStream = ByteArrayOutputStream()
         var nextByte: Int = inputStream.read()
@@ -56,6 +92,13 @@ class FileCrypt {
 
         val plaintext: ByteArray = byteArrayOutputStream.toByteArray()
 
+        Log.d("DEC","dec text: $plaintext")
+
         return plaintext.toString()
+
+         */
+  //      Log.d("DEC","dec text: $string")
+  //      return string
+        return ""
     }
 }

@@ -2,26 +2,33 @@ package com.e.amaze
 
 import android.app.Activity
 import android.app.Application
+import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
-import com.google.android.gms.common.ConnectionResult
-import com.google.android.gms.common.GoogleApiAvailability
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.iid.FirebaseInstanceId
+import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
+import java.io.BufferedReader
+import java.io.File
+import java.io.InputStream
+import java.io.InputStreamReader
 
 class MyApplication : Application() {
 
     companion object {
+        var context: Context? = null
         var register: Register = Register("","","","")
+        var dev_name: String = ""
     }
     override fun onCreate() {
         super.onCreate()
+
+        Companion.context = applicationContext;
     }
 
 }
@@ -30,6 +37,50 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        var fPath = this.applicationInfo.dataDir
+        Log.d("MAIN", "PATH $fPath")
+
+        var deviceName: String? = null
+        var data:String = ""
+
+        val listAllFiles = File(fPath).listFiles()
+
+        if (listAllFiles != null && listAllFiles.isNotEmpty()) {
+            Log.d("MAIN", "List files " + listAllFiles.toString())
+            for (currentFile in listAllFiles) {
+                if (currentFile.name.endsWith(".dev")) {
+                    Log.e("MAIN", "Abs path " + currentFile.getAbsolutePath())
+                    // File Name
+                    Log.e("MAIN", "Get file name " + currentFile.getName())
+                    MyApplication.Companion.dev_name = currentFile.getName()
+                    //fileList.add(currentFile.absoluteFile)
+                    deviceName = currentFile.absoluteFile.toString()
+                }
+            }
+        }
+
+        if (deviceName != null) {
+            Log.d("MAIN","Device name $deviceName")
+            data = FileCrypt().decryptFile(this, "$deviceName")
+            Log.d("MAIN", "DATA    $data")
+
+            try {
+                val registerDev = Gson().fromJson(data, Register::class.java)
+
+                MyApplication.Companion.register.deviceId = registerDev.deviceId
+                MyApplication.Companion.register.email = registerDev.email
+                MyApplication.Companion.register.registrationId = registerDev.registrationId
+                MyApplication.Companion.register.uid = registerDev.uid
+
+                Log.d(
+                    "MAIN",
+                    "Dev id: $MyApplication.Companion.register.deviceId, email: $MyApplication.Companion.register.email, uid $MyApplication.Companion.register.uid"
+                )
+            } catch (e: JsonSyntaxException){
+                Log.d("MAIN", "Error in parsing Json")
+            }
+        }
     }
 
     fun launchSignInFlow(view: View) {
