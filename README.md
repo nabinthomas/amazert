@@ -74,7 +74,7 @@ A Sample is given below
 </pre>
 ##### Registration packet
 Registration is done on every reboot as the first message to the server.
-This make sure that the device's settings are updated on the server once it boots up
+This make sure that the device's settings and current status are updated on the server once it boots up
 A Sample is given below
 <pre>
 {
@@ -97,24 +97,34 @@ A Sample is given below
         "email": "ginto100@gmail.com",
         "uid": "oKiu1knj4IaeMvdrwCy212cIu753",
         "deviceId": "c55d78f3-18de-11eb-ae63-dca6328f819e"
-    }
+    },
+    "status": [{
+        "name": "wifi.clients",
+        "value": {
+            "freq": 5560,
+            "clients": {
+                "d4:c9:4b:4f:4c:72": {
+                    "auth": true,
+                    "assoc": true,
+                    "authorized": true,
+                    "preauth": false,
+                    "wds": false,
+                    "wmm": false,
+                    "ht": false,
+                    "vht": false,
+                    "wps": false,
+                    "mfp": false,
+                    "rrm": [115, 16, 145, 0, 4],
+                    "aid": 0
+                }
+            }
+        }
+    }],
 }
 </pre>
 ##### Hearbeat packet
-Heartbeat keeps the devices connection with the server alive.
-Server may choose to ignore this completely. 
+For simplification, Heartbeat packet is nothing but a registration packet that is sent across to the Cloud periodically.
 
-A Sample is given below
-<pre>
-{
-    "identifier" : {
-      'email': 'nabin@gmail.com', 
-      'uid': '_SDFsEfRSDjFCZXCVASEf',
-      'deviceId': 'fb967061-168a-11eb-9272-88e9fe6b97d6'
-    },
-    "action" : "heartbeat"
-}
-</pre>
 
 #### AmazeRT Communication from Cloud
 Commnication to from the cloud to AmazeRT Router also follow a similar structure of the communication the other way around
