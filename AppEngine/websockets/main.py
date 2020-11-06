@@ -78,7 +78,6 @@ def sendToAll(ws,message):
         client.ws.send(message)
 
 
-
 @sockets.route('/chat')
 def chat_socket(ws):
     while not ws.closed:
@@ -171,6 +170,11 @@ def notify_socket(ws):
 # [END gae_flex_websockets_app]
 
 
+def updateSettings(settingsPath,settingsJson):
+    settingsRef = db.reference(settingsPath) 
+    settingsRef.set(settingsJson)
+
+
 """
 WRT devices send message to this url for registration and heartbeat
 @param message - JSON Object holding the message from WRT device
@@ -223,10 +227,9 @@ def register_socket(ws):
                                 if "settings" in reg:
                                     settings = reg["settings"]
                                     print("settings" + str(settings))
-                                    
                                     settingsPath = "/users/" + uid  + "/" + deviceId + "/settings"
-                                    settingsRef = db.reference(settingsPath) 
-                                    settingsRef.set(settings)
+                                    updateSettings(settingsPath,settings)
+
                                 if "status" in reg:
                                     status = reg["status"]
                                     print("settings" + str(status))
