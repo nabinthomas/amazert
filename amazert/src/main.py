@@ -24,6 +24,8 @@ amazertlogfile = "/var/log/amazert.log"
 configFilePath = "/etc/amazert.json"
 appEngineUri = "ws://amaze-id1.wl.r.appspot.com/register"
 appEngineUri = "wss://amaze-id1.wl.r.appspot.com/register"
+lastSettingsSent = []
+lastStatusSent = []
 
 ##TODO . This is for local testing. The file should be in /etc along with other configs. 
 #configFilePath = "/tmp/amazert.json"
@@ -167,6 +169,43 @@ def runShellcommand(command):
         responseCode = -1
     return resultString.strip()
 
+"""
+Filter out settings that didnot change from last set of settings that was sent to the AppEngine
+"""
+def filterChangedSettings(newSettings):
+    filteredList = []
+    for setting in newSettings:
+        settingWasPresent = False 
+        for oldSetting in lastSettingsSent:
+            if (setting["name"] == oldSetting["name"]):
+                settingWasPresent = True
+                if (setting["value"] != oldSetting["value"]):
+                    filteredList.append(setting)
+        if (settingWasPresent == False):
+            filteredList.append(setting)
+    return filteredList
+
+"""
+Filter out status that didnot change from last set of settings that was sent to the AppEngine
+"""
+def filterChangedStatus(newStatus):
+    filteredList = []
+    for status in newStatus:
+        print ("Setting New = " + str(status))
+        statusWasPresent = False 
+        for oldStatus in lastStatusSent:
+            print ("Setting Old = " + str(oldStatus))
+            if (status["name"] == oldStatus["name"]):
+                statusWasPresent = True
+                if (status["value"] != oldStatus["value"]):
+                    filteredList.append(status)
+                    print ("Different : " + str(status) + "|||" + str(oldStatus))
+                else:
+                    print ("Same : " + str(status) + "|||" + str(status))
+        if (statusWasPresent == False) :
+            filteredList.append(status)
+    return filteredList
+
 """ 
 Prepare a list of all the settings which will be sent across to the AmazeRT App Engine
 """ 
@@ -229,7 +268,7 @@ def getAllSupportedStatus():
 """
 How frequent the heartbeat is sent to the server to keep the connection active.
 """ 
-heartBeatIntervalInSeconds = 30
+heartBeatIntervalInSeconds = 10
 
 """
 Prepares a packet to send. 
@@ -268,11 +307,16 @@ class amazeRTHeartBeatThread(threading.Thread):
             time.sleep(heartBeatIntervalInSeconds)
 
     def sendAllConfiguration(self):
+        global lastSettingsSent
+        global lastStatusSent
         message = { "action" : "register"}
         allSettings = getAllSupportedSettings()
-        message["settings"] = allSettings
-        message["status"] = getAllSupportedStatus()
+        allStatus = getAllSupportedStatus()
+        message["settings"] = filterChangedSettings(allSettings)
+        message["status"] = filterChangedStatus(allStatus)
         packettoSend = preparePacketToSend(self.config, message)
+        lastSettingsSent = allSettings
+        lastStatusSent = allStatus
         logger.debug(f"> {packettoSend}")
         self.ws.send(packettoSend)
 
