@@ -171,9 +171,26 @@ def notify_socket(ws):
 
 
 def updateSettings(settingsPath,settingsJson):
+    print("enter updateSettings")
     settingsRef = db.reference(settingsPath) 
-    settingsRef.set(settingsJson)
-
+    snapshot = settingsRef.order_by_key().get()
+    indexMax = len(snapshot)
+    print(" indexMax =" + str(indexMax)) 
+    nextInxex = indexMax
+    #print("Setting snapShot by index key = " + str(i)  + "  " + str(path)+  " key=" + str (setP["name"]) + " value=" + (setP["value"]) )
+    for key in settingsJson:
+        keyFound = False
+        for i in range (0,indexMax):
+            path = settingsPath +"/" + str(i)
+            settingRef = db.reference( path )
+            setP= settingRef.get()
+            #print(" settingsJson key = " +str(key))
+            if str(key["name"]) == str (setP["name"]):
+                settingRef.child("value").set(str(key["value"]))
+                keyFound = True
+                continue
+        if  keyFound == False:
+            db.reference( settingsPath +"/" + str(nextInxex)).set(key)
 
 """
 WRT devices send message to this url for registration and heartbeat
@@ -232,7 +249,7 @@ def register_socket(ws):
 
                                 if "status" in reg:
                                     status = reg["status"]
-                                    print("settings" + str(status))
+                                    #print("status" + str(status))
                                     statusPath = "/users/" + uid  + "/" + deviceId + "/status"
                                     statusRef = db.reference(statusPath) 
                                     statusRef.set(status)
