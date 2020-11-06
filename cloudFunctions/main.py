@@ -13,7 +13,7 @@ firebase_admin.initialize_app(cred,{
 
 
 #App Engine websocket uri
-uri = "ws://amaze-id1.wl.r.appspot.com/notify"
+uri = "wss://amaze-id1.wl.r.appspot.com/notify"
 
 from websocket import create_connection
 
