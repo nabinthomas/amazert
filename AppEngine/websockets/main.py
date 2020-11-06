@@ -220,12 +220,20 @@ def register_socket(ws):
                         for key,val in snapshot.items():
                             print("key = " +str(key))
                             if key == deviceId:
-                                settings = reg["settings"]
-                                print("settings" + str(settings))
-                                print("Found in DB")
-                                settingsPath = "/users/" + uid  + "/" + deviceId + "/settings"
-                                settingsRef = db.reference(settingsPath) 
-                                settingsRef.set(settings)
+                                if "settings" in reg:
+                                    settings = reg["settings"]
+                                    print("settings" + str(settings))
+                                    
+                                    settingsPath = "/users/" + uid  + "/" + deviceId + "/settings"
+                                    settingsRef = db.reference(settingsPath) 
+                                    settingsRef.set(settings)
+                                if "status" in reg:
+                                    status = reg["status"]
+                                    print("settings" + str(status))
+                                    statusPath = "/users/" + uid  + "/" + deviceId + "/status"
+                                    statusRef = db.reference(statusPath) 
+                                    statusRef.set(status)
+
                                 sendReply(ws, message, "PASS")
                                 scockeDevMap[deviceId]=ws
                                 print("Every Thing looks good")
