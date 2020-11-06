@@ -245,9 +245,10 @@ and updating that data
 """
 def preparePacketToSend(config, dataToSend):
     jsonPacket = dataToSend
-    identification{}
-    identification[]
-    del identification['registrationId'] # This should not be sent
+    identification = {}
+    identification['uid'] = config['uid']
+    identification['deviceId'] = config['deviceId']
+    identification['email'] = config['email']
     jsonPacket['identifier'] = identification
     return  json.dumps(jsonPacket)
 
