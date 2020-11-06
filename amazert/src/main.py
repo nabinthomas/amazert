@@ -23,6 +23,7 @@ keepRunning = True
 amazertlogfile = "/var/log/amazert.log"
 configFilePath = "/etc/amazert.json"
 appEngineUri = "ws://amaze-id1.wl.r.appspot.com/register"
+appEngineUri = "wss://amaze-id1.wl.r.appspot.com/register"
 
 ##TODO . This is for local testing. The file should be in /etc along with other configs. 
 #configFilePath = "/tmp/amazert.json"
@@ -244,7 +245,8 @@ and updating that data
 """
 def preparePacketToSend(config, dataToSend):
     jsonPacket = dataToSend
-    identification = config
+    identification{}
+    identification[]
     del identification['registrationId'] # This should not be sent
     jsonPacket['identifier'] = identification
     return  json.dumps(jsonPacket)
