@@ -16,12 +16,14 @@ import logging
 
 from websocket import create_connection
 
-keepRunning = True    
+from cryptography.fernet import Fernet
 
+keepRunning = True   
 
 amazertlogfile = "/var/log/amazert.log"
 configFilePath = "/etc/amazert.json"
 appEngineUri = "ws://amaze-id1.wl.r.appspot.com/register"
+appEngineUri = "wss://amaze-id1.wl.r.appspot.com/register"
 
 ##TODO . This is for local testing. The file should be in /etc along with other configs. 
 #configFilePath = "/tmp/amazert.json"
@@ -235,14 +237,18 @@ Every packet will need to be added with some extra information about the
 identification of the device being controlled/reported. This is a wrapper for generating
 and updating that data
 
-@param identification - JSON Object holding the device configuration (ID data)
+@param config - JSON Object holding the device configuration (ID data)
 @param dataToSend - JSON Object holding the data to be sent
 
 @return - JSON with identification data added to dataToSend
 
 """
-def preparePacketToSend(identification, dataToSend):
+def preparePacketToSend(config, dataToSend):
     jsonPacket = dataToSend
+    identification = {}
+    identification['uid'] = config['uid']
+    identification['deviceId'] = config['deviceId']
+    identification['email'] = config['email']
     jsonPacket['identifier'] = identification
     return  json.dumps(jsonPacket)
 
@@ -424,7 +430,7 @@ def loadCurrentRegistration():
         configFile = open(configFilePath)
         currentRegistration = json.load(configFile)
         if ((currentRegistration['email']) and (currentRegistration['deviceId']) and (currentRegistration['registrationId']) and (currentRegistration['uid'])):
-            del currentRegistration['registrationId']
+            ## del currentRegistration['registrationId']
             return currentRegistration
         return None
     except Exception:
