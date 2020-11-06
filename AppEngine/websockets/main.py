@@ -169,9 +169,8 @@ def notify_socket(ws):
 # [END gae_flex_websockets_app]
 # [END gae_flex_websockets_app]
 
-
+'''
 def updateSettings(settingsPath,settingsJson):
-    print("enter updateSettings")
     try:
         settingsRef = db.reference(settingsPath) 
         snapshot = settingsRef.order_by_key().get()
@@ -192,9 +191,32 @@ def updateSettings(settingsPath,settingsJson):
                     continue
             if  keyFound == False:
                 db.reference( settingsPath +"/" + str(nextInxex)).set(key)
+                nextInxex = nextInxex +1
     except Exception as e:
         print("Exceptoin in updateSettings " + str(e))
-
+'''
+def updateNameValue(nodePath,inputJason):
+    try:
+        pathRef = db.reference(nodePath) 
+        snapshot = pathRef.order_by_key().get()
+        indexMax = len(snapshot)
+        nextInxex = indexMax
+        for key in inputJason:
+            keyFound = False
+            for i in range (0,indexMax):
+                path = nodePath +"/" + str(i)
+                nodeRef = db.reference( path )
+                setP= nodeRef.get()
+                #print(" inputJason key = " +str(key))
+                if str(key["name"]) == str (setP["name"]):
+                    nodeRef.child("value").set(str(key["value"]))
+                    keyFound = True
+                    continue
+            if  keyFound == False:
+                db.reference( nodePath +"/" + str(nextInxex)).set(key)
+                nextInxex = nextInxex + 1
+    except Exception as e:
+        print("Exceptoin in updateNameValue " + str(e))
 
 """
 WRT devices send message to this url for registration and heartbeat
@@ -255,14 +277,17 @@ def register_socket(ws):
                                     if snapshot == None:
                                         settingsRef.set(settings)
                                     else :
-                                        updateSettings(settingsPath,settings)
+                                        updateNameValue(settingsPath,settings)
 
                                 if "status" in reg:
                                     status = reg["status"]
                                     #print("status" + str(status))
                                     statusPath = "/users/" + uid  + "/" + deviceId + "/status"
                                     statusRef = db.reference(statusPath) 
-                                    statusRef.set(status)
+                                    if statusRef.get() == None:
+                                        statusRef.set(status)
+                                    else :
+                                        updateNameValue(statusPath, status)
 
                                 sendReply(ws, message, "PASS")
                                 scockeDevMap[deviceId]=ws
