@@ -58,7 +58,7 @@ uidJson = {"id" : str(uniqueKey)}
 uidSetting = db.reference( "/uniqueId") 
 uidSetting.set(uidJson)
 
-print("Unique Id updated in DB " + str(uniqueKey))
+print("Unique Id updated in DB  " + str(uniqueKey) + " From Db=" +str(uidSetting.get()) )
 
 
 #Websocket related functions 
@@ -172,25 +172,29 @@ def notify_socket(ws):
 
 def updateSettings(settingsPath,settingsJson):
     print("enter updateSettings")
-    settingsRef = db.reference(settingsPath) 
-    snapshot = settingsRef.order_by_key().get()
-    indexMax = len(snapshot)
-    print(" indexMax =" + str(indexMax)) 
-    nextInxex = indexMax
-    #print("Setting snapShot by index key = " + str(i)  + "  " + str(path)+  " key=" + str (setP["name"]) + " value=" + (setP["value"]) )
-    for key in settingsJson:
-        keyFound = False
-        for i in range (0,indexMax):
-            path = settingsPath +"/" + str(i)
-            settingRef = db.reference( path )
-            setP= settingRef.get()
-            #print(" settingsJson key = " +str(key))
-            if str(key["name"]) == str (setP["name"]):
-                settingRef.child("value").set(str(key["value"]))
-                keyFound = True
-                continue
-        if  keyFound == False:
-            db.reference( settingsPath +"/" + str(nextInxex)).set(key)
+    try:
+        settingsRef = db.reference(settingsPath) 
+        snapshot = settingsRef.order_by_key().get()
+        indexMax = len(snapshot)
+        print(" indexMax =" + str(indexMax)) 
+        nextInxex = indexMax
+        #print("Setting snapShot by index key = " + str(i)  + "  " + str(path)+  " key=" + str (setP["name"]) + " value=" + (setP["value"]) )
+        for key in settingsJson:
+            keyFound = False
+            for i in range (0,indexMax):
+                path = settingsPath +"/" + str(i)
+                settingRef = db.reference( path )
+                setP= settingRef.get()
+                #print(" settingsJson key = " +str(key))
+                if str(key["name"]) == str (setP["name"]):
+                    settingRef.child("value").set(str(key["value"]))
+                    keyFound = True
+                    continue
+            if  keyFound == False:
+                db.reference( settingsPath +"/" + str(nextInxex)).set(key)
+    except Exception as e:
+        print("Exceptoin in updateSettings " + str(e))
+
 
 """
 WRT devices send message to this url for registration and heartbeat
@@ -245,7 +249,13 @@ def register_socket(ws):
                                     settings = reg["settings"]
                                     print("settings" + str(settings))
                                     settingsPath = "/users/" + uid  + "/" + deviceId + "/settings"
-                                    updateSettings(settingsPath,settings)
+                                   
+                                    settingsRef = db.reference(settingsPath) 
+                                    snapshot = settingsRef.order_by_key().get()
+                                    if snapshot == None:
+                                        settingsRef.set(settings)
+                                    else :
+                                        updateSettings(settingsPath,settings)
 
                                 if "status" in reg:
                                     status = reg["status"]
