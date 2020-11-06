@@ -124,7 +124,7 @@ A Sample is given below
 </pre>
 ##### Hearbeat packet
 For simplification, Heartbeat packet is nothing but a registration packet that is sent across to the Cloud periodically.
-
+However, for heartbeats, the settings array is filtered to send only those settings which changed. 
 
 #### AmazeRT Communication from Cloud
 Commnication to from the cloud to AmazeRT Router also follow a similar structure of the communication the other way around
