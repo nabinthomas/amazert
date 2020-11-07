@@ -23,14 +23,13 @@ def generateKey(password):
     return key
 
 def encrypt_AES_GCM(msg, password):
-    kdfSalt = os.urandom(16)
     secretKey = generateKey(password)
     aesCipher = AES.new(secretKey, AES.MODE_GCM)
     ciphertext, authTag = aesCipher.encrypt_and_digest(msg)
-    return (kdfSalt, ciphertext, aesCipher.nonce, authTag)
+    return (ciphertext, aesCipher.nonce, authTag)
 
 def decrypt_AES_GCM(encryptedMsg, password):
-    (kdfSalt, ciphertext, nonce, authTag) = encryptedMsg
+    (ciphertext, nonce, authTag) = encryptedMsg
     secretKey = generateKey(password)
     aesCipher = AES.new(secretKey, AES.MODE_GCM, nonce)
     plaintext = aesCipher.decrypt_and_verify(ciphertext, authTag)
@@ -41,10 +40,9 @@ password = "TestPassword"
 password = sys.argv[1]
 encryptedMsg = encrypt_AES_GCM(msg, password)
 print("encryptedMsg", {
-    'kdfSalt': binascii.hexlify(encryptedMsg[0]),
-    'ciphertext': binascii.hexlify(encryptedMsg[1]),
-    'aesIV': binascii.hexlify(encryptedMsg[2]),
-    'authTag': binascii.hexlify(encryptedMsg[3])
+    'ciphertext': binascii.hexlify(encryptedMsg[0]),
+    'aesIV': binascii.hexlify(encryptedMsg[1]),
+    'authTag': binascii.hexlify(encryptedMsg[2])
 })
 
 decryptedMsg = decrypt_AES_GCM(encryptedMsg, password)

@@ -13,10 +13,12 @@ import time
 import json
 import subprocess
 import logging 
-import uuid
 import base64
 from Crypto.Cipher import AES
 import binascii, os
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 from websocket import create_connection
 
@@ -172,9 +174,49 @@ def runShellcommand(command):
     return resultString.strip()
 
 """
+Encrypt a given string value to be sent to the server
+@param encryptionConfig - Parameters for encryption
+@return a Json object of the format
+    {
+        "cipherText": ciphertext, 
+        "IV": IV, 
+        "digest": message Digest
+    }
+"""
+def encryptMessage(encryptionConfig, message):
+    msgBytes = message.encode()
+    key = encryptionConfig["key"]
+    cipher = AES.new(key, AES.MODE_GCM)
+    cipherText, digest = cipher.encrypt_and_digest(msgBytes)
+    encValue = {
+        "cipherText" : str(base64.b64encode(cipherText), "utf-8"),
+        "IV" :  str(base64.b64encode(cipher.nonce), "utf-8"),
+        "digest" :  str(base64.b64encode(digest), "utf-8")
+    }
+    return encValue
+
+"""
+Decrypt a given value received from the server
+@param encryptionConfig - Parameters for encryption
+@param cipherValue a Json object of the format
+    {
+        "cipherText": ciphertext, 
+        "IV": IV, 
+        "digest": message Digest
+    }
+"""
+def decryptMessage(encryptionConfig, cipherValue):
+    cipherText = base64.b64decode(cipherValue["cipherText"])
+    IV = base64.b64decode(cipherValue["IV"])
+    digest = base64.b64decode(cipherValue["digest"])
+    key = encryptionConfig["key"]
+    cipher = AES.new(key, AES.MODE_GCM, IV)
+    plainText = cipher.decrypt_and_verify(cipherText, digest)
+    return plainText.decode("utf-8")
+
+"""
 Encrypt the "value" field in every object in the list of jsons passed in. 
 Each json object in the array is supposed to have "name" and "value". 
-"nonce" added to the value before encryption, and also as "nonce" in the output list
 @param encryptionConfig contains the details about what key/algorithm etc to use for encryption
 @param elements is the list of items for which the values should be encrypted
 @return encrypted list
@@ -184,10 +226,9 @@ def encryptAllValues(encryptionConfig, elements):
     for element in elements:
         encryptedElement = {}
         encryptedElement["name"] = element["name"]
-        encryptedElement["nonce"] = str(uuid.uuid4())
         encryptedElement["value"] = element["value"]
-        encryptedElement["encValue"] = element["value"]
-        encryptedElement["decValue"] = element["value"]
+        encryptedElement["encValue"] = encryptMessage(encryptionConfig, element["value"])
+        encryptedElement["decValue"] = decryptMessage(encryptionConfig, encryptedElement["encValue"])
         encryptedList.append(encryptedElement)
     return encryptedList
 
@@ -499,6 +540,25 @@ def loadCurrentRegistration():
     return None
 
 """
+Generates a 256 bit key to be used for encryption
+@param password - password used to generate the key. We will use the registrationId for this
+@param salt - salt to be used for key generation. 
+@return bytes containing the key
+"""
+def generateKey(password, salt):
+    password = password.encode()
+    kdf = PBKDF2HMAC(
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt=salt, 
+        iterations=100000,
+        backend=default_backend()
+    )
+    key = kdf.derive(password) 
+    #print("key = [" + str(key) + "]")
+    return key
+
+"""
 Main for the service. Connects to the Cloud App Engine, Initialize local handlers 
 and keep listening to requests
 """
@@ -510,11 +570,21 @@ async def amazeRTServiceMain():
         exit(-1)
     ## Generate Encryption Keys
     config["encryption"] = {
-        "algorithm" : "AES",
+        "algorithm" : "AES-256-GCM",
         "key" : ""
     }
-    ws = create_connection(appEngineUri #, ssl=ssl_context
-    )
+
+    ## salt used is static since the password is already a random uuid generated during install
+    config["encryption"]["key"] = generateKey(config["registrationId"], b'salt_')
+
+    testMessage = "1234"
+    cipherObject = encryptMessage(config["encryption"], testMessage)
+    print ("cipher = " + json.dumps(cipherObject))
+    plainText = decryptMessage(config["encryption"], cipherObject)
+
+    print ("test = ", testMessage, " plain = ", plainText)
+    #exit(0)
+    ws = create_connection(appEngineUri)
 
     hearbeatThread = amazeRTHeartBeatThread(config, ws)
     hearbeatThread.start()
