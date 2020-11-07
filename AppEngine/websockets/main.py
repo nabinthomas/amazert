@@ -58,7 +58,7 @@ uidJson = {"id" : str(uniqueKey)}
 uidSetting = db.reference( "/uniqueId") 
 uidSetting.set(uidJson)
 
-print("Unique Id updated in DB " + str(uniqueKey))
+print("Unique Id updated in DB  " + str(uniqueKey) + " From Db=" +str(uidSetting.get()) )
 
 
 #Websocket related functions 
@@ -169,11 +169,54 @@ def notify_socket(ws):
 # [END gae_flex_websockets_app]
 # [END gae_flex_websockets_app]
 
-
+'''
 def updateSettings(settingsPath,settingsJson):
-    settingsRef = db.reference(settingsPath) 
-    settingsRef.set(settingsJson)
-
+    try:
+        settingsRef = db.reference(settingsPath) 
+        snapshot = settingsRef.order_by_key().get()
+        indexMax = len(snapshot)
+        print(" indexMax =" + str(indexMax)) 
+        nextInxex = indexMax
+        #print("Setting snapShot by index key = " + str(i)  + "  " + str(path)+  " key=" + str (setP["name"]) + " value=" + (setP["value"]) )
+        for key in settingsJson:
+            keyFound = False
+            for i in range (0,indexMax):
+                path = settingsPath +"/" + str(i)
+                settingRef = db.reference( path )
+                setP= settingRef.get()
+                #print(" settingsJson key = " +str(key))
+                if str(key["name"]) == str (setP["name"]):
+                    settingRef.child("value").set(str(key["value"]))
+                    keyFound = True
+                    continue
+            if  keyFound == False:
+                db.reference( settingsPath +"/" + str(nextInxex)).set(key)
+                nextInxex = nextInxex +1
+    except Exception as e:
+        print("Exceptoin in updateSettings " + str(e))
+'''
+def updateNameValue(nodePath,inputJason):
+    try:
+        pathRef = db.reference(nodePath) 
+        snapshot = pathRef.order_by_key().get()
+        indexMax = len(snapshot)
+        nextInxex = indexMax
+        for key in inputJason:
+            keyFound = False
+            for i in range (0,indexMax):
+                path = nodePath +"/" + str(i)
+                nodeRef = db.reference( path )
+                setP= nodeRef.get()
+                #print(" inputJason key = " +str(key))
+                if str(key["name"]) == str (setP["name"]):
+                    nodeRef.child("value").set(str(key["value"]))
+                    keyFound = True
+                    continue
+            if  keyFound == False:
+                db.reference( nodePath +"/" + str(nextInxex)).set(key)
+                nextInxex = nextInxex + 1
+    except Exception as e:
+        print("Exceptoin in updateNameValue " + str(e))
 
 """
 WRT devices send message to this url for registration and heartbeat
@@ -228,14 +271,23 @@ def register_socket(ws):
                                     settings = reg["settings"]
                                     print("settings" + str(settings))
                                     settingsPath = "/users/" + uid  + "/" + deviceId + "/settings"
-                                    updateSettings(settingsPath,settings)
+                                   
+                                    settingsRef = db.reference(settingsPath) 
+                                    snapshot = settingsRef.order_by_key().get()
+                                    if snapshot == None:
+                                        settingsRef.set(settings)
+                                    else :
+                                        updateNameValue(settingsPath,settings)
 
                                 if "status" in reg:
                                     status = reg["status"]
-                                    print("settings" + str(status))
+                                    #print("status" + str(status))
                                     statusPath = "/users/" + uid  + "/" + deviceId + "/status"
                                     statusRef = db.reference(statusPath) 
-                                    statusRef.set(status)
+                                    if statusRef.get() == None:
+                                        statusRef.set(status)
+                                    else :
+                                        updateNameValue(statusPath, status)
 
                                 sendReply(ws, message, "PASS")
                                 scockeDevMap[deviceId]=ws

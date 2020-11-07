@@ -13,16 +13,21 @@ import time
 import json
 import subprocess
 import logging 
+import uuid
+import base64
+from Crypto.Cipher import AES
+import binascii, os
 
 from websocket import create_connection
-
-from cryptography.fernet import Fernet
 
 keepRunning = True   
 
 amazertlogfile = "/var/log/amazert.log"
 configFilePath = "/etc/amazert.json"
 appEngineUri = "ws://amaze-id1.wl.r.appspot.com/register"
+appEngineUri = "wss://amaze-id1.wl.r.appspot.com/register"
+lastSettingsSent = []
+lastStatusSent = []
 
 ##TODO . This is for local testing. The file should be in /etc along with other configs. 
 #configFilePath = "/tmp/amazert.json"
@@ -166,6 +171,58 @@ def runShellcommand(command):
         responseCode = -1
     return resultString.strip()
 
+"""
+Encrypt the "value" field in every object in the list of jsons passed in. 
+Each json object in the array is supposed to have "name" and "value". 
+"nonce" added to the value before encryption, and also as "nonce" in the output list
+@param encryptionConfig contains the details about what key/algorithm etc to use for encryption
+@param elements is the list of items for which the values should be encrypted
+@return encrypted list
+"""
+def encryptAllValues(encryptionConfig, elements):
+    encryptedList = []
+    for element in elements:
+        encryptedElement = {}
+        encryptedElement["name"] = element["name"]
+        encryptedElement["nonce"] = str(uuid.uuid4())
+        encryptedElement["value"] = element["value"]
+        encryptedElement["encValue"] = element["value"]
+        encryptedElement["decValue"] = element["value"]
+        encryptedList.append(encryptedElement)
+    return encryptedList
+
+"""
+Filter out settings that didnot change from last set of settings that was sent to the AppEngine
+"""
+def filterChangedSettings(newSettings):
+    filteredList = []
+    for setting in newSettings:
+        settingWasPresent = False 
+        for oldSetting in lastSettingsSent:
+            if (setting["name"] == oldSetting["name"]):
+                settingWasPresent = True
+                if (setting["value"] != oldSetting["value"]):
+                    filteredList.append(setting)
+        if (settingWasPresent == False):
+            filteredList.append(setting)
+    return filteredList
+
+"""
+Filter out status that didnot change from last set of settings that was sent to the AppEngine
+"""
+def filterChangedStatus(newStatus):
+    filteredList = []
+    for status in newStatus:
+        statusWasPresent = False 
+        for oldStatus in lastStatusSent:
+            if (status["name"] == oldStatus["name"]):
+                statusWasPresent = True
+                if (status["value"] != oldStatus["value"]):
+                    filteredList.append(status)
+        if (statusWasPresent == False) :
+            filteredList.append(status)
+    return filteredList
+
 """ 
 Prepare a list of all the settings which will be sent across to the AmazeRT App Engine
 """ 
@@ -228,7 +285,7 @@ def getAllSupportedStatus():
 """
 How frequent the heartbeat is sent to the server to keep the connection active.
 """ 
-heartBeatIntervalInSeconds = 30
+heartBeatIntervalInSeconds = 10
 
 """
 Prepares a packet to send. 
@@ -244,8 +301,10 @@ and updating that data
 """
 def preparePacketToSend(config, dataToSend):
     jsonPacket = dataToSend
-    identification = config
-    del identification['registrationId'] # This should not be sent
+    identification = {}
+    identification['uid'] = config['uid']
+    identification['deviceId'] = config['deviceId']
+    identification['email'] = config['email']
     jsonPacket['identifier'] = identification
     return  json.dumps(jsonPacket)
 
@@ -265,11 +324,16 @@ class amazeRTHeartBeatThread(threading.Thread):
             time.sleep(heartBeatIntervalInSeconds)
 
     def sendAllConfiguration(self):
+        global lastSettingsSent
+        global lastStatusSent
         message = { "action" : "register"}
         allSettings = getAllSupportedSettings()
-        message["settings"] = allSettings
-        message["status"] = getAllSupportedStatus()
+        allStatus = getAllSupportedStatus()
+        message["settings"] = encryptAllValues(self.config["encryption"], filterChangedSettings(allSettings))
+        message["status"] = filterChangedStatus(allStatus)
         packettoSend = preparePacketToSend(self.config, message)
+        lastSettingsSent = allSettings
+        lastStatusSent = allStatus
         logger.debug(f"> {packettoSend}")
         self.ws.send(packettoSend)
 
@@ -444,7 +508,11 @@ async def amazeRTServiceMain():
     if (config is None):
         logger.debug("AmazeRT is not configured on this machine. please run initial configuration using init.py")
         exit(-1)
-    
+    ## Generate Encryption Keys
+    config["encryption"] = {
+        "algorithm" : "AES",
+        "key" : ""
+    }
     ws = create_connection(appEngineUri #, ssl=ssl_context
     )
 

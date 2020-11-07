@@ -9,6 +9,9 @@ python3 get-pip.py --force-reinstall
 pip3 install websockets
 pip3 install websocket-client
 okpg install python3-cryptography
+opkg install python3-cryptodome
+pip3 install pyaes
+pip3 install pbkdf2
 
 rm get-pip.py
 # Now copy the files to the respective places
