@@ -13,6 +13,7 @@ import time
 import json
 import subprocess
 import logging 
+import uuid
 
 from websocket import create_connection
 
@@ -24,6 +25,10 @@ amazertlogfile = "/var/log/amazert.log"
 configFilePath = "/etc/amazert.json"
 appEngineUri = "ws://amaze-id1.wl.r.appspot.com/register"
 appEngineUri = "wss://amaze-id1.wl.r.appspot.com/register"
+encryptionConfig = {
+    "algorithm" : "AES",
+    "key"  : ""
+}
 lastSettingsSent = []
 lastStatusSent = []
 
@@ -170,6 +175,26 @@ def runShellcommand(command):
     return resultString.strip()
 
 """
+Encrypt the "value" field in every object in the list of jsons passed in. 
+Each json object in the array is supposed to have "name" and "value". 
+"nonce" added to the value before encryption, and also as "nonce" in the output list
+@param encryptionConfig contains the details about what key/algorithm etc to use for encryption
+@param elements is the list of items for which the values should be encrypted
+@return encrypted list
+"""
+def encryptAllValues(encryptionConfig, elements):
+    encryptedList = []
+    for element in elements:
+        encryptedElement = {}
+        encryptedElement["name"] = element["name"]
+        encryptedElement["nonce"] = str(uuid.uuid4())
+        encryptedElement["value"] = element["value"]
+        encryptedElement["encValue"] = element["value"]
+        encryptedElement["decValue"] = element["value"]
+        encryptedList.append(encryptedElement)
+    return encryptedList
+
+"""
 Filter out settings that didnot change from last set of settings that was sent to the AppEngine
 """
 def filterChangedSettings(newSettings):
@@ -191,17 +216,12 @@ Filter out status that didnot change from last set of settings that was sent to 
 def filterChangedStatus(newStatus):
     filteredList = []
     for status in newStatus:
-        print ("Setting New = " + str(status))
         statusWasPresent = False 
         for oldStatus in lastStatusSent:
-            print ("Setting Old = " + str(oldStatus))
             if (status["name"] == oldStatus["name"]):
                 statusWasPresent = True
                 if (status["value"] != oldStatus["value"]):
                     filteredList.append(status)
-                    print ("Different : " + str(status) + "|||" + str(oldStatus))
-                else:
-                    print ("Same : " + str(status) + "|||" + str(status))
         if (statusWasPresent == False) :
             filteredList.append(status)
     return filteredList
@@ -312,7 +332,7 @@ class amazeRTHeartBeatThread(threading.Thread):
         message = { "action" : "register"}
         allSettings = getAllSupportedSettings()
         allStatus = getAllSupportedStatus()
-        message["settings"] = filterChangedSettings(allSettings)
+        message["settings"] = encryptAllValues(encryptionConfig, filterChangedSettings(allSettings))
         message["status"] = filterChangedStatus(allStatus)
         packettoSend = preparePacketToSend(self.config, message)
         lastSettingsSent = allSettings
