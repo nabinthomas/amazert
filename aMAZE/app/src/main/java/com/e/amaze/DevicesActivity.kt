@@ -17,6 +17,7 @@ import com.google.firebase.ktx.Firebase
 class DevicesActivity : AppCompatActivity() {
 
     private val database = Firebase.database.getReferenceFromUrl("https://amaze-id1.firebaseio.com/").database
+    private lateinit var deviceViewModel: DeviceViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

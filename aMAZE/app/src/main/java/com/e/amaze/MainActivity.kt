@@ -8,6 +8,8 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
@@ -18,6 +20,7 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.InputStream
 import java.io.InputStreamReader
+import java.util.ArrayList
 
 class MyApplication : Application() {
 
@@ -26,6 +29,7 @@ class MyApplication : Application() {
         var register: Register = Register("","","","")
         var dev_name: String = ""
         lateinit var globalSettingsList:List<SettingDetails>
+        var deviceList: MutableLiveData<List<String>> = MutableLiveData<List<String>>()
 
         fun  updateFeatureMapping(applicationContext: Context ) {
             val mContext: Context = applicationContext
@@ -49,9 +53,6 @@ class MyApplication : Application() {
     }
 }
 
-
-
-
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,6 +68,8 @@ class MainActivity : AppCompatActivity() {
 
         val listAllFiles = File(fPath).listFiles()
 
+        var deviceList: MutableList <String> = ArrayList()
+
         if (listAllFiles != null && listAllFiles.isNotEmpty()) {
             Log.d("MAIN", "List files " + listAllFiles.toString())
             for (currentFile in listAllFiles) {
@@ -77,10 +80,15 @@ class MainActivity : AppCompatActivity() {
                     MyApplication.Companion.dev_name = currentFile.getName()
                     //fileList.add(currentFile.absoluteFile)
                     deviceName = currentFile.absoluteFile.toString()
+                    deviceList.add(currentFile.getName())
                 }
             }
+
+            MyApplication.Companion.deviceList.value = deviceList
         }
 
+        Log.d("MAIN", "Dev list " + deviceList.toString())
+        Log.d("MAIN", "Dev list Data " + MyApplication.Companion.deviceList.value.toString())
         Log.d("MAIN", "Dev name " + MyApplication.Companion.dev_name)
 
         if (deviceName != null) {
@@ -147,7 +155,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun launchDevicesActivity(view: View, user: String) {
-        val intent = Intent(this, DevicesActivity::class.java)
+        //val intent = Intent(this, DevicesActivity::class.java)
+        val intent = Intent(this, DeviceListActivity::class.java)
         intent.putExtra("Name", user)
         startActivity(intent)
 
