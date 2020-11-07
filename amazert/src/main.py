@@ -14,10 +14,11 @@ import json
 import subprocess
 import logging 
 import uuid
+import base64
+from Crypto.Cipher import AES
+import binascii, os
 
 from websocket import create_connection
-
-from cryptography.fernet import Fernet
 
 keepRunning = True   
 
@@ -25,10 +26,6 @@ amazertlogfile = "/var/log/amazert.log"
 configFilePath = "/etc/amazert.json"
 appEngineUri = "ws://amaze-id1.wl.r.appspot.com/register"
 appEngineUri = "wss://amaze-id1.wl.r.appspot.com/register"
-encryptionConfig = {
-    "algorithm" : "AES",
-    "key"  : ""
-}
 lastSettingsSent = []
 lastStatusSent = []
 
@@ -332,7 +329,7 @@ class amazeRTHeartBeatThread(threading.Thread):
         message = { "action" : "register"}
         allSettings = getAllSupportedSettings()
         allStatus = getAllSupportedStatus()
-        message["settings"] = encryptAllValues(encryptionConfig, filterChangedSettings(allSettings))
+        message["settings"] = encryptAllValues(self.config["encryption"], filterChangedSettings(allSettings))
         message["status"] = filterChangedStatus(allStatus)
         packettoSend = preparePacketToSend(self.config, message)
         lastSettingsSent = allSettings
@@ -511,7 +508,11 @@ async def amazeRTServiceMain():
     if (config is None):
         logger.debug("AmazeRT is not configured on this machine. please run initial configuration using init.py")
         exit(-1)
-    
+    ## Generate Encryption Keys
+    config["encryption"] = {
+        "algorithm" : "AES",
+        "key" : ""
+    }
     ws = create_connection(appEngineUri #, ssl=ssl_context
     )
 
