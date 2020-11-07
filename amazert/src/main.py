@@ -188,12 +188,12 @@ def encryptMessage(encryptionConfig, message):
     key = encryptionConfig["key"]
     cipher = AES.new(key, AES.MODE_GCM)
     cipherText, digest = cipher.encrypt_and_digest(msgBytes)
-    encValue = {
+    secureValue = {
         "cipherText" : str(base64.b64encode(cipherText), "utf-8"),
         "IV" :  str(base64.b64encode(cipher.nonce), "utf-8"),
         "digest" :  str(base64.b64encode(digest), "utf-8")
     }
-    return encValue
+    return secureValue
 
 """
 Decrypt a given value received from the server
@@ -227,8 +227,8 @@ def encryptAllValues(encryptionConfig, elements):
         encryptedElement = {}
         encryptedElement["name"] = element["name"]
         encryptedElement["value"] = element["value"]
-        encryptedElement["encValue"] = encryptMessage(encryptionConfig, element["value"])
-        encryptedElement["decValue"] = decryptMessage(encryptionConfig, encryptedElement["encValue"])
+        encryptedElement["secureValue"] = encryptMessage(encryptionConfig, element["value"])
+        encryptedElement["decValue"] = decryptMessage(encryptionConfig, encryptedElement["secureValue"])
         encryptedList.append(encryptedElement)
     return encryptedList
 
