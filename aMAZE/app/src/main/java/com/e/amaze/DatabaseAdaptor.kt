@@ -43,6 +43,8 @@ class SettingsAdapter(
         holder.settingNameView.setOnClickListener{
             val intent = Intent(context, UpdateSettings::class.java)
             intent.putExtra("Name", current.name.toString())
+            intent.putExtra("DisplayName", holder.settingNameView.text.toString())
+
             intent.putExtra("Value", current.value.toString())
             intent.putExtra("dbIndex", position.toString())
             context.startActivity(intent)

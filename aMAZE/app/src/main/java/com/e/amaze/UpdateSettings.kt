@@ -18,6 +18,7 @@ class UpdateSettings : AppCompatActivity() {
     lateinit var settingName:String
     lateinit var settingValue:String
     lateinit var databaseIndex:String
+    lateinit var displayName:String
 
     lateinit var settingNameView: TextView
     lateinit var settingValueView: TextView
@@ -30,11 +31,12 @@ class UpdateSettings : AppCompatActivity() {
         setContentView(R.layout.activity_update_settings)
 
         settingName = intent.getStringExtra("Name")
+        displayName = intent.getStringExtra("DisplayName")
         settingValue = intent.getStringExtra("Value")
         databaseIndex = intent.getStringExtra("dbIndex")
 
         settingNameView = findViewById(R.id.textViewUpdateName)
-        settingNameView.setText(settingName.toString())
+        settingNameView.setText(displayName.toString())
         settingValueView = findViewById(R.id.EditTextUpdateValue)
         settingValueView.setText(settingValue.toString())
         switchCtl = findViewById(R.id.switch1)
@@ -91,6 +93,10 @@ class UpdateSettings : AppCompatActivity() {
 
         // Navigate back to Settings page
         onBackPressed()
+    }
+
+    fun resetSettingValue(view: View) {
+        settingValueView.setText(settingValue.toString())
     }
 
 }

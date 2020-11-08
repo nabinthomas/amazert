@@ -31,5 +31,4 @@ class DeviceSettingActivity : AppCompatActivity() {
                 products?.let { adapter.setItems(it) }
             })
     }
-
 }

@@ -11,6 +11,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken
@@ -26,6 +28,7 @@ class MyApplication : Application() {
         var register: Register = Register("","","","")
         var dev_name: String = ""
         lateinit var globalSettingsList:List<SettingDetails>
+        val projectDatabase = Firebase.database.getReferenceFromUrl("https://amaze-id1.firebaseio.com/").database
 
         fun  updateFeatureMapping(applicationContext: Context ) {
             val mContext: Context = applicationContext

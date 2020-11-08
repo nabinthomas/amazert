@@ -31,7 +31,7 @@
     },
     {
       "settingName" : "wireless.wifinet0.disabled",
-      "displayName" : "MAC List",
+      "displayName" : "Wifi Status",
       "inputOptions" : " ",
       "isSwitch" : "true"
     }

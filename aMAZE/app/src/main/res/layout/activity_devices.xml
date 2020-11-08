@@ -10,11 +10,11 @@
         android:id="@+id/button3"
         android:layout_width="130dp"
         android:layout_height="55dp"
-        android:layout_marginStart="137dp"
-        android:layout_marginTop="88dp"
+        android:layout_marginStart="144dp"
+        android:layout_marginTop="28dp"
         android:onClick="launchFirebaseIo"
         android:text="@string/update_device"
-        android:visibility="invisible"
+        android:visibility="visible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button4" />
 
@@ -27,31 +27,53 @@
         android:text="@string/add_device"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.494"
+        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.155" />
+        app:layout_constraintVertical_bias="0.119" />
 
     <Button
         android:id="@+id/button4"
         android:layout_width="135dp"
-        android:layout_height="54dp"
+        android:layout_height="59dp"
         android:layout_marginStart="140dp"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="34dp"
         android:onClick="logoutCurrentUser"
         android:text="LogOut"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button10" />
+        app:layout_constraintTop_toBottomOf="@+id/button7" />
 
     <Button
         android:id="@+id/button10"
         android:layout_width="135dp"
         android:layout_height="59dp"
         android:layout_marginStart="140dp"
-        android:layout_marginTop="56dp"
-        android:onClick="toastItUp"
+        android:layout_marginTop="34dp"
+        android:onClick="launchDeviceSettingActivity"
         android:text="SETTINGS"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button2" />
+
+    <Button
+        android:id="@+id/button12"
+        android:layout_width="135dp"
+        android:layout_height="59dp"
+        android:layout_marginStart="140dp"
+        android:layout_marginTop="34dp"
+        android:onClick="testEncrypt"
+        android:text="Button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button3" />
+
+    <Button
+        android:id="@+id/button7"
+        android:layout_width="135dp"
+        android:layout_height="59dp"
+        android:layout_marginStart="140dp"
+        android:layout_marginTop="34dp"
+        android:onClick="launchStatusActivity"
+        android:text="STATUS"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button10" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -32,7 +32,6 @@ class DeviceSettingsViewModel (application: Application) : AndroidViewModel(appl
         settingLiveData = FirebaseQueryLiveData(DbREF)
     }
 
-
     fun getDataSnapshotLiveData(): LiveData<DataSnapshot?> {
         return settingLiveData
     }}
