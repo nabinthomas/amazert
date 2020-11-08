@@ -14,7 +14,7 @@
         android:layout_marginTop="28dp"
         android:onClick="launchFirebaseIo"
         android:text="@string/update_device"
-        android:visibility="visible"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button4" />
 
@@ -62,6 +62,7 @@
         android:layout_marginTop="34dp"
         android:onClick="testEncrypt"
         android:text="Button"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button3" />
 
@@ -73,6 +74,7 @@
         android:layout_marginTop="34dp"
         android:onClick="launchStatusActivity"
         android:text="STATUS"
+        android:visibility="visible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button10" />
 

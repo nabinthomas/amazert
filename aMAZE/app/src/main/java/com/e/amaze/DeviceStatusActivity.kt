@@ -22,7 +22,7 @@ class DeviceStatusActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_device_status)
 
-        readCurrentDB()
+        //readCurrentDB()
     }
 
     private fun readCurrentDB() {
