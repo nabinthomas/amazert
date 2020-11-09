@@ -176,12 +176,10 @@ def runShellcommand(command):
 """
 Encrypt a given string value to be sent to the server
 @param encryptionConfig - Parameters for encryption
-@return a Json object of the format
-    {
-        "cipherText": ciphertext, 
-        "IV": IV, 
-        "digest": message Digest
-    }
+@return a string object of the format
+    IV + digest + cipher text
+    24 bytes + 24 bytes + cipher texxt variable length
+    The string is base64 encoded
 """
 def encryptMessage(encryptionConfig, message):
     msgBytes = message.encode()
@@ -200,12 +198,10 @@ def encryptMessage(encryptionConfig, message):
 """
 Decrypt a given value received from the server
 @param encryptionConfig - Parameters for encryption
-@param cipherValue a Json object of the format
-    {
-        "cipherText": ciphertext, 
-        "IV": IV, 
-        "digest": message Digest
-    }
+@param cipherValue a string object of the format
+    IV + digest + cipher text
+    24 bytes + 24 bytes + cipher texxt variable length
+    The string is base64 encoded
 """
 def decryptMessage(encryptionConfig, cipherValue):
     cipherObject = {
@@ -233,11 +229,6 @@ def encryptAllValues(encryptionConfig, elements):
     for element in elements:
         encryptedElement = {}
         encryptedElement["name"] = element["name"]
-        encryptedElement["value"] = element["value"]
-        #encryptedElement["secureValue"] = encryptMessage(encryptionConfig, element["value"])
-        #encryptedElement["decValue"] = decryptMessage(encryptionConfig, encryptedElement["secureValue"])
-        #if (encryptedElement["name"] == "system.@system[0].hostname"):
-        #    encryptedElement["value"] = encryptedElement["secureValue"]; 
         encryptedElement["value"] = encryptMessage(encryptionConfig, element["value"])
         encryptedList.append(encryptedElement)
     return encryptedList
@@ -435,24 +426,19 @@ def amazeRTCommandHandler(config, ws, command, options):
 """
 A Setting that is stored in the cloud may be encrypted. If we receive a request from the 
 cloud to change a setting, we need to decrypt the setting.
-@param encSetting - Encrypted Setting object in the format like the example below 
+@param encSetting - Encrypted Setting string
     @see encryptMessage for details on the format
-    {
-             "cipherText": "kW8oucD+5w==",
-             "IV": "cBBByjBDWu4gqwQzoQLSWg==",
-             "digest": "poMSr3KbJTmBAQO/7K+FXQ=="
-    }
-    For settings that are not encrypted, it may be just a string, and in such cases, the same value will be returned. 
 @return - setting that was decrypted. 
 Note: If the decryption failed, an exception will be raised.
 """
-def decryptIfNeeded(config, value):
+def decryptSetting(config, value):
     try:
         plainText = decryptMessage(config["encryption"], value)
     except Exception as e:
         #Assuming this is unencrypted setting
         raise e
     return plainText
+
 """
 Handle a request to apply a particular setting
 @param config - Identification for this device. 
@@ -467,7 +453,7 @@ def amazerRTSettingHandler(config, ws, settings, options):
         settingName = str(setting["name"])
         settingValue = str(setting["value"])
         try:
-            settingValue = decryptIfNeeded(config, settingValue)
+            settingValue = decryptSetting(config, settingValue)
         except Exception as e:
             # If the decryption failed, then something is wrong with the data sent from the cloud, 
             # Or the database itself may be corrupted. In that case, try to recover the database next time we 
@@ -477,12 +463,6 @@ def amazerRTSettingHandler(config, ws, settings, options):
             lastSettingsSent = []
             continue
 
-        #if (settingName == "system.@system[0].hostname"):
-            #settingValue = {"cipherText": "m3oOKNHu8w==", "IV": "JOVFqlzvpkaboWZIp0nFKA==", "digest": "kwoBBDw3KPeRSwKhyPHbEA=="}
-        #    settingValue = str(settingValue)
-        #    print ("Before Decrypt Name -> " + settingName + ", Value -> " + str(settingValue))
-        #    settingValue = decryptIfNeeded(config, settingValue)
-        #    print ("After Decrypt Name -> " + settingName + ", Value -> " + str(settingValue))
         response = ""
         # Find the rule for handling this setting. 
         for rule in dataDrivenSettingsRules:
@@ -650,7 +630,6 @@ async def amazeRTServiceMain():
         logger.debug("Connection was closed by server. Will quit now and restart + ", str(e))
         exit(-1)
     hearbeatThread.join()
-            
 
 ## Setup debug logging
 logger = logging.getLogger("AmazeRT::Main")
@@ -659,7 +638,6 @@ loghandler = logging.FileHandler(amazertlogfile)
 logformatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 loghandler.setFormatter(logformatter)
 logger.addHandler(loghandler)
-
 
 logger.debug ("Starting amazeRT Management system\n")
 

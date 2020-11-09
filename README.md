@@ -78,49 +78,55 @@ This make sure that the device's settings and current status are updated on the 
 A Sample is given below
 <pre>
 {
-    "action": "register",
-    "settings": [{
-        "name": "system.@system[0].hostname",
-        "value": "amazert"
-    }, {
-        "name": "wireless.wifinet0.ssid",
-        "value": "AWrt"
-    }, {
-        "name": "wireless.wifinet0.disabled",
-        "value": "0"
-    }, 
-            .. Other Settings like this.. TBD 
-            See dataDrivenSettingsRules in main.py to see the list of settings 
-            that is currently supported
-    ],
-    "identifier": {
-        "email": "ginto100@gmail.com",
-        "uid": "oKiu1knj4IaeMvdrwCy212cIu753",
-        "deviceId": "c55d78f3-18de-11eb-ae63-dca6328f819e"
-    },
-    "status": [{
-        "name": "wifi.clients",
-        "value": {
-            "freq": 5560,
-            "clients": {
-                "d4:c9:4b:4f:4c:72": {
-                    "auth": true,
-                    "assoc": true,
-                    "authorized": true,
-                    "preauth": false,
-                    "wds": false,
-                    "wmm": false,
-                    "ht": false,
-                    "vht": false,
-                    "wps": false,
-                    "mfp": false,
-                    "rrm": [115, 16, 145, 0, 4],
-                    "aid": 0
-                }
-            }
-        }
-    }],
-}
+ {
+     "action": "register",
+     "settings": [{
+         "name": "system.@system[0].hostname",
+         "value": "wtMv/BV7OLUfoV4TOxhWIA==GGiy0zTiVpm8i/17FrDCQA==4iFV4CAHasg="
+     }, {
+         "name": "wireless.wifinet0.ssid",
+         "value": "tT760DVgoZtDjjkpHyIALw==bHuwfcQVlaO6C5wt6Udw4w==Q8pD3w=="
+     }, {
+         "name": "wireless.radio0.country",
+         "value": "d4S2Ji1GHU0ptBOQ9RjHwA==3SAgpb1FR88FgoDUlVAI3w==hZA="
+     }, {
+         "name": "wireless.wifinet0.macfilter",
+         "value": "FU7sqNP8T8Fqo9uL5KgOfg==UE9XeHcwjoZZgdxQPPg+JQ==+39aWhf9aA=="
+     }, {
+         "name": "wireless.wifinet0.maclist",
+         "value": "0wmIN4IxqfXrIaDsTN4eng==IaO/pCgQuH7vIROcYt32Dw=="
+     }, {
+         "name": "wireless.wifinet0.disabled",
+         "value": "ARklPOoAgZ2GM/oidcjGug==ZZ49Wmf04pqJMBr2b0hSOQ==/A=="
+     }],
+     "status": [{
+         "name": "wifi.clients",
+         "value": {
+             "freq": 5560,
+             "clients": {
+                 "d4:c9:4b:4f:4c:72": {
+                     "auth": true,
+                     "assoc": true,
+                     "authorized": true,
+                     "preauth": false,
+                     "wds": false,
+                     "wmm": false,
+                     "ht": false,
+                     "vht": false,
+                     "wps": false,
+                     "mfp": false,
+                     "rrm": [115, 16, 145, 0, 4],
+                     "aid": 0
+                 }
+             }
+         }
+     }],
+     "identifier": {
+         "uid": "0NWFFJG764T2ucPAhdLDNwQjcgA2",
+         "deviceId": "6650ed14-1a7e-11eb-92da-dca6328f80c0",
+         "email": "nabin.thomas@gmail.com"
+     }
+ }
 </pre>
 ##### Hearbeat packet
 For simplification, Heartbeat packet is nothing but a registration packet that is sent across to the Cloud periodically.
@@ -131,6 +137,7 @@ Commnication to from the cloud to AmazeRT Router also follow a similar structure
 
 #### AmazeRT Applying a setting from Cloud
 Example Request to apply a setting
+Note: the value should be encrypted. See "register" packet earlier for details.
 <pre>
 {
     "identifier" : {
