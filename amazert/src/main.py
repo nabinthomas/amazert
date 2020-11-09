@@ -193,7 +193,9 @@ def encryptMessage(encryptionConfig, message):
         "IV" :  str(base64.b64encode(cipher.nonce), "utf-8"),
         "digest" :  str(base64.b64encode(digest), "utf-8")
     }
-    return secureValue
+    secureValueString = secureValue["IV"] + secureValue["digest"] + secureValue["cipherText"]
+    #return secureValue
+    return secureValueString
 
 """
 Decrypt a given value received from the server
@@ -206,9 +208,14 @@ Decrypt a given value received from the server
     }
 """
 def decryptMessage(encryptionConfig, cipherValue):
-    cipherText = base64.b64decode(cipherValue["cipherText"])
-    IV = base64.b64decode(cipherValue["IV"])
-    digest = base64.b64decode(cipherValue["digest"])
+    cipherObject = {
+        "IV": cipherValue[0:24],
+        "digest": cipherValue[24:48],
+        "cipherText": cipherValue[48:]
+    }
+    cipherText = base64.b64decode(cipherObject["cipherText"])
+    IV = base64.b64decode(cipherObject["IV"])
+    digest = base64.b64decode(cipherObject["digest"])
     key = encryptionConfig["key"]
     cipher = AES.new(key, AES.MODE_GCM, IV)
     plainText = cipher.decrypt_and_verify(cipherText, digest)
@@ -227,8 +234,11 @@ def encryptAllValues(encryptionConfig, elements):
         encryptedElement = {}
         encryptedElement["name"] = element["name"]
         encryptedElement["value"] = element["value"]
-        encryptedElement["secureValue"] = encryptMessage(encryptionConfig, element["value"])
-        encryptedElement["decValue"] = decryptMessage(encryptionConfig, encryptedElement["secureValue"])
+        #encryptedElement["secureValue"] = encryptMessage(encryptionConfig, element["value"])
+        #encryptedElement["decValue"] = decryptMessage(encryptionConfig, encryptedElement["secureValue"])
+        #if (encryptedElement["name"] == "system.@system[0].hostname"):
+        #    encryptedElement["value"] = encryptedElement["secureValue"]; 
+        encryptedElement["value"] = encryptMessage(encryptionConfig, element["value"])
         encryptedList.append(encryptedElement)
     return encryptedList
 
@@ -326,7 +336,7 @@ def getAllSupportedStatus():
 """
 How frequent the heartbeat is sent to the server to keep the connection active.
 """ 
-heartBeatIntervalInSeconds = 10
+heartBeatIntervalInSeconds = 30
 
 """
 Prepares a packet to send. 
@@ -423,6 +433,27 @@ def amazeRTCommandHandler(config, ws, command, options):
     ws.send(json.dumps(responseJson))
 
 """
+A Setting that is stored in the cloud may be encrypted. If we receive a request from the 
+cloud to change a setting, we need to decrypt the setting.
+@param encSetting - Encrypted Setting object in the format like the example below 
+    @see encryptMessage for details on the format
+    {
+             "cipherText": "kW8oucD+5w==",
+             "IV": "cBBByjBDWu4gqwQzoQLSWg==",
+             "digest": "poMSr3KbJTmBAQO/7K+FXQ=="
+    }
+    For settings that are not encrypted, it may be just a string, and in such cases, the same value will be returned. 
+@return - setting that was decrypted. 
+Note: If the decryption failed, an exception will be raised.
+"""
+def decryptIfNeeded(config, value):
+    try:
+        plainText = decryptMessage(config["encryption"], value)
+    except Exception as e:
+        #Assuming this is unencrypted setting
+        raise e
+    return plainText
+"""
 Handle a request to apply a particular setting
 @param config - Identification for this device. 
 @param ws - used for communicating with the server
@@ -435,6 +466,23 @@ def amazerRTSettingHandler(config, ws, settings, options):
     for setting in settings:
         settingName = str(setting["name"])
         settingValue = str(setting["value"])
+        try:
+            settingValue = decryptIfNeeded(config, settingValue)
+        except Exception as e:
+            # If the decryption failed, then something is wrong with the data sent from the cloud, 
+            # Or the database itself may be corrupted. In that case, try to recover the database next time we 
+            # do the heartbeat. 
+            # Do not apply this setting, but proceed with other settings. 
+            global lastSettingsSent
+            lastSettingsSent = []
+            continue
+
+        #if (settingName == "system.@system[0].hostname"):
+            #settingValue = {"cipherText": "m3oOKNHu8w==", "IV": "JOVFqlzvpkaboWZIp0nFKA==", "digest": "kwoBBDw3KPeRSwKhyPHbEA=="}
+        #    settingValue = str(settingValue)
+        #    print ("Before Decrypt Name -> " + settingName + ", Value -> " + str(settingValue))
+        #    settingValue = decryptIfNeeded(config, settingValue)
+        #    print ("After Decrypt Name -> " + settingName + ", Value -> " + str(settingValue))
         response = ""
         # Find the rule for handling this setting. 
         for rule in dataDrivenSettingsRules:
@@ -578,9 +626,16 @@ async def amazeRTServiceMain():
     config["encryption"]["key"] = generateKey(config["registrationId"], b'salt_')
 
     testMessage = "1234"
-    cipherObject = encryptMessage(config["encryption"], testMessage)
+    cipherText = encryptMessage(config["encryption"], testMessage)
+    #secureValueString = secureValue["IV"] + secureValue["digest"] + secureValue["cipherText"]
+    print("CipherText = " + cipherText)
+    cipherObject = {
+        "IV": cipherText[0:24],
+        "digest": cipherText[24:48],
+        "cipherText": cipherText[48:]
+    }
     print ("cipher = " + json.dumps(cipherObject))
-    plainText = decryptMessage(config["encryption"], cipherObject)
+    plainText = decryptMessage(config["encryption"], cipherText)
 
     print ("test = ", testMessage, " plain = ", plainText)
     #exit(0)
