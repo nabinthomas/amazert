@@ -1,18 +1,18 @@
 package com.e.amaze
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import java.security.SecureRandom
 import javax.crypto.Cipher
-import javax.crypto.KeyGenerator
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.PBEKeySpec
@@ -125,64 +125,25 @@ class DevicesActivity : AppCompatActivity() {
 
     fun testEncrypt(view: View) {
         val symEnc:SymKeyEncryption = SymKeyEncryption()
-        val cipherText = symEnc.encryptString("Hello World")
-        val decText = symEnc.decryptCipherText(cipherText)
+        val (cipherText, ivSpec, msgDigest) = symEnc.encryptString("Hello World")
+        val decText = symEnc.decryptCipherText(cipherText, ivSpec)
 
-        Log.d(TAG, "Decrypted text: --" + decText.toString())
-        /*
-        // https://developer.android.com/guide/topics/security/cryptography
-        // https://www.raywenderlich.com/778533-encryption-tutorial-for-android-getting-started
-        // https://medium.com/@lucideus/secure-derivation-of-keys-in-android-pbkdf2-lucideus-371452cc29f7
-        val saltStr:String = "salt_"
-        val registrationId:String =  "7544723b-ebaf-40dd-bb91-c0589a231a17"
-        //val clearTextStr = "Message for AES-256-GCM + Scrypt encryption"
-        val clearTextStr = "AESGCM @Test Message"
+        Log.d(TAG, "Decrypted text: --" + decText.toString()+ "--")
+/*
+        val nCipherStr = "iTvRxgZYfw=="
+        val nCipher = Base64.decode(nCipherStr,Base64.DEFAULT)
+        val nIvStr = "1UtIBqU9LHPgXoZIPygFng=="
+        val nIv = Base64.decode(nIvStr, Base64.DEFAULT)
+        val nIvSPec: IvParameterSpec = IvParameterSpec(nIv)
+        val nPlainText = symEnc.decryptCipherText(nCipher, nIvSPec)
+        Log.d(TAG, "Decrypted text2: --" + nPlainText.toString()+ "--")
+ */
 
-        val password = registrationId.toCharArray()
-        val salt = saltStr.toByteArray()
-        val keyLength = 256
-        val iterationCount = 10000
-
-        //Generate PBKDF2 Key
-        val pbKeySpec = PBEKeySpec(password, salt, 10000, 256) // 1
-
-        val secretKeyFactory = SecretKeyFactory.getInstance(("PBKDF2WithHmacSHA256")) // 2
-        val keyBytes = secretKeyFactory.generateSecret(pbKeySpec).encoded // 3
-        val keySpec = SecretKeySpec(keyBytes, "AES") // 4
-        Log.d(TAG, "Key: $keySpec")
-
-        // Generate IV
-        val ivRandom = SecureRandom() //not caching previous seeded instance of SecureRandom
-        val iv = ByteArray(16)
-        ivRandom.nextBytes(iv)
-        val ivSpec = IvParameterSpec(iv) // 2
-
-        //val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
-        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-
-        //cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec)
-        cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec)
-
-
-        val dataToEncrypt = clearTextStr.toByteArray()
-        Log.d(TAG, "I/P ByteArray: $dataToEncrypt")
-
-        val encrypted = cipher.doFinal(dataToEncrypt) // 2
-
-        Log.d(TAG, "CIPHER: $encrypted")
-
-
-//Decrypt
-        //val cipherd = Cipher.getInstance("AES/CBC/PKCS7Padding")
-        val cipherd = Cipher.getInstance("AES/GCM/NoPadding")
-
-        //cipherd.init(Cipher.DECRYPT_MODE, keySpec, ivSpec)
-        cipherd.init(Cipher.DECRYPT_MODE, keySpec, ivSpec)
-
-        val decrypted:ByteArray = cipherd.doFinal(encrypted)
-
-        Log.d(TAG, "DECRYPTED String: --" + decrypted.toString(Charsets.UTF_8) + "--  String: " + decrypted.contentToString())
-*/
+        val comboVal = "wtMv/BV7OLUfoV4TOxhWIA==GGiy0zTiVpm8i/17FrDCQA==4iFV4CAHasg="
+        val (iv, digest, cipherTExt) = symEnc.segregateSettingData(comboVal)
+        Log.d(TAG, "IV: "+ iv.iv + "  Digest: " + digest.contentToString() + "  CipherText: " + cipherTExt.contentToString())
+        val nPlainText = symEnc.decryptCipherText(cipherTExt, iv)
+        Log.d(TAG, "Decrypted text2: --" + nPlainText.toString()+ "--")
     }
 
     fun launchStatusActivity(view: View) {
