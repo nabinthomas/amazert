@@ -2,11 +2,14 @@ package com.e.amaze
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 
 class DeviceListAdapter internal constructor(
     val context: Context
@@ -30,6 +33,30 @@ class DeviceListAdapter internal constructor(
             holder.deviceView.text = current
 
             holder.deviceView.setOnClickListener{
+                var fPath = context.applicationInfo.dataDir
+
+                var fName = fPath + "/" + current.toString() + ".dev"
+                var data:String = ""
+                Log.d("DEVLIST","Device name " + fName)
+                data = FileCrypt().decryptFile(context, fName)
+                Log.d("DEVLIST", "DATA    $data")
+
+                try {
+                    val registerDev = Gson().fromJson(data, Register::class.java)
+
+                    MyApplication.Companion.register.deviceId = registerDev.deviceId
+                    MyApplication.Companion.register.email = registerDev.email
+                    MyApplication.Companion.register.registrationId = registerDev.registrationId
+                    MyApplication.Companion.register.uid = registerDev.uid
+
+                    Log.d(
+                        "DEVLIST",
+                        "Dev id: " + MyApplication.Companion.register.deviceId + " email: " + MyApplication.Companion.register.email + " uid: " +  MyApplication.Companion.register.uid
+                    )
+                } catch (e: JsonSyntaxException){
+                    Log.d("DEVLIST", "Error in parsing Json")
+                }
+
                 val intent = Intent(context, DeviceSettingActivity::class.java)
                 intent.putExtra("Name", current)
                 context.startActivity(intent)

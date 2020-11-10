@@ -6,7 +6,9 @@ import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.EditText
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
@@ -17,6 +19,7 @@ import com.jcraft.jsch.ChannelExec
 import com.jcraft.jsch.ChannelSftp
 import com.jcraft.jsch.ChannelSftp.OVERWRITE
 import com.jcraft.jsch.JSch
+import kotlinx.android.synthetic.main.add_device.*
 import java.io.BufferedReader
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
@@ -31,6 +34,7 @@ class AddDevice : AppCompatActivity() {
     private val database = Firebase.database.getReferenceFromUrl("https://amaze-id1.firebaseio.com/").database
     private lateinit var mContext: Context
     private lateinit var deviceName:EditText
+    private lateinit var progressBar: ProgressBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +45,13 @@ class AddDevice : AppCompatActivity() {
         uId = intent.getStringExtra("Uid")
         mContext = this.applicationContext
         deviceName = findViewById<EditText>(R.id.editTextDeviceName)
+
+        progressBar = findViewById<ProgressBar>(R.id.progressBar1)
+        val addButton: Button = findViewById<Button>(R.id.addButton)
+        val doneButton: Button = findViewById<Button>(R.id.doneButton)
+
+        progressBar.visibility = View.INVISIBLE
+        doneButton.visibility = View.INVISIBLE
     }
 
     fun launchAddDeviceHandling(view: View) {
@@ -52,13 +63,24 @@ class AddDevice : AppCompatActivity() {
         val deviceDetails = findViewById<EditText>(R.id.deviceDetails)
         var output:String = "None"
 
-        var devFile = deviceName.text.toString() + ".dev"
-        Log.d("ADD", "Existing file name "+ MyApplication.Companion.dev_name + " new file name $devFile")
-        if (devFile.trim().toString() == MyApplication.Companion.dev_name.trim().toString()) {
-            Log.d("ADD", "Same name used")
-            Toast.makeText(this,"Device with same name '" + deviceName.text.toString() + "' already exist, please try a different device name", Toast.LENGTH_LONG).show()
-            return
+        var devFile = deviceName.text.toString()
+        //Log.d("ADD", "Existing file name "+ MyApplication.Companion.dev_name + " new file name $devFile")
+        for (i in MyApplication.Companion.deviceList.value?.indices!!) {
+
+            if (devFile.trim().toString() == MyApplication.Companion.deviceList.value!![i].trim().toString()) {
+                Log.d("ADD", "Same name used")
+                Toast.makeText(
+                    this,
+                    "Device with same name '" + deviceName.text.toString() + "' already exist, please try a different device name",
+                    Toast.LENGTH_LONG
+                ).show()
+                return
+            }
         }
+
+        addButton.visibility = View.VISIBLE
+        doneButton.visibility = View.INVISIBLE
+        progressBar.visibility = View.VISIBLE
 
         class SshPostTask : AsyncTask<Void, Void, String>() {
             override fun doInBackground(vararg p0: Void?): String {
@@ -68,9 +90,11 @@ class AddDevice : AppCompatActivity() {
             }
 
             override fun onPostExecute(result: String) {
-                deviceDetails.setText("Post Cloud registration.. start device service")
-                print("Post Cloud registration.. start device service")
-
+                deviceDetails.setText("Cloud registration done.. started device service")
+                print("Cloud registration done.. started device service")
+                progressBar.visibility = View.GONE
+                addButton.visibility = View.INVISIBLE
+                doneButton.visibility = View.VISIBLE
             }
         }
 
@@ -106,6 +130,7 @@ class AddDevice : AppCompatActivity() {
         }
         class SshTask : AsyncTask<Void, Void, String>() {
             override fun doInBackground(vararg p0: Void?): String {
+                deviceDetails.setText("Secure Device software installation started ...")
                 output = executeRemoteCommand(userName.text.toString(), passwd.text.toString(), deviceIP.text.toString())
                 print(output)
                 return output
@@ -113,7 +138,7 @@ class AddDevice : AppCompatActivity() {
 
             override fun onPostExecute(result: String) {
                 //deviceDetails.setText(output.toString())
-                deviceDetails.setText("ssh done")
+                deviceDetails.setText("Secure Device installation done")
                 //deviceDetails.setText(Uri.parse("android.resource://com.e.amaze/" + R.raw.amazert).toString())
                 SftpGetTask().execute()
             }
@@ -124,6 +149,8 @@ class AddDevice : AppCompatActivity() {
                 var am: AssetManager = getAssets()
                 var inputStream: InputStream = am.open("amazert.pkg")
 
+                deviceDetails.setText("Starting secure copy of device software package")
+
                 output = executeCopyCommand(userName.text.toString(), passwd.text.toString(), deviceIP.text.toString(), 22, inputStream)
                 print(output)
                 return output
@@ -131,7 +158,7 @@ class AddDevice : AppCompatActivity() {
 
             override fun onPostExecute(result: String) {
                 //deviceDetails.setText(output.toString())
-                deviceDetails.setText("Sftp Done, start Ssh ...")
+                deviceDetails.setText("Secure copy of package done")
                 print("Sftp Done, start Ssh ...")
                 SshTask().execute()
             }
@@ -139,13 +166,14 @@ class AddDevice : AppCompatActivity() {
 
         class SshInitTask : AsyncTask<Void, Void, String>() {
             override fun doInBackground(vararg p0: Void?): String {
+                deviceDetails.setText("Installing supporting software packages")
                 output = executeRemoteInitCommand(userName.text.toString(), passwd.text.toString(), deviceIP.text.toString())
                 print(output)
                 return output
             }
 
             override fun onPostExecute(result: String) {
-                deviceDetails.setText("Ssh Init Done, start sftp ...")
+                deviceDetails.setText("Support software installation done")
                 print("Ssh Init Done, start sftp ...")
                 SftpTask().execute()
             }
@@ -155,6 +183,10 @@ class AddDevice : AppCompatActivity() {
         //SshTask().execute()
         SshInitTask().execute()
 
+    }
+
+    fun launchAddDeviceDone(view: View) {
+        onBackPressed()
     }
 
     private fun registerDeviceToCloud() {
@@ -342,6 +374,19 @@ class AddDevice : AppCompatActivity() {
         var device = deviceName.text.toString()
         var fName = "$fPath/$device.dev"
         mContext?.let { FileCrypt().encryptFile(it, fName, response) }
+
+        //MyApplication.Companion.deviceList.value?.plus(device)
+
+        var deviceList: MutableList <String> = ArrayList()
+        for (i in MyApplication.Companion.deviceList.value?.indices!!) {
+
+            deviceList.add(MyApplication.Companion.deviceList.value!![i].trim().toString())
+        }
+
+        deviceList.add(device.toString())
+
+        //MyApplication.Companion.deviceList.value = deviceList
+        MyApplication.Companion.deviceList.postValue(deviceList)
 
         MyApplication.Companion.dev_name = "$device.dev"
         Log.d("ADD", "Dev reg file created "+ MyApplication.Companion.dev_name)
