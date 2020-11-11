@@ -178,7 +178,7 @@ Encrypt a given string value to be sent to the server
 @param encryptionConfig - Parameters for encryption
 @return a string object of the format
     IV + digest + cipher text
-    24 bytes + 24 bytes + cipher texxt variable length
+    24 bytes + 24 bytes + cipher text variable length
     The string is base64 encoded
 """
 def encryptMessage(encryptionConfig, message):
@@ -200,7 +200,7 @@ Decrypt a given value received from the server
 @param encryptionConfig - Parameters for encryption
 @param cipherValue a string object of the format
     IV + digest + cipher text
-    24 bytes + 24 bytes + cipher texxt variable length
+    24 bytes + 24 bytes + cipher text variable length
     The string is base64 encoded
 """
 def decryptMessage(encryptionConfig, cipherValue):
@@ -605,20 +605,19 @@ async def amazeRTServiceMain():
     ## salt used is static since the password is already a random uuid generated during install
     config["encryption"]["key"] = generateKey(config["registrationId"], b'salt_')
 
-    testMessage = "1234"
-    cipherText = encryptMessage(config["encryption"], testMessage)
+    #testMessage = "1234"
+    #cipherText = encryptMessage(config["encryption"], testMessage)
     #secureValueString = secureValue["IV"] + secureValue["digest"] + secureValue["cipherText"]
-    print("CipherText = " + cipherText)
-    cipherObject = {
-        "IV": cipherText[0:24],
-        "digest": cipherText[24:48],
-        "cipherText": cipherText[48:]
-    }
-    print ("cipher = " + json.dumps(cipherObject))
-    plainText = decryptMessage(config["encryption"], cipherText)
+    #print("CipherText = " + cipherText)
+    #cipherObject = {
+    #    "IV": cipherText[0:24],
+    #    "digest": cipherText[24:48],
+    #    "cipherText": cipherText[48:]
+    #}
+    #print ("cipher = " + json.dumps(cipherObject))
+    #plainText = decryptMessage(config["encryption"], cipherText)
 
-    print ("test = ", testMessage, " plain = ", plainText)
-    #exit(0)
+    #print ("test = ", testMessage, " plain = ", plainText)
     ws = create_connection(appEngineUri)
 
     hearbeatThread = amazeRTHeartBeatThread(config, ws)
