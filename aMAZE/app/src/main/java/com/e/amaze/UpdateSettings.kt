@@ -1,17 +1,16 @@
 package com.e.amaze
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.telephony.mbms.StreamingServiceInfo
 import android.util.Log
+import android.view.Gravity
 import android.view.View
-import android.widget.Spinner
+import android.view.View.OnFocusChangeListener
 import android.widget.Switch
 import android.widget.TextView
-import androidx.core.view.isVisible
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
+
 
 class UpdateSettings : AppCompatActivity() {
 
@@ -19,6 +18,8 @@ class UpdateSettings : AppCompatActivity() {
     lateinit var settingValue:String
     lateinit var databaseIndex:String
     lateinit var displayName:String
+    lateinit var inputOptions:String
+
 
     lateinit var settingNameView: TextView
     lateinit var settingValueView: TextView
@@ -35,6 +36,8 @@ class UpdateSettings : AppCompatActivity() {
         settingName = intent.getStringExtra("Name")
         displayName = intent.getStringExtra("DisplayName")
         settingValue = intent.getStringExtra("Value")
+        inputOptions = intent.getStringExtra("inputOptions")
+
         databaseIndex = intent.getStringExtra("dbIndex")
 
         settingNameView = findViewById(R.id.textViewUpdateName)
@@ -44,6 +47,33 @@ class UpdateSettings : AppCompatActivity() {
         switchCtl = findViewById(R.id.switch1)
 
         updateUIControls()
+
+        settingValueView.onFocusChangeListener = object : OnFocusChangeListener {
+            override fun onFocusChange(view: View, hasFocus: Boolean) {
+                if (!hasFocus) {
+                    val location = IntArray(2)
+                    settingValueView.getLocationOnScreen(location)
+                    val toast = Toast.makeText(applicationContext,inputOptions,Toast.LENGTH_LONG)
+                    toast.setGravity(Gravity.TOP or Gravity.LEFT, location[0], location[1]-150)
+                    toast.show()
+                }
+            }
+        }
+        settingValueView.setOnClickListener(){
+            val location = IntArray(2)
+            settingValueView.getLocationOnScreen(location)
+            val toast = Toast.makeText(applicationContext,inputOptions,Toast.LENGTH_LONG)
+            toast.setGravity(Gravity.TOP or Gravity.LEFT, location [0], location[1]-150)
+            toast.show()
+        }
+
+        switchCtl.setOnClickListener(){
+            val location = IntArray(2)
+            switchCtl.getLocationOnScreen(location)
+            val toast = Toast.makeText(applicationContext,inputOptions,Toast.LENGTH_SHORT)
+            toast.setGravity(Gravity.TOP or Gravity.LEFT, location [0]+100, location[1]-150)
+            toast.show()
+        }
     }
 
     fun updateUIControls() {
@@ -101,5 +131,6 @@ class UpdateSettings : AppCompatActivity() {
 
     fun resetSettingValue(view: View) {
         settingValueView.setText(settingValue.toString())
+        updateUIControls()
     }
 }

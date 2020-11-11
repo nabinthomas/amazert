@@ -32,22 +32,34 @@ class SettingsAdapter(
 
     override fun onBindViewHolder(holder: SettingsViewHolder, position: Int) {
         val current = items[position]
+        var inputOptions: String = ""
         val filterList = MyApplication.Companion.globalSettingsList.filter { (key, value) -> key.equals(current.name.toString()) }
         if (filterList.isNotEmpty()) {
             holder.settingNameView.text = filterList[0].displayName.toString()
+            inputOptions = filterList[0].inputOptions.toString()
         } else {
             holder.settingNameView.text = current.name.toString()
         }
 
         val (ivSpec, digest, cipher) = MyApplication.Companion.symEnc.segregateSettingData(current.value.toString())
         val decryptedValue = MyApplication.Companion.symEnc.decryptCipherText(cipher + digest, ivSpec)
-        holder.settingValueView.text = decryptedValue
+
+        if (current.name == "wireless.wifinet0.disabled") {
+            if (decryptedValue == "1"){
+                holder.settingValueView.text = "OFF"
+            } else{
+                holder.settingValueView.text = "ON"
+            }
+        } else {
+            holder.settingValueView.text = decryptedValue
+        }
 
         holder.settingNameView.setOnClickListener{
             val intent = Intent(context, UpdateSettings::class.java)
             intent.putExtra("Name", current.name.toString())
             intent.putExtra("DisplayName", holder.settingNameView.text.toString())
             intent.putExtra("Value", decryptedValue)
+            intent.putExtra("inputOptions", inputOptions)
             intent.putExtra("dbIndex", position.toString())
             context.startActivity(intent)
         }
@@ -57,6 +69,7 @@ class SettingsAdapter(
             intent.putExtra("Name", current.name.toString())
             intent.putExtra("DisplayName", holder.settingNameView.text.toString())
             intent.putExtra("Value", decryptedValue)
+            intent.putExtra("inputOptions", inputOptions)
             intent.putExtra("dbIndex", position.toString())
             context.startActivity(intent)
         }

@@ -9,17 +9,19 @@
 
     <TextView
         android:id="@+id/textViewUpdateName"
-        android:layout_width="195dp"
+        android:layout_width="159dp"
         android:layout_height="60dp"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="112dp"
+        android:layout_marginTop="100dp"
+        android:gravity="center_vertical|center_horizontal"
+        android:fontFamily="sans-serif-black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/EditTextUpdateValue"
         android:layout_width="122dp"
-        android:layout_height="57dp"
+        android:layout_height="60dp"
         android:layout_marginStart="20dp"
         android:layout_marginTop="100dp"
         android:ems="10"
@@ -27,21 +29,10 @@
         app:layout_constraintStart_toEndOf="@+id/textViewUpdateName"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/button11"
-        android:layout_width="162dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="36dp"
-        android:layout_marginTop="68dp"
-        android:onClick="updateSetting"
-        android:text="UPDATE"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewUpdateName" />
-
     <Switch
         android:id="@+id/switch1"
-        android:layout_width="124dp"
-        android:layout_height="58dp"
+        android:layout_width="150dp"
+        android:layout_height="62dp"
         android:layout_marginStart="20dp"
         android:layout_marginTop="98dp"
         android:visibility="invisible"
@@ -49,11 +40,22 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/button"
-        android:layout_width="138dp"
-        android:layout_height="51dp"
+        android:id="@+id/button11"
+        android:layout_width="159dp"
+        android:layout_height="48dp"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="84dp"
+        android:layout_marginTop="50dp"
+        android:onClick="updateSetting"
+        android:text="UPDATE"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewUpdateName" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="150dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="50dp"
         android:onClick="resetSettingValue"
         android:text="RESET"
         app:layout_constraintStart_toEndOf="@+id/button11"
