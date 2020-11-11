@@ -33,6 +33,7 @@ class MyApplication : Application() {
         lateinit var globalSettingsList:List<SettingDetails>
         val projectDatabase = Firebase.database.getReferenceFromUrl("https://amaze-id1.firebaseio.com/").database
         var deviceList: MutableLiveData<List<String>> = MutableLiveData<List<String>>()
+        val symEnc:SymKeyEncryption = SymKeyEncryption()
 
         fun  updateFeatureMapping(applicationContext: Context ) {
             val mContext: Context = applicationContext
@@ -83,7 +84,7 @@ class MainActivity : AppCompatActivity() {
                     MyApplication.Companion.dev_name = currentFile.getName()
                     //fileList.add(currentFile.absoluteFile)
                     deviceName = currentFile.absoluteFile.toString()
-                    deviceList.add(currentFile.getName().substringBefore("."))
+                    deviceList.add(currentFile.getName())
                 }
             }
 
@@ -159,7 +160,7 @@ class MainActivity : AppCompatActivity() {
 
     fun launchDevicesActivity(view: View, user: String) {
         //val intent = Intent(this, DevicesActivity::class.java)
-        val intent = Intent(this, DeviceListActivity::class.java)
+	val intent = Intent(this, DeviceListActivity::class.java)
         intent.putExtra("Name", user)
         startActivity(intent)
 

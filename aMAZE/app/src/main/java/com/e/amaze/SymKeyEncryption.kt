@@ -11,15 +11,11 @@ import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
 
 class SymKeyEncryption {
-    // https://developer.android.com/guide/topics/security/cryptography
-    // https://www.raywenderlich.com/778533-encryption-tutorial-for-android-getting-started
-    // https://medium.com/@lucideus/secure-derivation-of-keys-in-android-pbkdf2-lucideus-371452cc29f7
-
-    private val TAG = "SymmetricKeyEncrypter: "
+    private val TAG = "SymKeyEncryption"
     private val KeyLength = 256
     private val IterationCount = 100000
     private val saltStr:String = "salt_"
-    private val registrationId:String =  "6650ed14-1a7e-11eb-92da-dca6328f80c0"
+    private var registrationId:String =  MyApplication.Companion.register.registrationId
     private lateinit var SymmetricKey:SecretKeySpec
     private lateinit var EncCipher:Cipher
     private lateinit var DecryptCipher:Cipher
@@ -27,14 +23,18 @@ class SymKeyEncryption {
 
     // Initialize Symmetric Key
     init {
+        if (MyApplication.Companion.register.registrationId === "") {
+            registrationId = "7544723b-ebaf-40dd-bb91-c0589a231a17"
+        }
+
         val password = registrationId.toCharArray()
         val salt = saltStr.toByteArray()
 
         //Generate PBKDF2 Key
-        val pbKeySpec = PBEKeySpec(password, salt, IterationCount, KeyLength) // 1
-        val secretKeyFactory = SecretKeyFactory.getInstance(("PBKDF2WithHmacSHA256")) // 2
-        val keyBytes = secretKeyFactory.generateSecret(pbKeySpec).encoded // 3
-        SymmetricKey = SecretKeySpec(keyBytes, "AES") // 4
+        val pbKeySpec = PBEKeySpec(password, salt, IterationCount, KeyLength)
+        val secretKeyFactory = SecretKeyFactory.getInstance(("PBKDF2WithHmacSHA256"))
+        val keyBytes = secretKeyFactory.generateSecret(pbKeySpec).encoded
+        SymmetricKey = SecretKeySpec(keyBytes, "AES")
         Log.d(TAG, "Key: ${SymmetricKey.toString()}")
 
     }
@@ -44,11 +44,11 @@ class SymKeyEncryption {
         val ivRandom = SecureRandom() //not caching previous seeded instance of SecureRandom
         val iv = ByteArray(16)
         ivRandom.nextBytes(iv)
-        val ivSpec = IvParameterSpec(iv) // 2
+        val ivSpec = IvParameterSpec(iv)
         return ivSpec
     }
 
-    fun encryptString(plaintext: String) : Triple<ByteArray, IvParameterSpec, ByteArray>{
+    fun encryptString(plaintext: String) : String{
         // Generate IV
         val ivSpec = generateIV()
 
@@ -58,17 +58,32 @@ class SymKeyEncryption {
         val dataToEncrypt = plaintext.toByteArray()
         val cipherText = EncCipher.doFinal(dataToEncrypt)
 
-        Log.d(TAG, "Generated CipherText: $cipherText")
-        return Triple (cipherText, ivSpec, getMessageDigest(plaintext))
+        val digestArray: ByteArray = Arrays.copyOfRange(cipherText,cipherText.size - 16, cipherText.size)
+        val cipherTextArray: ByteArray = Arrays.copyOfRange(cipherText, 0, cipherText.size - 16)
+        val outDigestString = String(Base64.getEncoder().encode(digestArray))
+        val outCipherTextString = String(Base64.getEncoder().encode(cipherTextArray))
+        val outIvSpecString = String(Base64.getEncoder().encode(ivSpec.iv))
+
+        //Log.d(TAG, "DIGEST: " + outDigestString)
+        //Log.d(TAG, "CIPHER: " + outCipherTextString)
+        //Log.d(TAG, "IV: " + outIvSpecString)
+        //Log.d(TAG, "OUTPUT::: " + outIvSpecString + outDigestString + outCipherTextString)
+
+        return outIvSpecString + outDigestString + outCipherTextString
     }
 
     fun decryptCipherText(cipherText: ByteArray, ivSpec:IvParameterSpec) : String{
         DecryptCipher = Cipher.getInstance("AES/GCM/NoPadding")
         DecryptCipher.init(Cipher.DECRYPT_MODE, SymmetricKey, ivSpec)
 
-        val plainTextByteArray:ByteArray = DecryptCipher.doFinal(cipherText)
+        var plainTextByteArray: ByteArray = byteArrayOf()
+        try {
+            plainTextByteArray = DecryptCipher.doFinal(cipherText)
+        } catch (e: Exception){
+            Log.d(TAG, e.toString() )
+            e.printStackTrace()
+        }
 
-        Log.d(TAG, "DECRYPTED String: --" + plainTextByteArray.toString(Charsets.UTF_8) + "--  String: " + plainTextByteArray.contentToString())
         return plainTextByteArray.toString(Charsets.UTF_8)
     }
 

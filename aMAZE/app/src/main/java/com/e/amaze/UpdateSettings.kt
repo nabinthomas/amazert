@@ -23,8 +23,10 @@ class UpdateSettings : AppCompatActivity() {
     lateinit var settingNameView: TextView
     lateinit var settingValueView: TextView
     lateinit var switchCtl: Switch
+    //private val symEnc:SymKeyEncryption = SymKeyEncryption()
+    private val TAG = "UpdateSettings"
 
-    private val database = Firebase.database.getReferenceFromUrl("https://amaze-id1.firebaseio.com/").database
+    private val database = MyApplication.Companion.projectDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,8 +78,10 @@ class UpdateSettings : AppCompatActivity() {
 
     fun updateSetting(view: View) {
         val settingValueView: TextView = findViewById(R.id.EditTextUpdateValue)
-        //val updateVal = settingValueView.text
         val updateVal = getUpdateVal()
+        // Encrypt value using SymKey Enc
+        val encryptedValue = MyApplication.Companion.symEnc.encryptString(updateVal)
+        Log.d(TAG, "CIPHERText Combo: " + encryptedValue)
 
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         var deviceId: String = MyApplication.Companion.register.deviceId
@@ -89,7 +93,7 @@ class UpdateSettings : AppCompatActivity() {
         val nameRef = database.getReference(settingPath.toString())
         nameRef.setValue(settingName)
         val valRef = database.getReference(valPath.toString())
-        valRef.setValue(updateVal.toString())
+        valRef.setValue(encryptedValue)
 
         // Navigate back to Settings page
         onBackPressed()
@@ -98,5 +102,4 @@ class UpdateSettings : AppCompatActivity() {
     fun resetSettingValue(view: View) {
         settingValueView.setText(settingValue.toString())
     }
-
 }
