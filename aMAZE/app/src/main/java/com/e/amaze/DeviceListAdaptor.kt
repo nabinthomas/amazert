@@ -57,7 +57,7 @@ class DeviceListAdapter internal constructor(
                     Log.d("DEVLIST", "Error in parsing Json")
                 }
 
-                val intent = Intent(context, DeviceSettingActivity::class.java)
+                val intent = Intent(context, DevicesActivity::class.java)
                 intent.putExtra("Name", current)
                 context.startActivity(intent)
             }
