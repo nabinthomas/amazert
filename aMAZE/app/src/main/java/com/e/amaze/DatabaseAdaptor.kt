@@ -47,7 +47,6 @@ class SettingsAdapter(
             val intent = Intent(context, UpdateSettings::class.java)
             intent.putExtra("Name", current.name.toString())
             intent.putExtra("DisplayName", holder.settingNameView.text.toString())
-
             intent.putExtra("Value", decryptedValue)
             intent.putExtra("dbIndex", position.toString())
             context.startActivity(intent)
@@ -57,7 +56,6 @@ class SettingsAdapter(
             val intent = Intent(context, UpdateSettings::class.java)
             intent.putExtra("Name", current.name.toString())
             intent.putExtra("DisplayName", holder.settingNameView.text.toString())
-
             intent.putExtra("Value", decryptedValue)
             intent.putExtra("dbIndex", position.toString())
             context.startActivity(intent)

@@ -10,13 +10,15 @@ android:layout_height="wrap_content">
         android:layout_width="match_parent"
         android:layout_height="64dp"
         android:layout_marginVertical="2dp"
+        android:background="@color/common_google_signin_btn_text_dark_default"
         android:ellipsize="none"
         android:fadeScrollbars="false"
-        android:fontFamily="sans-serif-black"
         android:gravity="center|left"
         android:paddingLeft="4dp"
+        android:textSize="14dp"
         android:textIsSelectable="false" />
 
 </LinearLayout>
     <!--style="@style/word_title" -->
+    <!--        android:fontFamily="sans-serif-black" -->
     <!--android:background="@android:color/holo_orange_light"-->

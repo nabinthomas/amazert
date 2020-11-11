@@ -15,6 +15,7 @@
         android:fadeScrollbars="false"
         android:gravity="center|left"
         android:paddingLeft="4dp"
+        android:textSize="14dp"
         android:textIsSelectable="false" />
 
     <TextView

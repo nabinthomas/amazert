@@ -19,20 +19,6 @@
         app:layout_constraintTop_toBottomOf="@+id/button4" />
 
     <Button
-        android:id="@+id/button2"
-        android:layout_width="135dp"
-        android:layout_height="58dp"
-        android:layout_marginTop="28dp"
-        android:onClick="launchAddDevice"
-        android:text="@string/add_device"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.119" />
-
-    <Button
         android:id="@+id/button4"
         android:layout_width="135dp"
         android:layout_height="59dp"
@@ -40,6 +26,7 @@
         android:layout_marginTop="34dp"
         android:onClick="logoutCurrentUser"
         android:text="LogOut"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button7" />
 
@@ -48,11 +35,11 @@
         android:layout_width="135dp"
         android:layout_height="59dp"
         android:layout_marginStart="140dp"
-        android:layout_marginTop="34dp"
         android:onClick="launchDeviceSettingActivity"
         android:text="SETTINGS"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button2" />
+        tools:layout_editor_absoluteY="197dp" />
 
     <Button
         android:id="@+id/button12"
@@ -74,8 +61,78 @@
         android:layout_marginTop="34dp"
         android:onClick="launchStatusActivity"
         android:text="STATUS"
-        android:visibility="visible"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button10" />
+
+    <TextView
+        android:id="@+id/textView9"
+        android:layout_width="410dp"
+        android:layout_height="49dp"
+        android:text="TextView"
+        android:textSize="16dp"
+        android:gravity="center|left"
+        tools:layout_editor_absoluteX="1dp"
+        tools:layout_editor_absoluteY="1dp" />
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="409dp"
+        android:layout_height="3dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintTop_toBottomOf="@+id/textView9"
+        tools:layout_editor_absoluteX="1dp" />
+
+    <TextView
+        android:id="@+id/textView10"
+        android:layout_width="408dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="1dp"
+        android:text="Settings"
+        android:onClick="launchDeviceSettingActivity"
+        app:layout_constraintTop_toBottomOf="@+id/divider"
+        tools:layout_editor_absoluteX="1dp" />
+
+    <TextView
+        android:id="@+id/textView11"
+        android:layout_width="408dp"
+        android:layout_height="40dp"
+        android:text="Status"
+        android:onClick="launchStatusActivity"
+        app:layout_constraintTop_toBottomOf="@+id/divider2"
+        tools:layout_editor_absoluteX="1dp" />
+
+    <TextView
+        android:id="@+id/textView12"
+        android:layout_width="408dp"
+        android:layout_height="40dp"
+        android:onClick="logoutCurrentUser"
+        android:text="Logout"
+        app:layout_constraintTop_toTopOf="@+id/divider3"
+        tools:layout_editor_absoluteX="3dp" />
+
+    <View
+        android:id="@+id/divider2"
+        android:layout_width="409dp"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintTop_toBottomOf="@+id/textView10"
+        tools:layout_editor_absoluteX="2dp" />
+
+    <View
+        android:id="@+id/divider3"
+        android:layout_width="409dp"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintTop_toBottomOf="@+id/textView11"
+        tools:layout_editor_absoluteX="2dp" />
+
+    <View
+        android:id="@+id/divider4"
+        android:layout_width="409dp"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintTop_toBottomOf="@+id/textView12"
+        tools:layout_editor_absoluteX="1dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

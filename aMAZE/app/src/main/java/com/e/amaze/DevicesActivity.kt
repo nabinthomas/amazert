@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.util.Base64
 import android.util.Log
 import android.view.View
+import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.firebase.ui.auth.AuthUI
@@ -23,10 +25,17 @@ class DevicesActivity : AppCompatActivity() {
     private val TAG = "DEVICES_ACTIVITY"
     private val database = Firebase.database.getReferenceFromUrl("https://amaze-id1.firebaseio.com/").database
     private lateinit var deviceViewModel: DeviceViewModel
+    private lateinit var devName: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_devices)
+
+        devName = intent.getStringExtra("Name")
+
+        var devText = findViewById<TextView>(R.id.textView9)
+
+        devText.text = devName
     }
 
     fun launchAddDevice(view: View) {
