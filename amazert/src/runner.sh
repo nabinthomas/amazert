@@ -1,6 +1,6 @@
 currenttime=`date`
 echo "$currenttime : AmazeRT Runner started.." >> /var/log/amazert.log
-
+date -u > /var/log/amazert.start
 while [ 1 ]
 do
     python3 /usr/bin/amazert/main.py

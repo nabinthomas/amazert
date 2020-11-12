@@ -19,6 +19,7 @@ import binascii, os
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from json import JSONDecodeError
 
 from websocket import create_connection
 
@@ -167,7 +168,6 @@ def runShellcommand(command):
             resultString = resultString + line
         for line in commandProcess.stderr:
             resultString = resultString + line
-
     except Exception as e:
         resultString = str(e)
         responseCode = -1
@@ -302,8 +302,17 @@ to the Cloud backend, for later use from the Mobile App
 The format is  { <name> :[command to run to read the json status], ...}
 """
 statusRules = [{
-    "name": "wifi.clients" ,
-    "command" : ["ubus", "call", "hostapd.wlan0", "get_clients"],
+    "name": "wifi.clients",
+    "command" : ["ubus", "call", "hostapd.wlan0", "get_clients"]
+}, {
+    "name": "amazert.heartbeat.time",
+    "command" : ["date", "-u"]
+}, {
+    "name": "amazert.poweron.time" ,
+    "command" : ["cat", "/var/log/amazert.start"]
+}, {
+    "name": "amazert.status" ,
+    "command" : ["echo", "running"]
 }]
 
 """ 
@@ -318,7 +327,11 @@ def getAllSupportedStatus():
             command = rule["command"]
             status["name"] = rule["name"]
             statusOutput = str(runShellcommand(command))
-            status["value"] = json.loads(statusOutput)
+            try:
+                status["value"] = json.loads(statusOutput)
+            except JSONDecodeError as e: 
+                # If json parsing fails, this may be just an output string
+                status["value"] = statusOutput
             allStatus.append(status)
         except Exception as e:
             logger.debug("failed status rule " + str(rule) + str(e))
