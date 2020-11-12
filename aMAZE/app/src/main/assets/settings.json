@@ -20,19 +20,19 @@
     {
       "settingName" : "wireless.wifinet0.macfilter",
       "displayName" : "MAC Filter",
-      "inputOptions" : " ",
+      "inputOptions" : "MAC Address to filter out",
       "isSwitch" : "false"
     },
     {
       "settingName" : "wireless.wifinet0.maclist",
       "displayName" : "MAC List",
-      "inputOptions" : " ",
+      "inputOptions" : "MAC Address list",
       "isSwitch" : "false"
     },
     {
       "settingName" : "wireless.wifinet0.disabled",
       "displayName" : "Wifi Status",
-      "inputOptions" : " ",
+      "inputOptions" : "ON/OFF ",
       "isSwitch" : "true"
     }
 ]
