@@ -2,16 +2,16 @@ package com.e.amaze
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
 import android.view.View
-import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
+
 
 class DeviceListActivity : AppCompatActivity(){
 
@@ -21,7 +21,10 @@ class DeviceListActivity : AppCompatActivity(){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_device_list)
 
-        val actionbar = supportActionBar
+        val toolbar: Toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+
+//        val actionbar = supportActionBar
 //        actionbar!!.title = MyApplication.toolbarName
         //set back button
 //        actionbar.setDisplayHomeAsUpEnabled(true)
@@ -51,5 +54,12 @@ class DeviceListActivity : AppCompatActivity(){
         }
 
     }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean{
+        // Inflate the menu; this adds items to the action bar if it is present.
+        menuInflater.inflate(R.menu.menu, menu)
+        return true
+    }
+
 
 }

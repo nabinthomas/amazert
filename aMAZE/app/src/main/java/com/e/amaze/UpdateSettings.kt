@@ -3,12 +3,14 @@ package com.e.amaze
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
+import android.view.Menu
 import android.view.View
 import android.view.View.OnFocusChangeListener
 import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import com.google.firebase.auth.FirebaseAuth
 
 
@@ -32,6 +34,9 @@ class UpdateSettings : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_update_settings)
+
+        val toolbar: Toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
 
         settingName = intent.getStringExtra("Name")
         displayName = intent.getStringExtra("DisplayName")
@@ -74,6 +79,12 @@ class UpdateSettings : AppCompatActivity() {
             toast.setGravity(Gravity.TOP or Gravity.LEFT, location [0]+100, location[1]-150)
             toast.show()
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean{
+        // Inflate the menu; this adds items to the action bar if it is present.
+        menuInflater.inflate(R.menu.menu, menu)
+        return true
     }
 
     fun updateUIControls() {

@@ -1,7 +1,9 @@
 package com.e.amaze
 
 import android.os.Bundle
+import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -17,6 +19,9 @@ class DeviceSettingActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_device_setting)
 
+        val toolbar: Toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerview)
         val adapter = SettingsAdapter(this)
         recyclerView.adapter = adapter
@@ -30,5 +35,11 @@ class DeviceSettingActivity : AppCompatActivity() {
                 // Update the cached copy of the products in the adapter.
                 products?.let { adapter.setItems(it) }
             })
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean{
+        // Inflate the menu; this adds items to the action bar if it is present.
+        menuInflater.inflate(R.menu.menu, menu)
+        return true
     }
 }

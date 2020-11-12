@@ -5,12 +5,14 @@ import android.content.res.AssetManager
 import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -41,6 +43,9 @@ class AddDevice : AppCompatActivity() {
         setContentView(R.layout.add_device)
     //    SshTask().execute()
 
+        val toolbar: Toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+
         uName = intent.getStringExtra("Name")
         uId = intent.getStringExtra("Uid")
         mContext = this.applicationContext
@@ -52,6 +57,12 @@ class AddDevice : AppCompatActivity() {
 
         progressBar.visibility = View.INVISIBLE
         doneButton.visibility = View.INVISIBLE
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean{
+        // Inflate the menu; this adds items to the action bar if it is present.
+        menuInflater.inflate(R.menu.menu, menu)
+        return true
     }
 
     fun launchAddDeviceHandling(view: View) {

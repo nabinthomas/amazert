@@ -7,10 +7,16 @@
     android:layout_height="match_parent"
     tools:context=".DeviceStatusActivity">
 
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar_m"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerview_status"
-        android:layout_width="404dp"
-        android:layout_height="662dp"
+        android:layout_width="402dp"
+        android:layout_height="609dp"
         android:layout_marginStart="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -21,9 +27,9 @@
         android:id="@+id/textView8"
         android:layout_width="404dp"
         android:layout_height="55dp"
-        android:text="ClientList"
         android:fontFamily="sans-serif-black"
-        tools:layout_editor_absoluteX="4dp"
-        tools:layout_editor_absoluteY="2dp" />
+        android:text="ClientList"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        tools:layout_editor_absoluteX="4dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

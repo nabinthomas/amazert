@@ -7,6 +7,11 @@
     android:layout_height="match_parent"
     tools:context=".dbio">
 
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar_m"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
     <EditText
         android:id="@+id/uid"
@@ -159,31 +164,31 @@
         android:layout_width="71dp"
         android:layout_height="42dp"
         android:layout_marginStart="46dp"
-        android:layout_marginTop="35dp"
+        android:layout_marginTop="8dp"
         android:text="Hostname"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
     <EditText
         android:id="@+id/editTextHostname"
         android:layout_width="148dp"
         android:layout_height="45dp"
         android:layout_marginStart="29dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="8dp"
         android:ems="10"
         android:inputType="textPersonName"
         app:layout_constraintStart_toEndOf="@+id/textView6"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
     <Button
         android:id="@+id/button8"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="21dp"
-        android:layout_marginTop="27dp"
+        android:layout_marginTop="8dp"
         android:onClick="updateHostname"
         android:text="Update"
         app:layout_constraintStart_toEndOf="@+id/editTextHostname"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
