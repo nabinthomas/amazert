@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.database.DataSnapshot
 
-class DeviceStatusActivity : AppCompatActivity() {
+class ConnectedDevicesActivity : AppCompatActivity() {
 
     private lateinit var statusViewModel: DeviceStatusViewModel
 
