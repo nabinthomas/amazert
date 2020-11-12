@@ -96,6 +96,15 @@ class StatusAdapter(
                 }
                 //MyApplication.Companion.ClientMACList.value = clientMACList
             }
+            "amazert.heartbeat.time" -> {
+                Log.d(TAG, "RCVD $statusKey  == $statusValue")
+            }
+            "amazert.poweron.time" -> {
+                Log.d(TAG, "RCVD $statusKey == $statusValue")
+            }
+            "amazert.status" -> {
+                Log.d(TAG, "RCVD $statusKey == $statusValue")
+            }
             else -> {
                 Log.d(TAG, "WARNING: New Status Item [$statusKey]? ADD support!")
             }

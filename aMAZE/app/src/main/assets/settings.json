@@ -20,7 +20,7 @@
     {
       "settingName" : "wireless.wifinet0.macfilter",
       "displayName" : "MAC Filter",
-      "inputOptions" : "MAC Address to filter out",
+      "inputOptions" : "disable/allow/deny",
       "isSwitch" : "false"
     },
     {

@@ -2,11 +2,9 @@ package com.e.amaze
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Base64
 import android.util.Log
 import android.view.Menu
 import android.view.View
-import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -166,7 +164,7 @@ class DevicesActivity : AppCompatActivity() {
     }
 
     fun launchStatusActivity(view: View) {
-        val intent = Intent(this, DeviceStatusActivity::class.java)
+        val intent = Intent(this, ConnectedDevicesActivity::class.java)
         startActivity(intent)
     }
 }
