@@ -6,8 +6,10 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.firebase.ui.auth.AuthUI
@@ -61,6 +63,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val toolbar: Toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
 
         var fPath = this.applicationInfo.dataDir
         Log.d("MAIN", "PATH $fPath")
@@ -116,6 +121,12 @@ class MainActivity : AppCompatActivity() {
                 Log.d("MAIN", "Error in parsing Json")
             }
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean{
+        // Inflate the menu; this adds items to the action bar if it is present.
+        menuInflater.inflate(R.menu.menu, menu)
+        return true
     }
 
     fun launchSignInFlow(view: View) {

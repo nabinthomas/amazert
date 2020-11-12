@@ -6,6 +6,7 @@
         android:id="@+id/miProfile"
         android:icon="@drawable/account"
         app:showAsAction="ifRoom|withText"
+        android:onClick="onProfileAction"
         android:title="Profile">
     </item>
 </menu>

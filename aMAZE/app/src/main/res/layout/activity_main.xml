@@ -7,6 +7,12 @@
     android:background="@drawable/openwrt_bkg"
     tools:context=".MainActivity">
 
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar_m"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
     <Button
         android:id="@+id/button6"
         android:layout_width="132dp"
