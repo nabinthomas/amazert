@@ -1,7 +1,9 @@
 package com.e.amaze
 
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.LiveData
@@ -40,6 +42,14 @@ class ConnectedDevicesActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean{
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu, menu)
+
+        val userProf = menu.findItem(R.id.miProfile)
+
+        userProf.setIcon(BitmapDrawable(resources, MyApplication.Companion.bitmap))
         return true
+    }
+
+    fun onProfileAction(item: MenuItem) {
+
     }
 }

@@ -1,6 +1,9 @@
 package com.e.amaze
 
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -12,6 +15,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
+import java.io.InputStream
+import java.net.URL
 
 
 class DeviceListActivity : AppCompatActivity(){
@@ -59,6 +64,10 @@ class DeviceListActivity : AppCompatActivity(){
     override fun onCreateOptionsMenu(menu: Menu): Boolean{
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu, menu)
+
+        val userProf = menu.findItem(R.id.miProfile)
+
+        userProf.setIcon(BitmapDrawable(resources, MyApplication.Companion.bitmap))
         return true
     }
 

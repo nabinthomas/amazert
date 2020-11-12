@@ -4,13 +4,13 @@ import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
@@ -24,7 +24,8 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.InputStream
 import java.io.InputStreamReader
-import java.util.ArrayList
+import java.net.URL
+import java.util.*
 
 class MyApplication : Application() {
 
@@ -36,6 +37,7 @@ class MyApplication : Application() {
         val projectDatabase = Firebase.database.getReferenceFromUrl("https://amaze-id1.firebaseio.com/").database
         var deviceList: MutableLiveData<List<String>> = MutableLiveData<List<String>>()
         val symEnc:SymKeyEncryption = SymKeyEncryption()
+        lateinit var bitmap: Bitmap
 
         fun  updateFeatureMapping(applicationContext: Context ) {
             val mContext: Context = applicationContext
@@ -63,9 +65,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        val toolbar: Toolbar = findViewById<Toolbar>(R.id.toolbar)
-        setSupportActionBar(toolbar)
 
         var fPath = this.applicationInfo.dataDir
         Log.d("MAIN", "PATH $fPath")
@@ -123,12 +122,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean{
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu, menu)
-        return true
-    }
-
     fun launchSignInFlow(view: View) {
         // Give users the option to sign in / register with their email or Google account.
         // If users choose to register with their email,
@@ -159,6 +152,33 @@ class MainActivity : AppCompatActivity() {
             if (resultCode == Activity.RESULT_OK) {
                 // User successfully signed in.
                 Log.i("MSG", "Successfully signed in user ${FirebaseAuth.getInstance().currentUser?.displayName}!")
+
+                class ProfileDownload :
+                    AsyncTask<String?, Void?, Bitmap?>() {
+
+                    protected override fun onPostExecute(bitmap: Bitmap?) {
+                        //Populate Ui
+                        if (bitmap != null) {
+                            MyApplication.Companion.bitmap = bitmap
+                        }
+                        super.onPostExecute(bitmap)
+                    }
+
+                    protected override fun doInBackground(vararg params: String?): Bitmap {
+                        // Open URL connection read bitmaps and return form here
+
+                        val photoUrl = FirebaseAuth.getInstance().currentUser?.photoUrl
+
+                        //val myBitmap: Bitmap =  photoUrl.
+                        MyApplication.Companion.bitmap = BitmapFactory.decodeStream(URL(photoUrl.toString()).getContent() as InputStream)
+
+                        return MyApplication.Companion.bitmap
+                    }
+
+                }
+
+                ProfileDownload().execute()
+
                 launchDevicesActivity(View(applicationContext), FirebaseAuth.getInstance().currentUser?.displayName.toString())
             } else {
                 // Sign in failed. If response is null, the user canceled the
@@ -176,7 +196,5 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
 
     }
-
-
 
 }

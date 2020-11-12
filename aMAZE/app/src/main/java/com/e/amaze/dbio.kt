@@ -2,9 +2,11 @@ package com.e.amaze
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.EditText
@@ -88,7 +90,15 @@ class dbio : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean{
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu, menu)
+
+        val userProf = menu.findItem(R.id.miProfile)
+
+        userProf.setIcon(BitmapDrawable(resources, MyApplication.Companion.bitmap))
         return true
+    }
+
+    fun onProfileAction(item: MenuItem) {
+
     }
 
     override fun onSupportNavigateUp(): Boolean {

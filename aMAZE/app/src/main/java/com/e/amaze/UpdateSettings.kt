@@ -1,9 +1,11 @@
 package com.e.amaze
 
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.View.OnFocusChangeListener
 import android.widget.Switch
@@ -84,7 +86,15 @@ class UpdateSettings : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean{
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu, menu)
+
+        val userProf = menu.findItem(R.id.miProfile)
+
+        userProf.setIcon(BitmapDrawable(resources, MyApplication.Companion.bitmap))
         return true
+    }
+
+    fun onProfileAction(item: MenuItem) {
+
     }
 
     fun updateUIControls() {
