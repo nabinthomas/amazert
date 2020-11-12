@@ -84,7 +84,7 @@ class MainActivity : AppCompatActivity() {
                     MyApplication.Companion.dev_name = currentFile.getName()
                     //fileList.add(currentFile.absoluteFile)
                     deviceName = currentFile.absoluteFile.toString()
-                    deviceList.add(currentFile.getName())
+                    deviceList.add(currentFile.getName().substringBefore("."))
                 }
             }
 
