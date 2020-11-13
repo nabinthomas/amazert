@@ -72,7 +72,8 @@ class DeviceListActivity : AppCompatActivity(){
     }
 
     fun onProfileAction(item: MenuItem) {
-
+        val intent = Intent(this, UserProfile::class.java)
+        startActivity(intent)
     }
 
 }
