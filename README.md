@@ -161,7 +161,7 @@ Example command to reboot the device
     "deviceId": "fb967061-168a-11eb-9272-88e9fe6b97d6"
   },
   "action": "command",
-  "command": E('["reboot"])
+  "command": E('["reboot"]')
 }
 </pre>
 
