@@ -134,8 +134,6 @@ class UpdateSettings : AppCompatActivity() {
         val updateVal = getUpdateVal()
         // Encrypt value using SymKey Enc
         val encryptedValue = MyApplication.Companion.symEnc.encryptString(updateVal)
-        Log.d(TAG, "CIPHERText Combo: " + encryptedValue)
-
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         var deviceId: String = MyApplication.Companion.register.deviceId
         if (MyApplication.Companion.register.deviceId === "") {

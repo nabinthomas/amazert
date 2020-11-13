@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -67,19 +68,6 @@ class DevicesActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    fun registerAppDb(view: View) {
-        var userId = FirebaseAuth.getInstance().currentUser?.uid
-        val deviceId = "device-".plus("$userId") // TODO : Pass DeviceId as argument to this call.
-        val refPrefix = userId.plus("/device/$deviceId")
-
-        val myRef = database.getReference(refPrefix)
-        myRef.setValue("$deviceId")
-
-        // View the connected DB URL
-        Log.d("FBase","In registerAppDb "+database.reference.repo)
-        Toast.makeText(baseContext, "Connected to DB: "+database.reference.repo.toString(), Toast.LENGTH_LONG).show()
-    }
-
     fun launchDevicesActivity(view: View, user: String) {
         val intent = Intent(this, DevicesActivity::class.java)
         intent.putExtra("Name", user)
@@ -119,41 +107,6 @@ class DevicesActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    fun encryptString(plaintext: String) : ByteArray{
-        // https://developer.android.com/guide/topics/security/cryptography
-        // https://www.raywenderlich.com/778533-encryption-tutorial-for-android-getting-started
-        // https://medium.com/@lucideus/secure-derivation-of-keys-in-android-pbkdf2-lucideus-371452cc29f7
-        val saltStr:String = "salt_"
-        val registrationId:String =  "7544723b-ebaf-40dd-bb91-c0589a231a17"
-
-        val password = registrationId.toCharArray()
-        val salt = saltStr.toByteArray()
-        val keyLength = 256
-        val iterationCount = 10000
-
-        //Generate PBKDF2 Key
-        val pbKeySpec = PBEKeySpec(password, salt, 10000, 256) // 1
-        val secretKeyFactory = SecretKeyFactory.getInstance(("PBKDF2WithHmacSHA256")) // 2
-        val keyBytes = secretKeyFactory.generateSecret(pbKeySpec).encoded // 3
-        val keySpec = SecretKeySpec(keyBytes, "AES") // 4
-        Log.d(TAG, "Key: $keySpec")
-
-        // Generate IV
-        val ivRandom = SecureRandom() //not caching previous seeded instance of SecureRandom
-        val iv = ByteArray(16)
-        ivRandom.nextBytes(iv)
-        val ivSpec = IvParameterSpec(iv) // 2
-
-        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-        cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec)
-
-        val dataToEncrypt = plaintext.toByteArray()
-        val cipherText = cipher.doFinal(dataToEncrypt) // 2
-        Log.d(TAG, "Generated CipherText: $cipherText")
-
-        return cipherText
-    }
-
     fun testEncrypt(view: View) {
         val cipherText = MyApplication.Companion.symEnc.encryptString("1234")
         Log.d(TAG, "CIPHERText Combo: " + cipherText)
@@ -179,6 +132,32 @@ class DevicesActivity : AppCompatActivity() {
     fun launchStatusActivity(view: View) {
         val intent = Intent(this, ConnectedDevicesActivity::class.java)
         startActivity(intent)
+    }
+
+    fun rebootDevice(view: View) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        var deviceId: String = MyApplication.Companion.register.deviceId
+        if (MyApplication.Companion.register.deviceId === "") {
+            deviceId = "532e8c40-18cd-11eb-a4ca-dca6328f80c0" }
+
+        val dbCommandPath = "users/$userId/$deviceId/request"
+        val actionPath = dbCommandPath.plus("/action")
+        val cmdPath = dbCommandPath.plus("/command")
+        val actionRef = database.getReference(actionPath)
+        val cmdRef = database.getReference(cmdPath)
+
+        val rebootCommand:String = "[reboot, now]"
+        val encryptedValue = MyApplication.Companion.symEnc.encryptString(rebootCommand)
+
+        actionRef.setValue("command")
+        cmdRef.setValue(encryptedValue)
+        //Toast.makeText(baseContext, "Device REBOOT triggered", Toast.LENGTH_LONG).show()
+
+        val location = IntArray(2)
+        findViewById<TextView>(R.id.textView12).getLocationOnScreen(location)
+        val toast = Toast.makeText(applicationContext,"Device REBOOT triggered",Toast.LENGTH_SHORT)
+        toast.setGravity(Gravity.TOP or Gravity.LEFT, location [0]+200, location[1])
+        toast.show()
     }
 }
 
