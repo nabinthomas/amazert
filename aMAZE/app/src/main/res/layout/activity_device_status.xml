@@ -32,8 +32,7 @@
         android:layout_marginStart="2dp"
         android:layout_marginTop="4dp"
         android:layout_marginEnd="4dp"
-        android:fontFamily="sans-serif-black"
-        android:gravity="left"
+        android:gravity="left|center_vertical"
         android:text="Connected Devices"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -45,6 +44,7 @@
         android:layout_height="50dp"
         android:layout_marginStart="1dp"
         android:layout_marginEnd="4dp"
+        android:gravity="left|center_vertical"
         android:text="TextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView18"
@@ -56,6 +56,7 @@
         android:layout_height="50dp"
         android:layout_marginStart="1dp"
         android:layout_marginEnd="4dp"
+        android:gravity="left|center_vertical"
         android:text="TextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView18"
@@ -68,6 +69,7 @@
         android:layout_marginStart="1dp"
         android:layout_marginEnd="4dp"
         android:text="TextView"
+        android:gravity="left|center_vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView20"
         app:layout_constraintTop_toBottomOf="@+id/textView16" />
@@ -76,17 +78,16 @@
         android:id="@+id/textView18"
         android:layout_width="135dp"
         android:layout_height="50dp"
-        android:layout_marginStart="2dp"
-        android:fontFamily="sans-serif-black"
+        android:gravity="left|center_vertical"
         android:text="Device Status"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar"/>
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
     <TextView
         android:id="@+id/textView19"
         android:layout_width="135dp"
         android:layout_height="50dp"
         android:layout_marginStart="2dp"
-        android:fontFamily="sans-serif-black"
+        android:gravity="left|center_vertical"
         android:text="Power On Time"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView15" />
@@ -96,7 +97,7 @@
         android:layout_width="135dp"
         android:layout_height="50dp"
         android:layout_marginStart="2dp"
-        android:fontFamily="sans-serif-black"
+        android:gravity="left|center_vertical"
         android:text="HeartBeat Time"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView19" />

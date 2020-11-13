@@ -12,70 +12,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <Button
-        android:id="@+id/button3"
-        android:layout_width="130dp"
-        android:layout_height="55dp"
-        android:layout_marginStart="144dp"
-        android:layout_marginTop="28dp"
-        android:onClick="launchFirebaseIo"
-        android:text="@string/update_device"
-        android:visibility="invisible"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button4" />
-
-    <Button
-        android:id="@+id/button4"
-        android:layout_width="135dp"
-        android:layout_height="59dp"
-        android:layout_marginStart="140dp"
-        android:layout_marginTop="34dp"
-        android:onClick="logoutCurrentUser"
-        android:text="LogOut"
-        android:visibility="invisible"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button7" />
-
-    <Button
-        android:id="@+id/button10"
-        android:layout_width="135dp"
-        android:layout_height="59dp"
-        android:layout_marginStart="140dp"
-        android:onClick="launchDeviceSettingActivity"
-        android:text="SETTINGS"
-        android:visibility="invisible"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="197dp" />
-
-    <Button
-        android:id="@+id/button12"
-        android:layout_width="135dp"
-        android:layout_height="59dp"
-        android:layout_marginStart="140dp"
-        android:layout_marginTop="34dp"
-        android:onClick="testEncrypt"
-        android:text="Button"
-        android:visibility="invisible"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button3" />
-
-    <Button
-        android:id="@+id/button7"
-        android:layout_width="135dp"
-        android:layout_height="59dp"
-        android:layout_marginStart="140dp"
-        android:layout_marginTop="34dp"
-        android:onClick="launchStatusActivity"
-        android:text="STATUS"
-        android:visibility="invisible"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button10" />
-
     <TextView
         android:id="@+id/textView9"
         android:layout_width="410dp"
         android:layout_height="49dp"
-        android:gravity="center|left"
+        android:gravity="center_vertical|left"
         android:text="TextView"
         android:textSize="16dp"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
@@ -95,6 +36,7 @@
         android:layout_height="40dp"
         android:layout_marginTop="1dp"
         android:text="Settings"
+        android:gravity="center_vertical|left"
         android:onClick="launchDeviceSettingActivity"
         app:layout_constraintTop_toBottomOf="@+id/divider"
         tools:layout_editor_absoluteX="1dp" />
@@ -105,6 +47,7 @@
         android:layout_height="40dp"
         android:text="Status"
         android:onClick="launchStatusActivity"
+        android:gravity="center_vertical|left"
         app:layout_constraintTop_toBottomOf="@+id/divider2"
         tools:layout_editor_absoluteX="1dp" />
 
@@ -113,6 +56,7 @@
         android:layout_width="408dp"
         android:layout_height="40dp"
         android:onClick="rebootDevice"
+        android:gravity="center_vertical|left"
         android:text="Reboot"
         app:layout_constraintTop_toTopOf="@+id/divider3"
         tools:layout_editor_absoluteX="3dp" />

@@ -7,6 +7,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -28,6 +29,9 @@ class ConnectedDevicesActivity : AppCompatActivity() {
         deviceStatusView = findViewById(R.id.textView15)
         powerOnTimeView = findViewById(R.id.textView16)
         hBeatView = findViewById(R.id.textView17)
+
+        val toolbar: Toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
 
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerview_status)
         val adapter = StatusAdapter(this)
