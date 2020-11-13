@@ -52,7 +52,7 @@ def generateUUID():
     uniqueKey = uuid.uuid1() 
     return uniqueKey
 
-uniqueKey = generateUUID();
+uniqueKey = generateUUID()
 
 uidJson = {"id" : str(uniqueKey)}
 uidSetting = db.reference( "/uniqueId") 
@@ -129,40 +129,69 @@ def notify_socket(ws):
             print("uid=", uid)
             did= path[7]
             print("did=", did)
+            identifierRef= db.reference("/users/" + str(uid) + "/" + str(did)+ "/identifier")
+            identifier = identifierRef.get()
+            print("identifier =" + str(identifier))
+            email = identifier["email"]
+            print("Email :" + email)
 
-            settings = msg["data"]["settings"]
-            print("settings", settings)
+            data = msg["data"]
+            if "settings" in data:
+                settings = data["settings"]
+                print("settings", settings)
 
-            settingData=[]
-            for node in settings.keys():
-                print("node=", node)
+                settingData=[]
+                for node in settings.keys():
+                    print("node=", node)
+                    
+                    #refpath = "/users/" + str(uid) + "/" + str(did)+"/settings/"+node
+                    #{'settings': {'1': {'value': 'MuttuWRT'}}}
+                    refSetting = db.reference("/users/" + str(uid) + "/" + str(did)+ "/settings/" + str(node))
+                    settingChnage = refSetting.get()
+                    print("settingChnage=" + str(settingChnage))
+                    name = settingChnage["name"]
+                    val1= settingChnage["value"]
+                    print("name=" + name + "  Value=" +val1 )
+
+
+                    settingData.append({ "name" : str(name), "value" : str(val1)})
+                reply = {
+                    "identifier" : {
+                            "email": str(email), 
+                            "uid": str(uid),
+                            "deviceId": str(did)
+                    },
+                    "action": "setting",
+                    "setting" : settingData
+                }
+                print(reply)
+                wrtWs= scockeDevMap[str(did)]
+                wrtWs.send(json.dumps(reply))
+            elif "status" in data:
+                pass
+            elif "request" in data:
                 
-                #refpath = "/users/" + str(uid) + "/" + str(did)+"/settings/"+node
-                #{'settings': {'1': {'value': 'MuttuWRT'}}}
-                refSetting = db.reference("/users/" + str(uid) + "/" + str(did)+ "/settings/" + str(node))
-                settingChnage = refSetting.get()
-                print("settingChnage=" + str(settingChnage))
-                name = settingChnage["name"]
-                val1= settingChnage["value"]
-                print("name=" + name + "  Value=" +val1 )
+                request = data ["request"]
+                print("request =" + str(request))
+                if "command" in request:
+                    print("command = " + str( request["command"]))
+                    reply = {
+                        "identifier" : {
+                                "email": str(email), 
+                                "uid": str(uid),
+                                "deviceId": str(did)
+                        },
+                        "action": "command",
+                        "command" : request["command"]
+                    }
+                    
+                    #Now delete the request from DB.
+                    identifierRef= db.reference("/users/" + str(uid) + "/" + str(did)+ "/request/command")
+                    identifierRef.delete()
 
-                identifierRef= db.reference("/users/" + str(uid) + "/" + str(did)+ "/identifier")
-                identifier = identifierRef.get()
-                email = identifier["email"]
-                print("Email :" + email)
-                settingData.append({ "name" : str(name), "value" : str(val1)})
-            reply = {
-                "identifier" : {
-                        "email": str(email), 
-                        "uid": str(uid),
-                        "deviceId": str(did)
-                },
-                "action": "setting",
-                "setting" : settingData
-            }
-            print(reply)
-            wrtWs= scockeDevMap[str(did)]
-            wrtWs.send(json.dumps(reply))
+                    print(reply)
+                    wrtWs= scockeDevMap[str(did)]
+                    wrtWs.send(json.dumps(reply))
     except Exception as e:
             print("Message jason parse Error" + str(e))
                     
