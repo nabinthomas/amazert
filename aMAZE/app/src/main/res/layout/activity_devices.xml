@@ -112,7 +112,6 @@
         android:id="@+id/textView12"
         android:layout_width="408dp"
         android:layout_height="40dp"
-        android:onClick="logoutCurrentUser"
         android:text="Reboot"
         app:layout_constraintTop_toTopOf="@+id/divider3"
         tools:layout_editor_absoluteX="3dp" />

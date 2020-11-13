@@ -15,6 +15,7 @@
         <activity android:name=".dbio" />
         <activity android:name=".DevicesActivity" />
         <activity android:name=".DeviceListActivity" />
+        <activity android:name=".UserProfile" />
         <activity
             android:name=".AddDevice"
             android:parentActivityName=".DevicesActivity" />

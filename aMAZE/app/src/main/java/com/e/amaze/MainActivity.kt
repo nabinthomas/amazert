@@ -162,6 +162,8 @@ class MainActivity : AppCompatActivity() {
                             MyApplication.Companion.bitmap = bitmap
                         }
                         super.onPostExecute(bitmap)
+
+                        launchDevicesActivity(View(applicationContext), FirebaseAuth.getInstance().currentUser?.displayName.toString())
                     }
 
                     protected override fun doInBackground(vararg params: String?): Bitmap {
@@ -179,7 +181,7 @@ class MainActivity : AppCompatActivity() {
 
                 ProfileDownload().execute()
 
-                launchDevicesActivity(View(applicationContext), FirebaseAuth.getInstance().currentUser?.displayName.toString())
+//                launchDevicesActivity(View(applicationContext), FirebaseAuth.getInstance().currentUser?.displayName.toString())
             } else {
                 // Sign in failed. If response is null, the user canceled the
                 // sign-in flow using the back button. Otherwise, check

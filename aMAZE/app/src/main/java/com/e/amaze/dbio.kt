@@ -98,7 +98,8 @@ class dbio : AppCompatActivity() {
     }
 
     fun onProfileAction(item: MenuItem) {
-
+        val intent = Intent(this, UserProfile::class.java)
+        startActivity(intent)
     }
 
     override fun onSupportNavigateUp(): Boolean {

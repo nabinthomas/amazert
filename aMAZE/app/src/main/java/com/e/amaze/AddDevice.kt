@@ -1,6 +1,7 @@
 package com.e.amaze
 
 import android.content.Context
+import android.content.Intent
 import android.content.res.AssetManager
 import android.graphics.drawable.BitmapDrawable
 import android.os.AsyncTask
@@ -72,7 +73,8 @@ class AddDevice : AppCompatActivity() {
     }
 
     fun onProfileAction(item: MenuItem) {
-
+        val intent = Intent(this, UserProfile::class.java)
+        startActivity(intent)
     }
 
     fun launchAddDeviceHandling(view: View) {

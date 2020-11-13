@@ -54,7 +54,8 @@ class DevicesActivity : AppCompatActivity() {
     }
 
     fun onProfileAction(item: MenuItem) {
-
+        val intent = Intent(this, UserProfile::class.java)
+        startActivity(intent)
     }
 
     fun launchAddDevice(view: View) {
@@ -89,7 +90,9 @@ class DevicesActivity : AppCompatActivity() {
         val userName = FirebaseAuth.getInstance().currentUser
         Log.i("FBase", "LOGGING OUT User: $userName")
         AuthUI.getInstance().signOut(this)
-        onBackPressed()
+
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
     }
 
     fun launchFirebaseIo(view: View) {
