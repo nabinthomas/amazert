@@ -1,6 +1,10 @@
 package com.e.amaze
 
+import android.content.Intent
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
@@ -41,5 +45,20 @@ class ConnectedDevicesActivity : AppCompatActivity() {
                 powerOnTimeView.text = MyApplication.Companion.PowerOnTime
                 hBeatView.text = MyApplication.Companion.HbTime
             })
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean{
+        // Inflate the menu; this adds items to the action bar if it is present.
+        menuInflater.inflate(R.menu.menu, menu)
+
+        val userProf = menu.findItem(R.id.miProfile)
+
+        userProf.setIcon(BitmapDrawable(resources, MyApplication.Companion.bitmap))
+        return true
+    }
+
+    fun onProfileAction(item: MenuItem) {
+        val intent = Intent(this, UserProfile::class.java)
+        startActivity(intent)
     }
 }
