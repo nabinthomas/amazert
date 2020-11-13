@@ -340,7 +340,7 @@ def getAllSupportedStatus():
 """
 How frequent the heartbeat is sent to the server to keep the connection active.
 """ 
-heartBeatIntervalInSeconds = 30
+heartBeatIntervalInSeconds = 10
 
 """
 Prepares a packet to send. 
@@ -374,6 +374,7 @@ class amazeRTHeartBeatThread(threading.Thread):
         self.config = config
 
     def run(self):
+        global keepRunning
         while (keepRunning == True):
             self.sendAllConfiguration()
             time.sleep(heartBeatIntervalInSeconds)
@@ -405,15 +406,22 @@ in the format like
 
 @param config - Identification for this device. 
 @param ws - used for communicating with the server
-@command array of command + command line params
-@options Special options to run the command. Unused for now. Added for future enhancements
+@param encCommand array of command + command line params. Each element in the array is separately encrypted and signed
+    Note that this should be a json array, converted to string and then encrypted using the device key, by the Client App
+@param options Special options to run the command. Unused for now. Added for future enhancements
 """
-def amazeRTCommandHandler(config, ws, command, options):
-    logger.debug ("Executing command : > " + json.dumps(command))
-    # Send a response.
+def amazeRTCommandHandler(config, ws, encCommand, options):
+    if encCommand is None:
+        return
+    logger.debug ("Ecnrypted Command received : < " + str(encCommand) )
+    
+    # Response to be sent back
     resultString = ""
-    responseCode = 0
+    responseCode = "PASS"
     try:
+        commandString = decryptMessage(config["encryption"], encCommand)
+        logger.debug ("Executing command : > " + (commandString))
+        command = json.loads(commandString)
         commandProcess = subprocess.Popen(command,
             stdin = subprocess.PIPE, 
             stdout = subprocess.PIPE,
@@ -425,7 +433,7 @@ def amazeRTCommandHandler(config, ws, command, options):
             resultString = resultString + line
     except Exception as e:
         resultString = str(e)
-        responseCode = -1
+        responseCode = "FAIL"
     
     responseJson = {
                      "action" : "response",
@@ -523,6 +531,7 @@ Handle a request to control the amazeRT SW, or some special commands
 
 """
 def amazerRTControlHandler(config, ws, control, options):
+    global keepRunning
     logger.debug ("Responding to control : > " + json.dumps(control))
     if control == "exit":
         keepRunning = False
@@ -547,10 +556,23 @@ matches the local configuration in config
 
 """
 def amazeRTActionHandler(config, ws):
+    global keepRunning
     logger.debug ("amazeRTActionHandler start ")
-    message = ws.recv()
+    try: 
+        message = ws.recv()
+    except Exception as e:
+        # If this happens, kill the AmazeRT agent. Runner should restart this later
+        logger.debug("Exception occured while reading data from cloud : " + str(e))
+        keepRunning = False
+        return
     logger.debug(f"< {message}")
-    request = json.loads(message)
+    try: 
+        request = json.loads(message)
+    except Exception as e:
+        logger.debug("Invalid message received.. only Json formatted messages are accepted. ["+  str(message) +"]")
+        # Create a dummy request which will be ignored by the handler
+        request = { "action" : "noop", "noop": "dummy"}
+
     try:
         action = request["action"]
         actionParams = request[action]
@@ -605,6 +627,8 @@ and keep listening to requests
 """
 async def amazeRTServiceMain():
 
+    global keepRunning
+
     config = loadCurrentRegistration()
     if (config is None):
         logger.debug("AmazeRT is not configured on this machine. please run initial configuration using init.py")
@@ -618,9 +642,8 @@ async def amazeRTServiceMain():
     ## salt used is static since the password is already a random uuid generated during install
     config["encryption"]["key"] = generateKey(config["registrationId"], b'salt_')
 
-    #testMessage = "1234"
+    #testMessage = '["ls"]'
     #cipherText = encryptMessage(config["encryption"], testMessage)
-    #secureValueString = secureValue["IV"] + secureValue["digest"] + secureValue["cipherText"]
     #print("CipherText = " + cipherText)
     #cipherObject = {
     #    "IV": cipherText[0:24],
@@ -631,6 +654,8 @@ async def amazeRTServiceMain():
     #plainText = decryptMessage(config["encryption"], cipherText)
 
     #print ("test = ", testMessage, " plain = ", plainText)
+    #exit(0)
+
     ws = create_connection(appEngineUri)
 
     hearbeatThread = amazeRTHeartBeatThread(config, ws)
@@ -640,7 +665,8 @@ async def amazeRTServiceMain():
             amazeRTActionHandler(config, ws)
     except websockets.exceptions.ConnectionClosedError as e:
         logger.debug("Connection was closed by server. Will quit now and restart + ", str(e))
-        exit(-1)
+        keepRunning = False
+
     hearbeatThread.join()
 
 ## Setup debug logging
