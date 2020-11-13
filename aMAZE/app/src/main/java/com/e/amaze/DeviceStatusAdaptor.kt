@@ -22,7 +22,6 @@ class StatusAdapter(
     private var pkgName: String = context.packageName
     private var clientMACList: MutableList <String> = java.util.ArrayList()
 
-
     inner class StatusViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val statusNameView: TextView = itemView.findViewById(R.id.textViewDeviceStatus)
     }
@@ -35,7 +34,6 @@ class StatusAdapter(
     override fun onBindViewHolder(holder: StatusViewHolder, position: Int) {
         val current = items[position]
         holder.statusNameView.text = current
-
         holder.statusNameView.setOnClickListener{
             /*
             val intent = Intent(context, UpdateSettings::class.java)
@@ -53,7 +51,6 @@ class StatusAdapter(
         for (ds in snapshot.children) {
             processDeviceStatus(ds)
         }
-
         this.items = clientMACList
         notifyDataSetChanged()
     }
@@ -98,12 +95,15 @@ class StatusAdapter(
             }
             "amazert.heartbeat.time" -> {
                 Log.d(TAG, "RCVD $statusKey  == $statusValue")
+                MyApplication.Companion.HbTime = statusValue.toString()
             }
             "amazert.poweron.time" -> {
                 Log.d(TAG, "RCVD $statusKey == $statusValue")
+                MyApplication.Companion.PowerOnTime = statusValue.toString()
             }
             "amazert.status" -> {
                 Log.d(TAG, "RCVD $statusKey == $statusValue")
+                MyApplication.Companion.DeviceStatus = statusValue.toString()
             }
             else -> {
                 Log.d(TAG, "WARNING: New Status Item [$statusKey]? ADD support!")

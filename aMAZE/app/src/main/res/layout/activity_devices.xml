@@ -55,7 +55,7 @@
         android:layout_marginTop="34dp"
         android:onClick="testEncrypt"
         android:text="Button"
-        android:visibility="visible"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button3" />
 

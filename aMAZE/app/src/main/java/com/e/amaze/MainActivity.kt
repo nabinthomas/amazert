@@ -38,6 +38,9 @@ class MyApplication : Application() {
         var deviceList: MutableLiveData<List<String>> = MutableLiveData<List<String>>()
         val symEnc:SymKeyEncryption = SymKeyEncryption()
         lateinit var bitmap: Bitmap
+        lateinit var HbTime:String
+        lateinit var PowerOnTime:String
+        lateinit var DeviceStatus:String
 
         fun  updateFeatureMapping(applicationContext: Context ) {
             val mContext: Context = applicationContext
@@ -49,8 +52,6 @@ class MyApplication : Application() {
 
             val itemType = object : TypeToken<List<SettingDetails>>() {}.type
             var out: List<SettingDetails> = Gson().fromJson(response, itemType)
-            //out.forEachIndexed { idx, ite -> Log.i("OUT=================", "> Item $idx:\n${ite.displayName} ${ite.inputOptions} ${ite.isSwitch}") }
-
             globalSettingsList = out
         }
     }
@@ -193,7 +194,7 @@ class MainActivity : AppCompatActivity() {
 
     fun launchDevicesActivity(view: View, user: String) {
         //val intent = Intent(this, DevicesActivity::class.java)
-	val intent = Intent(this, DeviceListActivity::class.java)
+	    val intent = Intent(this, DeviceListActivity::class.java)
         intent.putExtra("Name", user)
         startActivity(intent)
 
