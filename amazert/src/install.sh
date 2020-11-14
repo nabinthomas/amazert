@@ -19,6 +19,7 @@ mkdir -p /usr/bin/amazert
 cp *.py /usr/bin/amazert/
 cp runner.sh /usr/bin/amazert/
 chmod a+x /usr/bin/amazert/runner.sh
+chmod a+x /usr/bin/amazert/remove.sh
 cp amazert /etc/init.d/
 chmod a+x /etc/init.d/amazert
 /etc/init.d/amazert enable
