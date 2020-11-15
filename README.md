@@ -163,5 +163,11 @@ Example command to reboot the device
   "action": "command",
   "command": E('["reboot"]')
 }
+
 </pre>
+
+### Uninstallation 
+Android App can initiate an uninstall for the AmazerRT Agent running on the device by using the "command" interface in the protocol. 
+An encrypted command to start the uninstall can be sent via the cloud backend. To make the steps simpler and easily modifiable, an uninstall script is included as part of the installation, which removes AmazeRT agent, logs and startup scripts from the device.
+
 
