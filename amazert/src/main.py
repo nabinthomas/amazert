@@ -319,11 +319,11 @@ def getAllSupportedStatus():
             statusOutput = runShellcommand(command)
             try:
                 status["value"] = json.loads(statusOutput)
-                print("json success")
+                #print("json success")
             except JSONDecodeError as e: 
                 # If json parsing fails, this may be just an output string
                 status["value"] = statusOutput
-                print("failling back to string")
+                #print("failling back to string")
             allStatus.append(status)
         except Exception as e:
             logger.debug("failed status rule " + str(rule) + str(e))
@@ -650,7 +650,7 @@ async def amazeRTServiceMain():
     #exit(0)
 
     allStatus = getAllSupportedStatus()
-    print(json.dumps(allStatus))
+    #print(json.dumps(allStatus))
 
     #exit(0)
 
