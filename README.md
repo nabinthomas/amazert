@@ -127,10 +127,17 @@ A Sample is given below
          "email": "nabin.thomas@gmail.com"
      }
  }
+ 
 </pre>
+
+Note that the values in settings are encrypted using a key derived from the Registration Id of the 
+device. Only the Andoid App instance that registered this device has a copy of this registration Id. 
+The encrypted string is the result of concatenating IV, digest and the cipher text in that order
+Each section is base64 encoded to support binaries. Ecnryption uses AES algorithm in GCM mode, with a 256 bit key used for encryption
 ##### Hearbeat packet
 For simplification, Heartbeat packet is nothing but a registration packet that is sent across to the Cloud periodically.
-However, for heartbeats, the settings array is filtered to send only those settings which changed. 
+However, for heartbeats, the settings array is filtered to send only those settings which changed. Status is always sent 
+without any filtering.
 
 #### AmazeRT Communication from Cloud
 Commnication to from the cloud to AmazeRT Router also follow a similar structure of the communication the other way around
