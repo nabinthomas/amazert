@@ -308,6 +308,9 @@ statusRules = [{
     "name": "amazert.heartbeat.time",
     "command" : ["date", "-u"]
 }, {
+    "name": "dhcp.leases",
+    "command" : ["sh", "/usr/bin/amazert/dhcpclients.sh"]
+}, {
     "name": "amazert.poweron.time" ,
     "command" : ["cat", "/var/log/amazert.start"]
 }, {
@@ -326,12 +329,14 @@ def getAllSupportedStatus():
             status= {}
             command = rule["command"]
             status["name"] = rule["name"]
-            statusOutput = str(runShellcommand(command))
+            statusOutput = runShellcommand(command)
             try:
                 status["value"] = json.loads(statusOutput)
+                print("json success")
             except JSONDecodeError as e: 
                 # If json parsing fails, this may be just an output string
                 status["value"] = statusOutput
+                print("failling back to string")
             allStatus.append(status)
         except Exception as e:
             logger.debug("failed status rule " + str(rule) + str(e))
@@ -654,6 +659,11 @@ async def amazeRTServiceMain():
     #plainText = decryptMessage(config["encryption"], cipherText)
 
     #print ("test = ", testMessage, " plain = ", plainText)
+    #exit(0)
+
+    allStatus = getAllSupportedStatus()
+    print(json.dumps(allStatus))
+
     #exit(0)
 
     ws = create_connection(appEngineUri)

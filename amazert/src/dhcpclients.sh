@@ -1,0 +1,1 @@
+ubus call luci-rpc getDHCPLeases '{"family" : 0}'
