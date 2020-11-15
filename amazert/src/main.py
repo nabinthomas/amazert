@@ -249,22 +249,6 @@ def filterChangedSettings(newSettings):
             filteredList.append(setting)
     return filteredList
 
-"""
-Filter out status that didnot change from last set of settings that was sent to the AppEngine
-"""
-def filterChangedStatus(newStatus):
-    filteredList = []
-    for status in newStatus:
-        statusWasPresent = False 
-        for oldStatus in lastStatusSent:
-            if (status["name"] == oldStatus["name"]):
-                statusWasPresent = True
-                if (status["value"] != oldStatus["value"]):
-                    filteredList.append(status)
-        if (statusWasPresent == False) :
-            filteredList.append(status)
-    return filteredList
-
 """ 
 Prepare a list of all the settings which will be sent across to the AmazeRT App Engine
 """ 
@@ -310,6 +294,9 @@ statusRules = [{
 }, {
     "name": "dhcp.leases",
     "command" : ["sh", "/usr/bin/amazert/dhcpclients.sh"]
+}, {
+    "name": "assoclist.wlan0",
+    "command" : ["/usr/bin/python3", "/usr/bin/amazert/assoclist.py", "wlan0"]
 }, {
     "name": "amazert.poweron.time" ,
     "command" : ["cat", "/var/log/amazert.start"]
@@ -391,7 +378,8 @@ class amazeRTHeartBeatThread(threading.Thread):
         allSettings = getAllSupportedSettings()
         allStatus = getAllSupportedStatus()
         message["settings"] = encryptAllValues(self.config["encryption"], filterChangedSettings(allSettings))
-        message["status"] = filterChangedStatus(allStatus)
+        message["status"] = allStatus 
+        #print("Status Message from heartbeat" + json.dumps(message["status"]))
         packettoSend = preparePacketToSend(self.config, message)
         lastSettingsSent = allSettings
         lastStatusSent = allStatus
