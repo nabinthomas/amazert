@@ -96,7 +96,7 @@ Notify the appropriate WRT device about a realtime data base change event
 """
 @sockets.route('/notify')
 def notify_socket(ws):
-    print("NOTIFY")
+    print("Notify")
     try:
         while not ws.closed:
             message = ws.receive()
@@ -110,7 +110,7 @@ def notify_socket(ws):
             "data" = {'settings': {'1': {'value': 'MuttuWRT'}}}
             }
             '''
-            print(message)
+            #print(message)
             msg = json.loads(message)
             print("jsonload ok ")
             #validate the unique key and make sure that this is infact genuine cloud function call
@@ -167,13 +167,19 @@ def notify_socket(ws):
                 print(reply)
                 wrtWs= scockeDevMap[str(did)]
                 wrtWs.send(json.dumps(reply))
+                print("Notify settings Every things looks Good")
             elif "status" in data:
                 pass
             elif "request" in data:
-                
                 request = data ["request"]
                 print("request =" + str(request))
+                
                 if "command" in request:
+                    if request["command"] == None:
+                        #command is empty do nothing
+                        print ("command is None")
+                        continue
+
                     print("command = " + str( request["command"]))
                     reply = {
                         "identifier" : {
@@ -192,38 +198,14 @@ def notify_socket(ws):
                     print(reply)
                     wrtWs= scockeDevMap[str(did)]
                     wrtWs.send(json.dumps(reply))
+                    print("Notify command Every things looks Good")         
+                
     except Exception as e:
             print("Message jason parse Error" + str(e))
                     
 # [END gae_flex_websockets_app]
 # [END gae_flex_websockets_app]
 
-'''
-def updateSettings(settingsPath,settingsJson):
-    try:
-        settingsRef = db.reference(settingsPath) 
-        snapshot = settingsRef.order_by_key().get()
-        indexMax = len(snapshot)
-        print(" indexMax =" + str(indexMax)) 
-        nextInxex = indexMax
-        #print("Setting snapShot by index key = " + str(i)  + "  " + str(path)+  " key=" + str (setP["name"]) + " value=" + (setP["value"]) )
-        for key in settingsJson:
-            keyFound = False
-            for i in range (0,indexMax):
-                path = settingsPath +"/" + str(i)
-                settingRef = db.reference( path )
-                setP= settingRef.get()
-                #print(" settingsJson key = " +str(key))
-                if str(key["name"]) == str (setP["name"]):
-                    settingRef.child("value").set(str(key["value"]))
-                    keyFound = True
-                    continue
-            if  keyFound == False:
-                db.reference( settingsPath +"/" + str(nextInxex)).set(key)
-                nextInxex = nextInxex +1
-    except Exception as e:
-        print("Exceptoin in updateSettings " + str(e))
-'''
 def updateNameValue(nodePath,inputJason):
     try:
         pathRef = db.reference(nodePath) 
@@ -238,7 +220,7 @@ def updateNameValue(nodePath,inputJason):
                 setP= nodeRef.get()
                 #print(" inputJason key = " +str(key))
                 if str(key["name"]) == str (setP["name"]):
-                    nodeRef.child("value").set(str(key["value"]))
+                    nodeRef.child("value").set(key["value"])
                     keyFound = True
                     continue
             if  keyFound == False:
@@ -261,11 +243,10 @@ def register_socket(ws):
                 continue
             #TODO: json parsing error
             try :
-                print("Before Parsing")
                 reg = json.loads(message)
-                print("after Parsing")
+                print("Jason load ok ")
             except Exception as e:
-                print("Message jason parse error" + str(e))
+                print("Message jason load error" + str(e))
                 continue
                 
 
@@ -273,16 +254,16 @@ def register_socket(ws):
                 identifier= reg["identifier"]
                 print("identifier" + str(identifier))
                 uid = identifier["uid"]
-                print("uid" + str(uid))
+                print("uid = " + str(uid))
                 deviceId =identifier["deviceId"]
-                print("deviceId" + str(deviceId))
+                print("deviceId= " + str(deviceId))
                 # Now check whether the user device id in the db is same as the device id send by wrt. 
                 devIdpath = "/users/" + uid  + "/" + deviceId
                 UIdpath = "/users/" + uid 
                 try :
                     ref = db.reference(devIdpath )
                     queryResults1 = ref.get()
-                    print("DB Device Path query result: " + str(queryResults1))
+                    #print("DB Device Path query result: " + str(queryResults1))
                     if queryResults1 == None :
                         #there is no user or device registered
                         print("Given user or device NOT Found in DB")
@@ -291,14 +272,14 @@ def register_socket(ws):
                         #find the devices in the message and update the settigns under them 
                         uref = db.reference(UIdpath )
                         snapshot = uref.order_by_key().get()
-                        print("DB ressnapshotult= " + str(snapshot))
+                        #print("DB ressnapshotult= " + str(snapshot))
                         #do we really need this loop ?
                         for key,val in snapshot.items():
                             print("key = " +str(key))
                             if key == deviceId:
                                 if "settings" in reg:
                                     settings = reg["settings"]
-                                    print("settings" + str(settings))
+                                    #print("settings =" + str(settings))
                                     settingsPath = "/users/" + uid  + "/" + deviceId + "/settings"
                                    
                                     settingsRef = db.reference(settingsPath) 
@@ -310,7 +291,7 @@ def register_socket(ws):
 
                                 if "status" in reg:
                                     status = reg["status"]
-                                    #print("status" + str(status))
+                                    #print("status =" + str(status))
                                     statusPath = "/users/" + uid  + "/" + deviceId + "/status"
                                     statusRef = db.reference(statusPath) 
                                     if statusRef.get() == None:
@@ -320,7 +301,7 @@ def register_socket(ws):
 
                                 sendReply(ws, message, "PASS")
                                 scockeDevMap[deviceId]=ws
-                                print("Every Thing looks good")
+                                print("Register : Every Thing looks good")
                 except Exception as e:
                     print("Exceptoin here1 = " + str(e))
                     sendReply(ws, message, "FAIL")
@@ -342,11 +323,9 @@ if __name__ == '__main__':
     print("""
 This can not be run directly because the Flask development server does not
 support web sockets. Instead, use gunicorn:
-
 gunicorn -b 127.0.0.1:8080 -k flask_sockets.worker main:app
 
 Other useful commands are 
-gunicorn -b 127.0.0.1:8080 -k flask_sockets.worker main:app
 gcloud app deploy app.yaml     --project amaze-id1
 gcloud config set project amaze-id1
 gcloud app logs tail
