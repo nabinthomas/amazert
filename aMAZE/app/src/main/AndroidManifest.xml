@@ -18,7 +18,10 @@
         <activity android:name=".UserProfile" />
         <activity
             android:name=".AddDevice"
-            android:parentActivityName=".DevicesActivity" />
+            android:parentActivityName=".DeviceListActivity" />
+        <activity
+            android:name=".DeleteDevice"
+            android:parentActivityName=".DeviceListActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

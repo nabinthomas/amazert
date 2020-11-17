@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
@@ -60,6 +61,13 @@ class DeviceListAdapter internal constructor(
                 val intent = Intent(context, DevicesActivity::class.java)
                 intent.putExtra("Name", current)
                 context.startActivity(intent)
+            }
+
+            holder.deviceView.setOnLongClickListener{
+
+                Toast.makeText(context, "Long press",Toast.LENGTH_LONG).show()
+
+                return@setOnLongClickListener true
             }
         }
 

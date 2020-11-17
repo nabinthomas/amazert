@@ -68,6 +68,16 @@ class DevicesActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+    fun launchDeleteDeviceActivity(view: View) {
+        val intent = Intent(this, DeleteDevice::class.java)
+        var uid = FirebaseAuth.getInstance().currentUser?.uid
+        var user = FirebaseAuth.getInstance().currentUser?.email
+        intent.putExtra("Name", user)
+        intent.putExtra("Uid", uid)
+        intent.putExtra("DevName", devName)
+        startActivity(intent)
+    }
+
     fun launchDevicesActivity(view: View, user: String) {
         val intent = Intent(this, DevicesActivity::class.java)
         intent.putExtra("Name", user)

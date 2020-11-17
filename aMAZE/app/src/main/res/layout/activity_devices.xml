@@ -35,30 +35,40 @@
         android:layout_width="408dp"
         android:layout_height="40dp"
         android:layout_marginTop="1dp"
-        android:text="Settings"
         android:gravity="center_vertical|left"
         android:onClick="launchDeviceSettingActivity"
+        android:text="Settings"
         app:layout_constraintTop_toBottomOf="@+id/divider"
-        tools:layout_editor_absoluteX="1dp" />
+        tools:layout_editor_absoluteX="3dp" />
 
     <TextView
         android:id="@+id/textView11"
         android:layout_width="408dp"
         android:layout_height="40dp"
-        android:text="Status"
-        android:onClick="launchStatusActivity"
         android:gravity="center_vertical|left"
+        android:onClick="launchStatusActivity"
+        android:text="Status"
         app:layout_constraintTop_toBottomOf="@+id/divider2"
-        tools:layout_editor_absoluteX="1dp" />
+        tools:layout_editor_absoluteX="3dp" />
 
     <TextView
         android:id="@+id/textView12"
         android:layout_width="408dp"
         android:layout_height="40dp"
-        android:onClick="rebootDevice"
         android:gravity="center_vertical|left"
+        android:onClick="rebootDevice"
         android:text="Reboot"
         app:layout_constraintTop_toTopOf="@+id/divider3"
+        tools:layout_editor_absoluteX="3dp" />
+
+    <TextView
+        android:id="@+id/textView14"
+        android:layout_width="408dp"
+        android:layout_height="40dp"
+        android:gravity="center_vertical|left"
+        android:onClick="launchDeleteDeviceActivity"
+        android:text="Remove Device"
+        app:layout_constraintTop_toBottomOf="@+id/divider4"
         tools:layout_editor_absoluteX="3dp" />
 
     <View
@@ -84,5 +94,13 @@
         android:background="?android:attr/listDivider"
         app:layout_constraintTop_toBottomOf="@+id/textView12"
         tools:layout_editor_absoluteX="1dp" />
+
+    <View
+        android:id="@+id/divider5"
+        android:layout_width="409dp"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintTop_toBottomOf="@+id/textView14"
+        tools:layout_editor_absoluteX="0dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
