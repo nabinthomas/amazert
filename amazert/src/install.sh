@@ -17,8 +17,7 @@ rm get-pip.py
 # Now copy the files to the respective places
 mkdir -p /usr/bin/amazert
 cp *.py /usr/bin/amazert/
-cp runner.sh /usr/bin/amazert/
-cp remove.sh /usr/bin/amazert/
+cp *.sh /usr/bin/amazert/
 chmod a+x /usr/bin/amazert/runner.sh
 chmod a+x /usr/bin/amazert/remove.sh
 chmod a+x /usr/bin/amazert/dhcpclients.sh
