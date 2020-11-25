@@ -43,3 +43,17 @@ data class StatusClientInfo(
     var rrm: ArrayList<Int> ,
     var aid: String? = ""
 )
+
+@IgnoreExtraProperties
+data class StatusDhcpLeases(
+    var dhcp_leases:ArrayList<StatusDhcpLeasesInfo>
+)
+
+@IgnoreExtraProperties
+data class StatusDhcpLeasesInfo(
+    var expires:String? = "",
+    var hostname:String? = "",
+    var duid:String? = "",
+    var ipaddr:String?= "",
+    var macaddr:String? = ""
+)

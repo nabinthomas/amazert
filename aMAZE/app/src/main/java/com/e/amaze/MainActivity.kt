@@ -41,6 +41,9 @@ class MyApplication : Application() {
         lateinit var HbTime:String
         lateinit var PowerOnTime:String
         lateinit var DeviceStatus:String
+        lateinit var macIndex:String
+        lateinit var macDisableIndex:String
+        lateinit var macBannedList:String
 
         fun  updateFeatureMapping(applicationContext: Context ) {
             val mContext: Context = applicationContext

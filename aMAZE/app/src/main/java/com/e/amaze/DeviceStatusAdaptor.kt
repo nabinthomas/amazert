@@ -5,8 +5,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.ktx.getValue
 import com.google.gson.Gson
@@ -21,9 +24,11 @@ class StatusAdapter(
     private var items = emptyList<String>() // Cached copy of items
     private var pkgName: String = context.packageName
     private var clientMACList: MutableList <String> = java.util.ArrayList()
+    private val database = MyApplication.Companion.projectDatabase
 
     inner class StatusViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val statusNameView: TextView = itemView.findViewById(R.id.textViewDeviceStatus)
+        val macBanButton:Button = itemView.findViewById(R.id.button7)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StatusViewHolder {
@@ -34,16 +39,59 @@ class StatusAdapter(
     override fun onBindViewHolder(holder: StatusViewHolder, position: Int) {
         val current = items[position]
         holder.statusNameView.text = current
-        holder.statusNameView.setOnClickListener{
-            /*
-            val intent = Intent(context, UpdateSettings::class.java)
-            intent.putExtra("Name", current.name.toString())
-            intent.putExtra("DisplayName", holder.statusNameView.text.toString())
+        holder.macBanButton.setOnClickListener{
 
-            intent.putExtra("Value", current.value.toString())
-            intent.putExtra("dbIndex", position.toString())
-            context.startActivity(intent)
-             */
+            var banMacValue:String = ""
+            if (MyApplication.Companion.macBannedList != "")    {
+                if (MyApplication.Companion.macBannedList.contains(holder.statusNameView.text.toString())) {
+                    Toast.makeText(
+                        context,
+                        "MAC Address already in BAN list: " + MyApplication.Companion.macBannedList.toString(),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    banMacValue =
+                        MyApplication.Companion.macBannedList.plus(" " + holder.statusNameView.text.toString())
+                    MyApplication.Companion.macBannedList = banMacValue
+                }
+            } else {
+                banMacValue = holder.statusNameView.text.toString()
+                MyApplication.Companion.macBannedList = banMacValue
+            }
+
+            if (banMacValue != "" ) {
+                // Encrypt value using SymKey Enc
+                var encryptedValue = MyApplication.Companion.symEnc.encryptString(banMacValue)
+                val userId = FirebaseAuth.getInstance().currentUser?.uid
+                var deviceId: String = MyApplication.Companion.register.deviceId
+                if (MyApplication.Companion.register.deviceId === "") {
+                    deviceId = "532e8c40-18cd-11eb-a4ca-dca6328f80c0"
+                }
+                var databaseIndex = MyApplication.Companion.macIndex
+                var settingPath = "users/$userId/$deviceId/settings/$databaseIndex/name"
+                var valPath = "users/$userId/$deviceId/settings/$databaseIndex/value"
+
+                var nameRef = database.getReference(settingPath.toString())
+                nameRef.setValue("wireless.wifinet0.maclist")
+                var valRef = database.getReference(valPath.toString())
+                valRef.setValue(encryptedValue)
+
+                encryptedValue = MyApplication.Companion.symEnc.encryptString("Deny")
+                databaseIndex = MyApplication.Companion.macDisableIndex
+                settingPath = "users/$userId/$deviceId/settings/$databaseIndex/name"
+                valPath = "users/$userId/$deviceId/settings/$databaseIndex/value"
+
+                nameRef = database.getReference(settingPath.toString())
+                nameRef.setValue("wireless.wifinet0.disabled")
+                valRef = database.getReference(valPath.toString())
+                valRef.setValue(encryptedValue)
+
+                Toast.makeText(
+                    context,
+                    "MAC Address added to BAN list" ,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 
@@ -74,6 +122,7 @@ class StatusAdapter(
 
         when(statusKey){
             "wifi.clients" -> {
+                Log.d(TAG, statusValue.toString())
                 val splitList = statusValue.toString().split("{", "}")
                 val count = splitList.size - 3
                 var x:Int = 2
@@ -104,6 +153,12 @@ class StatusAdapter(
             "amazert.status" -> {
                 Log.d(TAG, "RCVD $statusKey == $statusValue")
                 MyApplication.Companion.DeviceStatus = statusValue.toString()
+            }
+            "dhcp.leases" -> {
+                Log.d(TAG, "RCVD $statusKey == $statusValue")
+                //var DhcpLeasesType = object :TypeToken<StatusDhcpLeases>() {}.type
+                //var dhcpLeases: StatusDhcpLeases = Gson().fromJson(statusValue.toString(), DhcpLeasesType)
+                //Log.d(TAG, dhcpLeases.dhcp_leases.toString())
             }
             else -> {
                 Log.d(TAG, "WARNING: New Status Item [$statusKey]? ADD support!")

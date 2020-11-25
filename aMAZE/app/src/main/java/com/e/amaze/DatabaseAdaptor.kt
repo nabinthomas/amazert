@@ -54,6 +54,15 @@ class SettingsAdapter(
             holder.settingValueView.text = decryptedValue
         }
 
+        if (current.name == "wireless.wifinet0.maclist") {
+            MyApplication.Companion.macIndex = position.toString()
+            MyApplication.Companion.macBannedList = decryptedValue.toString()
+        }
+
+        if (current.name == "wireless.wifinet0.disabled") {
+            MyApplication.Companion.macDisableIndex = position.toString()
+        }
+
         holder.settingNameView.setOnClickListener{
             val intent = Intent(context, UpdateSettings::class.java)
             intent.putExtra("Name", current.name.toString())
