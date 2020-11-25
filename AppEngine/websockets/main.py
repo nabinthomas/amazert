@@ -96,7 +96,7 @@ Notify the appropriate WRT device about a realtime data base change event
 """
 @sockets.route('/notify')
 def notify_socket(ws):
-    print("Notify")
+    print("Enter Notify")
     try:
         while not ws.closed:
             message = ws.receive()
@@ -138,7 +138,7 @@ def notify_socket(ws):
             data = msg["data"]
             if "settings" in data:
                 settings = data["settings"]
-                print("settings", settings)
+                print("Notify: settings", settings)
 
                 settingData=[]
                 for node in settings.keys():
@@ -169,10 +169,11 @@ def notify_socket(ws):
                 wrtWs.send(json.dumps(reply))
                 print("Notify settings Every things looks Good")
             elif "status" in data:
+                print("Notify:status: Pass : Good")
                 pass
             elif "request" in data:
                 request = data ["request"]
-                print("request =" + str(request))
+                print("Notify request =" + str(request))
                 
                 if "command" in request:
                     if request["command"] == None:
@@ -198,7 +199,7 @@ def notify_socket(ws):
                     print(reply)
                     wrtWs= scockeDevMap[str(did)]
                     wrtWs.send(json.dumps(reply))
-                    print("Notify command Every things looks Good")         
+                    print("Notify request:command: Every things looks Good")         
                 
     except Exception as e:
             print("Message jason parse Error" + str(e))
@@ -236,7 +237,7 @@ WRT devices send message to this url for registration and heartbeat
 @sockets.route('/register')
 def register_socket(ws):
     try:
-        print("Register ")
+        print("Enter Register ")
         while not ws.closed:
             message = ws.receive()
             if message is None:  # message is "None" if the client has closed.
@@ -301,7 +302,7 @@ def register_socket(ws):
 
                                 sendReply(ws, message, "PASS")
                                 scockeDevMap[deviceId]=ws
-                                print("Register : Every Thing looks good")
+                                print("Exit Register ")
                 except Exception as e:
                     print("Exceptoin here1 = " + str(e))
                     sendReply(ws, message, "FAIL")
