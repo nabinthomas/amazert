@@ -36,7 +36,7 @@ class MyApplication : Application() {
         lateinit var globalSettingsList:List<SettingDetails>
         val projectDatabase = Firebase.database.getReferenceFromUrl("https://amaze-id1.firebaseio.com/").database
         var deviceList: MutableLiveData<List<String>> = MutableLiveData<List<String>>()
-        val symEnc:SymKeyEncryption = SymKeyEncryption()
+        var symEnc:SymKeyEncryption = SymKeyEncryption()
         lateinit var bitmap: Bitmap
         lateinit var HbTime:String
         lateinit var PowerOnTime:String

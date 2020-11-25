@@ -42,6 +42,10 @@ class DevicesActivity : AppCompatActivity() {
         var devText = findViewById<TextView>(R.id.textView9)
 
         devText.text = devName
+
+        MyApplication.Companion.symEnc = SymKeyEncryption()
+
+        //testEncrypt()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean{
@@ -117,8 +121,10 @@ class DevicesActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    fun testEncrypt(view: View) {
-        val cipherText = MyApplication.Companion.symEnc.encryptString("1234")
+    fun testEncrypt() {
+        //val cipherText = MyApplication.Companion.symEnc.encryptString("1234")
+        //val cipherText = "BImvnpaSPjWMwqOeNSCpBw==q0fnnEU0pjc5W89fXK8EwA==VDlFIw=="
+        val cipherText = "J3HBnL62AcKhIRHSB0BeZQ==CqFjuA9n6vVwYhf0icughQ==r5cMojh+6pPVvscF"
         Log.d(TAG, "CIPHERText Combo: " + cipherText)
 
         val x = "ACRRaw=="
@@ -129,14 +135,19 @@ class DevicesActivity : AppCompatActivity() {
         val bdigest = java.util.Base64.getDecoder().decode(digest)
         Log.d(TAG, "Digest size: " + bdigest.size)
 
-        val (sIv, sDig, sCip) = MyApplication.Companion.symEnc.segregateSettingData("u4+C5I/3kmaAEo3h5L/EVg==9+vCN1DDxsAJPXhi0YjU5Q==ACRRaw==")
+        //val (sIv, sDig, sCip) = MyApplication.Companion.symEnc.segregateSettingData("u4+C5I/3kmaAEo3h5L/EVg==9+vCN1DDxsAJPXhi0YjU5Q==ACRRaw==")
+        var (sIv, sDig, sCip) = MyApplication.Companion.symEnc.segregateSettingData("BImvnpaSPjWMwqOeNSCpBw==q0fnnEU0pjc5W89fXK8EwA==VDlFIw==")
         Log.d(TAG, "sIV: " + String(java.util.Base64.getEncoder().encode(sIv.iv)))
         Log.d(TAG, "sDIGEST: " + String(java.util.Base64.getEncoder().encode(sDig)))
         Log.d(TAG, "sCIPHER: " + String(java.util.Base64.getEncoder().encode(sCip)))
 
         val decText = MyApplication.Companion.symEnc.decryptCipherText(sCip+sDig, sIv)
 
+        var (sIv1, sDig1, sCip1) = MyApplication.Companion.symEnc.segregateSettingData("J3HBnL62AcKhIRHSB0BeZQ==CqFjuA9n6vVwYhf0icughQ==r5cMojh+6pPVvscF")
+        val decText1 = MyApplication.Companion.symEnc.decryptCipherText(sCip1+sDig1, sIv1)
+
         Log.d(TAG, "Decrypted text#:: --" + decText.toString()+ "--")
+        Log.d(TAG, "Decrypted text1#:: --" + decText1.toString()+ "--")
     }
 
     fun launchStatusActivity(view: View) {
