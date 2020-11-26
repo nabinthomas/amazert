@@ -1,1 +1,2 @@
-echo "REbooting"
+echo "Rebooting"
+reboot
