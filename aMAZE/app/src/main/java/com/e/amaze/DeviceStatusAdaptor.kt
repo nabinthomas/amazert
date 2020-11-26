@@ -131,7 +131,7 @@ class StatusAdapter(
         val actionRef = database.getReference(actionPath)
         val cmdRef = database.getReference(cmdPath)
 
-        val blockCmd:String = "[\"banclient.sh\", \"" + holder.statusNameView.text.toString() + "\", \"600000\"]"
+        val blockCmd:String = "[\"banclient.sh\", \"" + holder.statusNameView.text.toString() + "\", \"3600000\"]"
 Log.d(TAG, "BLOCK cmd --" + blockCmd.toString() + "--")
         val encryptedValue = MyApplication.Companion.symEnc.encryptString(blockCmd)
 
@@ -139,7 +139,7 @@ Log.d(TAG, "BLOCK cmd --" + blockCmd.toString() + "--")
         cmdRef.setValue(encryptedValue)
         Toast.makeText(
             context,
-            "MAC Address blocked for 1 hour",
+            "MAC Address disconnected for 1 hour",
             Toast.LENGTH_SHORT
         ).show()
         /*
