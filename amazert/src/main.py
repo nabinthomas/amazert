@@ -449,7 +449,7 @@ def amazeRTCommandHandler(config, ws, encCommand, options):
                     }
 
     responseJson = preparePacketToSend(config, responseJson)
-    ws.send(json.dumps(responseJson))
+    ws.send(responseJson)
 
 """
 A Setting that is stored in the cloud may be encrypted. If we receive a request from the 
