@@ -39,61 +39,138 @@ class StatusAdapter(
     override fun onBindViewHolder(holder: StatusViewHolder, position: Int) {
         val current = items[position]
         holder.statusNameView.text = current
+        if (MyApplication.Companion.macBannedList.contains(current.toString())){
+            holder.macBanButton.setText("ALLOW")
+        } else {
+            holder.macBanButton.setText("BYAAN")
+        }
+
         holder.macBanButton.setOnClickListener{
-
-            var banMacValue:String = ""
-            if (MyApplication.Companion.macBannedList != "")    {
-                if (MyApplication.Companion.macBannedList.contains(holder.statusNameView.text.toString())) {
-                    Toast.makeText(
-                        context,
-                        "MAC Address already in BAN list: " + MyApplication.Companion.macBannedList.toString(),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                } else {
-                    banMacValue =
-                        MyApplication.Companion.macBannedList.plus(" " + holder.statusNameView.text.toString())
-                    MyApplication.Companion.macBannedList = banMacValue
-                }
+            if (holder.macBanButton.text == "BYAAN") {
+                handleMacBanOperation(holder)
             } else {
-                banMacValue = holder.statusNameView.text.toString()
-                MyApplication.Companion.macBannedList = banMacValue
-            }
-
-            if (banMacValue != "" ) {
-                // Encrypt value using SymKey Enc
-                var encryptedValue = MyApplication.Companion.symEnc.encryptString(banMacValue)
-                val userId = FirebaseAuth.getInstance().currentUser?.uid
-                var deviceId: String = MyApplication.Companion.register.deviceId
-                if (MyApplication.Companion.register.deviceId === "") {
-                    deviceId = "532e8c40-18cd-11eb-a4ca-dca6328f80c0"
-                }
-                var databaseIndex = MyApplication.Companion.macIndex
-                var settingPath = "users/$userId/$deviceId/settings/$databaseIndex/name"
-                var valPath = "users/$userId/$deviceId/settings/$databaseIndex/value"
-
-                var nameRef = database.getReference(settingPath.toString())
-                nameRef.setValue("wireless.wifinet0.maclist")
-                var valRef = database.getReference(valPath.toString())
-                valRef.setValue(encryptedValue)
-
-                encryptedValue = MyApplication.Companion.symEnc.encryptString("Deny")
-                databaseIndex = MyApplication.Companion.macDisableIndex
-                settingPath = "users/$userId/$deviceId/settings/$databaseIndex/name"
-                valPath = "users/$userId/$deviceId/settings/$databaseIndex/value"
-
-                nameRef = database.getReference(settingPath.toString())
-                nameRef.setValue("wireless.wifinet0.disabled")
-                valRef = database.getReference(valPath.toString())
-                valRef.setValue(encryptedValue)
-
-                Toast.makeText(
-                    context,
-                    "MAC Address added to BAN list" ,
-                    Toast.LENGTH_SHORT
-                ).show()
+                handleMacAllowOperation(holder)
             }
         }
     }
+
+    private fun handleMacAllowOperation(holder: StatusViewHolder) {
+        /*
+        var banMacValue:String = ""
+        if (MyApplication.Companion.macBannedList != "")    {
+            if (MyApplication.Companion.macBannedList.contains(holder.statusNameView.text.toString())) {
+                Toast.makeText(
+                    context,
+                    "MAC Address already in BAN list: " + MyApplication.Companion.macBannedList.toString(),
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                banMacValue =
+                    MyApplication.Companion.macBannedList.plus(" " + holder.statusNameView.text.toString())
+                MyApplication.Companion.macBannedList = banMacValue
+            }
+        } else {
+            banMacValue = holder.statusNameView.text.toString()
+            MyApplication.Companion.macBannedList = banMacValue
+        }
+
+        if (banMacValue != "" ) {
+            // Encrypt value using SymKey Enc
+            var encryptedValue = MyApplication.Companion.symEnc.encryptString(banMacValue)
+            val userId = FirebaseAuth.getInstance().currentUser?.uid
+            var deviceId: String = MyApplication.Companion.register.deviceId
+            if (MyApplication.Companion.register.deviceId === "") {
+                deviceId = "532e8c40-18cd-11eb-a4ca-dca6328f80c0"
+            }
+            var databaseIndex = MyApplication.Companion.macIndex
+            var settingPath = "users/$userId/$deviceId/settings/$databaseIndex/name"
+            var valPath = "users/$userId/$deviceId/settings/$databaseIndex/value"
+
+            var nameRef = database.getReference(settingPath.toString())
+            nameRef.setValue("wireless.wifinet0.maclist")
+            var valRef = database.getReference(valPath.toString())
+            valRef.setValue(encryptedValue)
+
+            encryptedValue = MyApplication.Companion.symEnc.encryptString("Deny")
+            databaseIndex = MyApplication.Companion.macDisableIndex
+            settingPath = "users/$userId/$deviceId/settings/$databaseIndex/name"
+            valPath = "users/$userId/$deviceId/settings/$databaseIndex/value"
+
+            nameRef = database.getReference(settingPath.toString())
+            nameRef.setValue("wireless.wifinet0.disabled")
+            valRef = database.getReference(valPath.toString())
+            valRef.setValue(encryptedValue)
+
+            Toast.makeText(
+                context,
+                "MAC Address added to BAN list" ,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+         */
+        Toast.makeText(
+            context,
+            "TO BE IMPL..." ,
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+    private fun handleMacBanOperation(holder: StatusViewHolder) {
+        var banMacValue:String = ""
+        if (MyApplication.Companion.macBannedList != "")    {
+            if (MyApplication.Companion.macBannedList.contains(holder.statusNameView.text.toString())) {
+                Toast.makeText(
+                    context,
+                    "MAC Address already in BAN list: " + MyApplication.Companion.macBannedList.toString(),
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                banMacValue =
+                    MyApplication.Companion.macBannedList.plus(" " + holder.statusNameView.text.toString())
+                MyApplication.Companion.macBannedList = banMacValue
+            }
+        } else {
+            banMacValue = holder.statusNameView.text.toString()
+            MyApplication.Companion.macBannedList = banMacValue
+        }
+
+        if (banMacValue != "" ) {
+            // Encrypt value using SymKey Enc
+            var encryptedValue = MyApplication.Companion.symEnc.encryptString(banMacValue)
+            val userId = FirebaseAuth.getInstance().currentUser?.uid
+            var deviceId: String = MyApplication.Companion.register.deviceId
+            if (MyApplication.Companion.register.deviceId === "") {
+                deviceId = "532e8c40-18cd-11eb-a4ca-dca6328f80c0"
+            }
+            var databaseIndex = MyApplication.Companion.macIndex
+            var settingPath = "users/$userId/$deviceId/settings/$databaseIndex/name"
+            var valPath = "users/$userId/$deviceId/settings/$databaseIndex/value"
+
+            var nameRef = database.getReference(settingPath.toString())
+            nameRef.setValue("wireless.wifinet0.maclist")
+            var valRef = database.getReference(valPath.toString())
+            valRef.setValue(encryptedValue)
+
+            encryptedValue = MyApplication.Companion.symEnc.encryptString("Deny")
+            databaseIndex = MyApplication.Companion.macDisableIndex
+            settingPath = "users/$userId/$deviceId/settings/$databaseIndex/name"
+            valPath = "users/$userId/$deviceId/settings/$databaseIndex/value"
+
+            nameRef = database.getReference(settingPath.toString())
+            nameRef.setValue("wireless.wifinet0.disabled")
+            valRef = database.getReference(valPath.toString())
+            valRef.setValue(encryptedValue)
+
+            Toast.makeText(
+                context,
+                "MAC Address added to BAN list" ,
+                Toast.LENGTH_SHORT
+            ).show()
+
+            holder.macBanButton.setText("ALLOW")
+        }
+    }
+
 
     internal fun setItems(snapshot: DataSnapshot) {
         for (ds in snapshot.children) {
