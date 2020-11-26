@@ -416,18 +416,18 @@ def amazeRTCommandHandler(config, ws, encCommand, options):
         logger.debug ("Executing command : > " + (commandString))
         inputCommand = json.loads(commandString)
         #["reboot.sh"]
-        print(str(inputCommand))
+        #print(str(inputCommand))
         inputCommand[0] = "/usr/bin/amazert/" + inputCommand[0]
-        print(str(inputCommand))
+        #print(str(inputCommand))
         #["/usr/bin/amazert/reboot.sh"]
         command = []
-        print(str(command))
+        #print(str(command))
         command.append("sh")
-        print(str(command))
+        #print(str(command))
         for arg in inputCommand:
             command.append(arg)
         #["sh", "/usr/bin/amazert/reboot.sh"]
-        print(json.dumps(command))
+        #print(json.dumps(command))
         commandProcess = subprocess.Popen(command,
             stdin = subprocess.PIPE, 
             stdout = subprocess.PIPE,
