@@ -167,7 +167,7 @@ class DevicesActivity : AppCompatActivity() {
         val actionRef = database.getReference(actionPath)
         val cmdRef = database.getReference(cmdPath)
 
-        val rebootCommand:String = "[\"reboot\"]"
+        val rebootCommand:String = "[\"reboot.sh\"]"
         val encryptedValue = MyApplication.Companion.symEnc.encryptString(rebootCommand)
 
         actionRef.setValue("command")

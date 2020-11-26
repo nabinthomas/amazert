@@ -414,7 +414,20 @@ def amazeRTCommandHandler(config, ws, encCommand, options):
     try:
         commandString = decryptMessage(config["encryption"], encCommand)
         logger.debug ("Executing command : > " + (commandString))
-        command = json.loads(commandString)
+        inputCommand = json.loads(commandString)
+        #["reboot.sh"]
+        print(str(inputCommand))
+        inputCommand[0] = "/usr/bin/amazert/" + inputCommand[0]
+        print(str(inputCommand))
+        #["/usr/bin/amazert/reboot.sh"]
+        command = []
+        print(str(command))
+        command.append("sh")
+        print(str(command))
+        for arg in inputCommand:
+            command.append(arg)
+        #["sh", "/usr/bin/amazert/reboot.sh"]
+        print(json.dumps(command))
         commandProcess = subprocess.Popen(command,
             stdin = subprocess.PIPE, 
             stdout = subprocess.PIPE,
@@ -425,6 +438,7 @@ def amazeRTCommandHandler(config, ws, encCommand, options):
         for line in commandProcess.stdout:
             resultString = resultString + line
     except Exception as e:
+        print(str(e))
         resultString = str(e)
         responseCode = "FAIL"
     
