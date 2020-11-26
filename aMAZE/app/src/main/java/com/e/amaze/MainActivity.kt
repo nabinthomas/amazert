@@ -43,7 +43,7 @@ class MyApplication : Application() {
         lateinit var DeviceStatus:String
         lateinit var macIndex:String
         lateinit var macDisableIndex:String
-        lateinit var macBannedList:String
+        var macBannedList:String = ""
 
         fun  updateFeatureMapping(applicationContext: Context ) {
             val mContext: Context = applicationContext
@@ -200,7 +200,6 @@ class MainActivity : AppCompatActivity() {
 	    val intent = Intent(this, DeviceListActivity::class.java)
         intent.putExtra("Name", user)
         startActivity(intent)
-
     }
 
 }

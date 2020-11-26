@@ -42,15 +42,18 @@ class StatusAdapter(
         if (MyApplication.Companion.macBannedList.contains(current.toString())){
             holder.macBanButton.setText("ALLOW")
         } else {
-            holder.macBanButton.setText("BYAAN")
+            holder.macBanButton.setText("BLOCK")
         }
 
         holder.macBanButton.setOnClickListener{
-            if (holder.macBanButton.text == "BYAAN") {
+            if (holder.macBanButton.text == "BLOCK") {
                 handleMacBanOperation(holder)
             } else {
                 handleMacAllowOperation(holder)
             }
+
+            val splitList = MyApplication.Companion.macBannedList.toString().split("'", " ")
+            Log.d(TAG, splitList[1].toString() + "- NXT -" + splitList[3].toString())
         }
     }
 
