@@ -218,8 +218,11 @@ class StatusAdapter(
 
 
                 while (x < count ) {
-                    val clientMac = splitList[x].split("=")[0]
-
+                    var clientMac = splitList[x].split("=")[0]
+                    val tmp = clientMac.split(",")
+                    if (tmp.size == 2 ) {
+                        clientMac = tmp[1].toString()
+                    }
                     clientMACList.add(clientMac)
                     x+=2
                     Log.d(TAG, "Clients: ITEM: " + clientMac.toString())
