@@ -18,9 +18,7 @@ rm get-pip.py
 mkdir -p /usr/bin/amazert
 cp *.py /usr/bin/amazert/
 cp *.sh /usr/bin/amazert/
-chmod a+x /usr/bin/amazert/runner.sh
-chmod a+x /usr/bin/amazert/remove.sh
-chmod a+x /usr/bin/amazert/dhcpclients.sh
+chmod a+x /usr/bin/amazert/*.sh
 cp amazert /etc/init.d/
 chmod a+x /etc/init.d/amazert
 /etc/init.d/amazert enable
