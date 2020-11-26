@@ -6,11 +6,15 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
 import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.appcompat.content.res.AppCompatResources.getDrawable
+import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.MutableLiveData
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
@@ -74,6 +78,8 @@ class MainActivity : AppCompatActivity() {
         Log.d("MAIN", "PATH $fPath")
 
         MyApplication.Companion.updateFeatureMapping(applicationContext)
+        MyApplication.Companion.bitmap = AppCompatResources.getDrawable(applicationContext, (R.drawable.account))!!
+            .toBitmap()
 
         var deviceName: String? = null
         var data:String = ""
