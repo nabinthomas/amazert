@@ -2,6 +2,7 @@ package com.e.amaze
 
 import android.content.Context
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -47,7 +48,8 @@ class StatusAdapter(
 
         holder.macBanButton.setOnClickListener{
             if (holder.macBanButton.text == "BLOCK") {
-                handleMacBanOperation(holder)
+                //handleMacBanOperation(holder)
+                blockMac(holder)
             } else {
                 handleMacAllowOperation(holder)
             }
@@ -117,6 +119,37 @@ class StatusAdapter(
         ).show()
     }
 
+    private fun blockMac(holder: StatusViewHolder ) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        var deviceId: String = MyApplication.Companion.register.deviceId
+        if (MyApplication.Companion.register.deviceId === "") {
+            deviceId = "532e8c40-18cd-11eb-a4ca-dca6328f80c0" }
+
+        val dbCommandPath = "users/$userId/$deviceId/request"
+        val actionPath = dbCommandPath.plus("/action")
+        val cmdPath = dbCommandPath.plus("/command")
+        val actionRef = database.getReference(actionPath)
+        val cmdRef = database.getReference(cmdPath)
+
+        val blockCmd:String = "[\"banclient.sh\", \"" + holder.statusNameView.text.toString() + "\", \"600000\"]"
+Log.d(TAG, "BLOCK cmd --" + blockCmd.toString() + "--")
+        val encryptedValue = MyApplication.Companion.symEnc.encryptString(blockCmd)
+
+        actionRef.setValue("command")
+        cmdRef.setValue(encryptedValue)
+        Toast.makeText(
+            context,
+            "MAC Address blocked for 1 hour",
+            Toast.LENGTH_SHORT
+        ).show()
+        /*
+        val location = IntArray(2)
+        findViewById<TextView>(R.id.textView12).getLocationOnScreen(location)
+        val toast = Toast.makeText(applicationContext,"Device REBOOT triggered",Toast.LENGTH_SHORT)
+        toast.setGravity(Gravity.TOP or Gravity.LEFT, location [0]+200, location[1])
+        toast.show()
+        */
+    }
     private fun handleMacBanOperation(holder: StatusViewHolder) {
         var banMacValue:String = ""
         if (MyApplication.Companion.macBannedList != "")    {
@@ -190,14 +223,10 @@ class StatusAdapter(
         val value = ds.value
 
         Log.d(TAG, " Status Item: " + key)
-        //Log.d(TAG, " VALUE: " + ds.value.toString())
 
         val dbValue = ds.value as HashMap<String, Any>
         val statusKey = dbValue["name"]
         val statusValue = dbValue["value"]
-        //Log.d(TAG, dbValue["name"].toString() )
-        //Log.d(TAG, dbValue["value"].toString() )
-
 
         when(statusKey){
             "wifi.clients" -> {
@@ -205,17 +234,6 @@ class StatusAdapter(
                 val count = splitList.size - 3
                 var x:Int = 2
                 clientMACList.clear()
-
-                Log.d(TAG, "CLIENTS: " + statusValue.toString())
-                Log.d(TAG, "CLIENTS - count: " + splitList.size.toString())
-                Log.d(TAG, "CLIENTS - SPlitStr: " + splitList.toString())
-                Log.d(TAG, "CLIENTS - SPlitStr[0]: " + splitList[0].toString())
-                Log.d(TAG, "CLIENTS - SPlitStr[1]: " + splitList[1].toString())
-                Log.d(TAG, "CLIENTS - SPlitStr[2]: " + splitList[2].toString())
-                Log.d(TAG, "CLIENTS - SPlitStr[3]: " + splitList[3].toString())
-                Log.d(TAG, "CLIENTS - SPlitStr[4]: " + splitList[4].toString())
-                Log.d(TAG, "CLIENTS - SPlitStr[5]: " + splitList[5].toString())
-
 
                 while (x < count ) {
                     var clientMac = splitList[x].split("=")[0]
@@ -227,7 +245,6 @@ class StatusAdapter(
                     x+=2
                     Log.d(TAG, "Clients: ITEM: " + clientMac.toString())
                 }
-                //MyApplication.Companion.ClientMACList.value = clientMACList
             }
             "amazert.heartbeat.time" -> {
                 Log.d(TAG, "RCVD $statusKey  == $statusValue")
