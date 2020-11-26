@@ -53,7 +53,6 @@ class StatusAdapter(
             }
 
             val splitList = MyApplication.Companion.macBannedList.toString().split("'", " ")
-            Log.d(TAG, splitList[1].toString() + "- NXT -" + splitList[3].toString())
         }
     }
 
@@ -202,23 +201,28 @@ class StatusAdapter(
 
         when(statusKey){
             "wifi.clients" -> {
-                Log.d(TAG, statusValue.toString())
                 val splitList = statusValue.toString().split("{", "}")
                 val count = splitList.size - 3
                 var x:Int = 2
                 clientMACList.clear()
 
-                while (x < count ) {
-                    val clientMac = splitList[x].split("'")[1]
-                    val clientVal = "{" + splitList[x+1].toString() + "}"
-                    //Log.d(TAG, "INFO: " + x + " " + clientVal)
-                    val itemType = object : TypeToken<StatusClientInfo>() {}.type
-                    var clientInfo: StatusClientInfo = Gson().fromJson(clientVal, itemType)
+                Log.d(TAG, "CLIENTS: " + statusValue.toString())
+                Log.d(TAG, "CLIENTS - count: " + splitList.size.toString())
+                Log.d(TAG, "CLIENTS - SPlitStr: " + splitList.toString())
+                Log.d(TAG, "CLIENTS - SPlitStr[0]: " + splitList[0].toString())
+                Log.d(TAG, "CLIENTS - SPlitStr[1]: " + splitList[1].toString())
+                Log.d(TAG, "CLIENTS - SPlitStr[2]: " + splitList[2].toString())
+                Log.d(TAG, "CLIENTS - SPlitStr[3]: " + splitList[3].toString())
+                Log.d(TAG, "CLIENTS - SPlitStr[4]: " + splitList[4].toString())
+                Log.d(TAG, "CLIENTS - SPlitStr[5]: " + splitList[5].toString())
 
-                    val client = StatusClientList(clientMac, clientInfo)
-                    //MyApplication.Companion.ClientStatus.add(client)
+
+                while (x < count ) {
+                    val clientMac = splitList[x].split("=")[0]
+
                     clientMACList.add(clientMac)
                     x+=2
+                    Log.d(TAG, "Clients: ITEM: " + clientMac.toString())
                 }
                 //MyApplication.Companion.ClientMACList.value = clientMACList
             }
