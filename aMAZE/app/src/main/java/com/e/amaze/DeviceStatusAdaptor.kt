@@ -126,11 +126,11 @@ class StatusAdapter(
                 ).show()
             } else {
                 banMacValue =
-                    MyApplication.Companion.macBannedList.plus(" " + holder.statusNameView.text.toString())
+                    MyApplication.Companion.macBannedList.plus(" '" + holder.statusNameView.text.toString()) + "'"
                 MyApplication.Companion.macBannedList = banMacValue
             }
         } else {
-            banMacValue = holder.statusNameView.text.toString()
+            banMacValue = "'" + holder.statusNameView.text.toString() + "'"
             MyApplication.Companion.macBannedList = banMacValue
         }
 
