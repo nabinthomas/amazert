@@ -41,6 +41,12 @@ class UpdateSettings : AppCompatActivity() {
         val toolbar: Toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
+        var devName = intent.getStringExtra("DevName")
+
+        var devText = findViewById<TextView>(R.id.textView9)
+
+        devText.text = devName
+
         settingName = intent.getStringExtra("Name")
         displayName = intent.getStringExtra("DisplayName")
         settingValue = intent.getStringExtra("Value")

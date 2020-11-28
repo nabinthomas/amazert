@@ -49,7 +49,7 @@
         android:text="TextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView18"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+        app:layout_constraintTop_toBottomOf="@+id/textView9" />
 
     <TextView
         android:id="@+id/textView16"
@@ -76,12 +76,23 @@
         app:layout_constraintTop_toBottomOf="@+id/textView16" />
 
     <TextView
+        android:id="@+id/textView9"
+        android:layout_width="410dp"
+        android:layout_height="49dp"
+        android:gravity="center_vertical|left"
+        android:text="TextView"
+        android:textSize="16dp"
+        android:background="#1111"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        tools:layout_editor_absoluteX="1dp" />
+
+    <TextView
         android:id="@+id/textView18"
         android:layout_width="135dp"
         android:layout_height="50dp"
         android:gravity="left|center_vertical"
         android:text="Device Status"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+        app:layout_constraintTop_toBottomOf="@+id/textView9" />
 
     <TextView
         android:id="@+id/textView19"

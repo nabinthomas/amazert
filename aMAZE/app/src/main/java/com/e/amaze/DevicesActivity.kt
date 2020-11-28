@@ -118,6 +118,7 @@ class DevicesActivity : AppCompatActivity() {
 
     fun launchDeviceSettingActivity(view: View) {
         val intent = Intent(this, DeviceSettingActivity::class.java)
+        intent.putExtra("Name", devName)
         startActivity(intent)
     }
 
@@ -152,6 +153,7 @@ class DevicesActivity : AppCompatActivity() {
 
     fun launchStatusActivity(view: View) {
         val intent = Intent(this, ConnectedDevicesActivity::class.java)
+        intent.putExtra("Name", devName)
         startActivity(intent)
     }
 

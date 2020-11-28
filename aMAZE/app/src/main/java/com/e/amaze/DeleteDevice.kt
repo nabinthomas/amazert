@@ -8,6 +8,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Button
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.google.firebase.auth.FirebaseAuth
@@ -24,6 +25,12 @@ class DeleteDevice: AppCompatActivity() {
 
         val toolbar: Toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
+
+        var devName = intent.getStringExtra("DevName")
+
+        var devText = findViewById<TextView>(R.id.textView9)
+
+        devText.text = devName
 
         val button: Button = findViewById(R.id.button14)
         button.setOnClickListener { view ->
