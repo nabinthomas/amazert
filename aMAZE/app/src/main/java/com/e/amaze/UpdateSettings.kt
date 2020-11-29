@@ -45,7 +45,8 @@ class UpdateSettings : AppCompatActivity() {
 
         var devText = findViewById<TextView>(R.id.textView9)
 
-        devText.text = devName
+        //devText.text = devName
+        devText.text = MyApplication.Companion.dev_name.removeSuffix(".dev")
 
         settingName = intent.getStringExtra("Name")
         displayName = intent.getStringExtra("DisplayName")

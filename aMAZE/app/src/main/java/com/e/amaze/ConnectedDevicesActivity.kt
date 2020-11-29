@@ -37,7 +37,8 @@ class ConnectedDevicesActivity : AppCompatActivity() {
 
         var devText = findViewById<TextView>(R.id.textView9)
 
-        devText.text = devName
+        //devText.text = devName
+        devText.text = MyApplication.Companion.dev_name.removeSuffix(".dev")
 
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerview_status)
         val adapter = StatusAdapter(this)
