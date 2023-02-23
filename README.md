@@ -123,7 +123,7 @@ A Sample is given below
      "identifier": {
          "uid": "0NWFFJG764T2ucPAhdLDNwQjcgA2",
          "deviceId": "6650ed14-1a7e-11eb-92da-dca6328f80c0",
-         "email": "nabin.thomas@gmail.com"
+         "email": "nabin@gmail.com"
      }
  }
  
